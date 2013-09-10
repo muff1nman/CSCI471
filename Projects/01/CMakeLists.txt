@@ -10,8 +10,6 @@ set( HTTPM_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include )
 # for a vim plugin and not necessary for project
 set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 
-
-
 # Configuration Stuff
 option(DEBUG "Turn debuggin on or off" ON)
 option(LOGGING "Turn loggin on or off" ON)
