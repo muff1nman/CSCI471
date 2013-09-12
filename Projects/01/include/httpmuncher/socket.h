@@ -9,15 +9,17 @@
 #define __socket_h__
 
 
-#include <sys/types.h>
 #include <sys/socket.h>
-#include <errno.h>
-#include <unistd.h>
 #include <netinet/in.h>
-#include <arpa/inet.h>
-
 // For htons and htonl
 #include <arpa/inet.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <errno.h>
+#include <string.h>
+#include <sys/types.h>
+
 
 #include "httpmuncher/socket/consumer.h"
 #include "httpmuncher/config.h"
@@ -25,6 +27,10 @@
 
 #ifdef LOGGING
 #include <glog/logging.h>
+#endif
+
+#ifdef DEBUG
+#include <iostream>
 #endif
 
 
@@ -67,6 +73,9 @@ int create_listening_tcp_port( unsigned short port_number ) {
 #ifdef LOGGING
 		LOG(FATAL) << ERROR_LISTENING_SOCKET << ": " << listening_fd << " [" << strerror(listening_fd) << "]";
 #else
+#ifdef DEBUG
+		std::cout << "Error is: " << listening_fd << " " << strerror(listening_fd) << std::endl;
+#endif
 		perror(ERROR_LISTENING_SOCKET);
 #endif
 		return listening_fd;
@@ -102,11 +111,16 @@ void accept_in_new_threads() {
 	int listen_fd = create_listening_tcp_port( LISTEN_PORT );
 	// we may assume listen_fd has already been checked...
 	if ( listen_fd != SUCCESS ) {
+#ifdef DEBUG
+		std::cout << "listen fd is: "  << listen_fd << std::endl;
+#endif
 		perror("error passed through create_listening_tcp_port...");
 	}
 
 	while(true) {
+#ifdef LOGGING
 		LOG(INFO) << "Waiting on incoming requests";
+#endif
 		connection_fd = accept(listen_fd, NULL ,NULL);
 		if( connection_fd != SUCCESS ) {
 #ifdef LOGGING
