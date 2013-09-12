@@ -22,6 +22,10 @@ configure_file(
 	${HTTPM_INCLUDE_DIR}/httpmuncher/config.h.cmake
 	${CMAKE_CURRENT_BINARY_DIR}/include/httpmuncher/config.h )
 
+# for boost lexical cast 
+find_package(Boost 1.54)
+include_directories(${Boost_INCLUDE_DIR})
+
 # Project includes 
 include_directories( ${HTTPM_INCLUDE_DIR} 
 	${CMAKE_CURRENT_BINARY_DIR}/include )

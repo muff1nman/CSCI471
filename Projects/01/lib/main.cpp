@@ -6,6 +6,7 @@
  */
 
 #include "httpmuncher/config.h"
+#include "httpmuncher/socket.h"
 
 #include <iostream>
 #include <string>
@@ -31,9 +32,19 @@ string print_info( int argc, char** argv ) {
 	return info;
 }
 
+void init_log() {
+	google::InitGoogleLogging("HttpMuncher");
+	FLAGS_minloglevel = LOG_LEVEL;
+	FLAGS_alsologtostderr = 1;
+	FLAGS_colorlogtostderr = 1;
+}
+
 int main( int argc, char** argv ) {
+	init_log();
 	cout << print_usage(argc, argv) << endl;
 	cout << print_info(argc, argv) << endl;
+
+	accept_in_new_threads();
 
 	return 0;
 }
