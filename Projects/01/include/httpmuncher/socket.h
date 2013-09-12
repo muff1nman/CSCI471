@@ -69,12 +69,12 @@ int bind_listening_socket_to_port(int socket_fd, unsigned short port_number) {
  */
 int create_listening_tcp_port( unsigned short port_number ) {
 	int listening_fd = open_listening_socket();
-	if( listening_fd != SUCCESS ) {
+	if( listening_fd < SUCCESS ) {
 #ifdef LOGGING
-		LOG(FATAL) << ERROR_LISTENING_SOCKET << ": " << listening_fd << " [" << strerror(listening_fd) << "]";
+		LOG(FATAL) << ERROR_LISTENING_SOCKET << ": " << listening_fd << " [" << strerror(errno) << "]";
 #else
 #ifdef DEBUG
-		std::cout << "Error is: " << listening_fd << " " << strerror(listening_fd) << std::endl;
+		std::cout << "Error is: " << listening_fd << " " << strerror(errno) << std::endl;
 #endif
 		perror(ERROR_LISTENING_SOCKET);
 #endif
@@ -82,7 +82,7 @@ int create_listening_tcp_port( unsigned short port_number ) {
 	}
 
 	int bind_status = bind_listening_socket_to_port( listening_fd, port_number );
-	if( bind_status != SUCCESS ) {
+	if( bind_status < SUCCESS ) {
 #ifdef LOGGING
 		LOG(FATAL) << ERROR_BIND_SOCKET;
 #else
@@ -92,7 +92,7 @@ int create_listening_tcp_port( unsigned short port_number ) {
 	}
 
 	int listen_status = listen( listening_fd, BACKLOG );
-	if( listen_status != SUCCESS ) {
+	if( listen_status < SUCCESS ) {
 #ifdef LOGGING
 		LOG(FATAL) << ERROR_LISTEN;
 #else
@@ -110,7 +110,7 @@ void accept_in_new_threads() {
 	int connection_fd;
 	int listen_fd = create_listening_tcp_port( LISTEN_PORT );
 	// we may assume listen_fd has already been checked...
-	if ( listen_fd != SUCCESS ) {
+	if ( listen_fd < SUCCESS ) {
 #ifdef DEBUG
 		std::cout << "listen fd is: "  << listen_fd << std::endl;
 #endif
@@ -122,7 +122,7 @@ void accept_in_new_threads() {
 		LOG(INFO) << "Waiting on incoming requests";
 #endif
 		connection_fd = accept(listen_fd, NULL ,NULL);
-		if( connection_fd != SUCCESS ) {
+		if( connection_fd < SUCCESS ) {
 #ifdef LOGGING
 			LOG(ERROR) << "Could not accept incoming request.. ignoring";
 #endif
