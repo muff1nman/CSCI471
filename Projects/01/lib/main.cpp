@@ -6,7 +6,7 @@
  */
 
 #include "httpmuncher/config.h"
-#include "httpmuncher/socket.h"
+#include "httpmuncher/socket/socket.h"
 
 #include <iostream>
 #include <string>

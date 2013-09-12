@@ -20,10 +20,10 @@
 #include <string.h>
 #include <sys/types.h>
 
-
 #include "httpmuncher/socket/consumer.h"
 #include "httpmuncher/config.h"
 #include "httpmuncher/util/messages.h"
+#include "httpmuncher/util/sig_handle.h"
 
 #ifdef LOGGING
 #include <glog/logging.h>
@@ -33,17 +33,12 @@
 #include <iostream>
 #endif
 
+int global_fd = 0;
 
 /**
  * Opens a socket to listen on returning the socket fd
  */
 int open_listening_socket() {
-#ifdef DEBUG
-#ifdef LOGGING
-	LOG(INFO) << "AF_INET is: " << AF_INET;
-	LOG(INFO) << "SOCK_STREAM is: " << SOCK_STREAM;
-#endif
-#endif
 	return socket(AF_INET, SOCK_STREAM, 0);
 }
 
@@ -73,9 +68,6 @@ int create_listening_tcp_port( unsigned short port_number ) {
 #ifdef LOGGING
 		LOG(FATAL) << ERROR_LISTENING_SOCKET << ": " << listening_fd << " [" << strerror(errno) << "]";
 #else
-#ifdef DEBUG
-		std::cout << "Error is: " << listening_fd << " " << strerror(errno) << std::endl;
-#endif
 		perror(ERROR_LISTENING_SOCKET);
 #endif
 		return listening_fd;
@@ -104,18 +96,23 @@ int create_listening_tcp_port( unsigned short port_number ) {
 	return listening_fd;
 }
 
-
+void handle_c( int sig ) {
+	close(global_fd);
+}
 
 void accept_in_new_threads() {
 	int connection_fd;
 	int listen_fd = create_listening_tcp_port( LISTEN_PORT );
 	// we may assume listen_fd has already been checked...
 	if ( listen_fd < SUCCESS ) {
-#ifdef DEBUG
-		std::cout << "listen fd is: "  << listen_fd << std::endl;
-#endif
 		perror("error passed through create_listening_tcp_port...");
 	}
+
+	// save the global handler
+	global_fd = listen_fd;
+
+	// create a sigint handler
+	handle_sigint(handle_c);
 
 	while(true) {
 #ifdef LOGGING
@@ -124,8 +121,9 @@ void accept_in_new_threads() {
 		connection_fd = accept(listen_fd, NULL ,NULL);
 		if( connection_fd < SUCCESS ) {
 #ifdef LOGGING
-			LOG(ERROR) << "Could not accept incoming request.. ignoring";
+			LOG(ERROR) << "Could not accept incoming request.. (quit)";
 #endif
+			break;
 		} else {
 #ifdef LOGGING
 			LOG(INFO) << "Accepted incoming request";
