@@ -129,7 +129,7 @@ void accept_in_new_threads() {
 			LOG(INFO) << "Accepted incoming request";
 #endif
 			EchoConsumer c(connection_fd);
-			c();
+			c.run();
 		}
 	}
 }

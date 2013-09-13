@@ -18,7 +18,7 @@ class Consumer : public Logging {
 
 		Consumer(int socket_fd) : socket_fd(socket_fd) { }
 
-		virtual void operator()() {
+		virtual void run() {
 #ifdef LOGGING
 			LOG(INFO) << "Doing operation with open socket";
 #endif

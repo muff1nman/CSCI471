@@ -17,7 +17,7 @@ class EchoConsumer : public Consumer {
 
 		EchoConsumer(int fd) : Consumer(fd) { }
 
-		virtual void operator()() {
+		virtual void run() {
 			while(true) {
 				int read_status = read(socket_fd, buffer, BUFSIZE - 1);
 
