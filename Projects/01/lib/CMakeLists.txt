@@ -1,9 +1,9 @@
-#set(LINK_LIBRARIES "")
-#if(${LOGGING})
-	#set(LINK_LIBRARIES ${LINK_LIBRARIES} glog)
-#endif(${LOGGING})
+add_subdirectory(socket)
+
+set(LINK_LIBRARIES httpmuncher_socket)
+if(${LOGGING} STREQUAL "ON")
+	set(LINK_LIBRARIES ${LINK_LIBRARIES} glog)
+endif()
 
 add_executable(Main main.cpp)
-if(${LOGGING} STREQUAL "ON")
-	target_link_libraries(Main glog)
-endif()
+target_link_libraries(Main ${LINK_LIBRARIES})

@@ -8,6 +8,10 @@
 #include "httpmuncher/config.h"
 #include "httpmuncher/socket/socket.h"
 
+#ifdef LOGGING
+#include <glog/logging.h>
+#endif
+
 #include <iostream>
 #include <string>
 
@@ -46,7 +50,7 @@ int main( int argc, char** argv ) {
 	cout << print_usage(argc, argv) << endl;
 	cout << print_info(argc, argv) << endl;
 
-	accept_in_new_threads();
+	accept_in_new_threads(LISTEN_PORT);
 
 	return 0;
 }

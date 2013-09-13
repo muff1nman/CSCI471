@@ -9,6 +9,7 @@
 #define __sig_handle_h__
 
 #include "httpmuncher/config.h"
+#include <cstdlib>
 
 #include <signal.h>
 
