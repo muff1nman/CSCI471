@@ -100,6 +100,12 @@ void handle_c( int sig ) {
 	close(global_fd);
 }
 
+// Runs a consumer and deletes it after completion.
+void thread_runner(Consumer* c) {
+	c->run();
+	delete c;
+}
+
 void accept_in_new_threads() {
 	int connection_fd;
 	int listen_fd = create_listening_tcp_port( LISTEN_PORT );
@@ -128,8 +134,7 @@ void accept_in_new_threads() {
 #ifdef LOGGING
 			LOG(INFO) << "Accepted incoming request";
 #endif
-			EchoConsumer c(connection_fd);
-			c.run();
+			thread_runner(new EchoConsumer(connection_fd));
 		}
 	}
 }
