@@ -15,15 +15,26 @@
 class EchoConsumer : public Consumer {
 	public:
 
-		EchoConsumer(int fd) : Consumer(fd) { }
+		EchoConsumer(int fd) : Consumer(fd) {
+#ifdef LOGGING
+			LOG(INFO) << "Echo Consumer created with fd: " << fd;
+#endif
+		}
 
 		virtual void run() {
 			while(true) {
 				int read_status = read(socket_fd, buffer, BUFSIZE - 1);
 
 				if( read_status > 0 ) {
-					puts(buffer);
+#ifdef LOGGING
+					LOG(INFO) << "Content read from connection" << "\nSTART REQUEST\n" << buffer << "\nPOSSIBLE END REQUEST (more content in next buffer?)";
+#endif
+				} else if(read_status == 0 ) {
+					break; // natural end of stream?
 				} else {
+#ifdef LOGGING
+					LOG(ERROR) << "read status: " << read_status;
+#endif
 					break;
 				}
 			}

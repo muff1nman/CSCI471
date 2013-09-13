@@ -8,7 +8,7 @@
 #ifndef __socket_h__
 #define __socket_h__
 
-
+// Netowkring stuff
 #include <sys/socket.h>
 #include <netinet/in.h>
 // For htons and htonl
@@ -19,6 +19,9 @@
 #include <errno.h>
 #include <string.h>
 #include <sys/types.h>
+
+// threading
+#include <boost/thread.hpp>
 
 #include "httpmuncher/socket/echo_consumer.h"
 #include "httpmuncher/config.h"
@@ -97,7 +100,16 @@ int create_listening_tcp_port( unsigned short port_number ) {
 }
 
 void handle_c( int sig ) {
-	close(global_fd);
+	int close_status = close(global_fd);
+	if(close_status < 0 ) {
+#ifdef LOGGING
+		LOG(ERROR) << "Could not close listening socket";
+#endif
+	} else {
+#ifdef LOGGING
+		LOG(INFO) << "Closed listening socket";
+#endif
+	}
 }
 
 // Runs a consumer and deletes it after completion.
@@ -134,7 +146,8 @@ void accept_in_new_threads() {
 #ifdef LOGGING
 			LOG(INFO) << "Accepted incoming request";
 #endif
-			thread_runner(new EchoConsumer(connection_fd));
+			boost::thread t(&thread_runner, new EchoConsumer(connection_fd));
+			t.detach();
 		}
 	}
 }
