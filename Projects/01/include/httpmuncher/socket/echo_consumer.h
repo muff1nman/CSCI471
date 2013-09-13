@@ -30,6 +30,9 @@ class EchoConsumer : public Consumer {
 					LOG(INFO) << "Content read from connection" << "\nSTART REQUEST\n" << buffer << "\nPOSSIBLE END REQUEST (more content in next buffer?)";
 #endif
 				} else if(read_status == 0 ) {
+#ifdef LOGGING
+					LOG(INFO) << "No more bytes";
+#endif
 					break; // natural end of stream?
 				} else {
 #ifdef LOGGING

@@ -112,7 +112,13 @@ void handle_c( int sig ) {
 // Runs a consumer and deletes it after completion.
 void thread_runner(Consumer* c) {
 	c->run();
+#ifdef LOGGING
+	LOG(INFO) << "Thread finalizing";
+#endif
 	delete c;
+#ifdef LOGGING
+	LOG(INFO) << "Thread released";
+#endif
 }
 
 void accept_in_new_threads(unsigned short port) {
