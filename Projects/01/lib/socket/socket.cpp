@@ -8,6 +8,32 @@
 #include "httpmuncher/socket/socket.h"
 #include "httpmuncher/util/messages.h"
 #include "httpmuncher/util/sig_handle.h"
+#include "httpmuncher/socket/consumer.h"
+#include "httpmuncher/socket/echo_consumer.h"
+#include "httpmuncher/config.h"
+
+// Netowkring stuff
+#include <sys/socket.h>
+#include <netinet/in.h>
+// For htons and htonl
+#include <arpa/inet.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <errno.h>
+#include <string.h>
+#include <sys/types.h>
+
+// threading
+#include <boost/thread.hpp>
+
+#ifdef LOGGING
+#include <glog/logging.h>
+#endif
+
+#ifdef DEBUG
+#include <iostream>
+#endif
 
 /**
  * Opens a socket to listen on returning the socket fd
@@ -89,9 +115,9 @@ void thread_runner(Consumer* c) {
 	delete c;
 }
 
-void accept_in_new_threads() {
+void accept_in_new_threads(unsigned short port) {
 	int connection_fd;
-	int listen_fd = create_listening_tcp_port( LISTEN_PORT );
+	int listen_fd = create_listening_tcp_port( port );
 	// we may assume listen_fd has already been checked...
 	if ( listen_fd < SUCCESS ) {
 		perror("error passed through create_listening_tcp_port...");
@@ -105,7 +131,7 @@ void accept_in_new_threads() {
 
 	while(true) {
 #ifdef LOGGING
-		LOG(INFO) << "Waiting for incoming requests on port " << LISTEN_PORT;
+		LOG(INFO) << "Waiting for incoming requests on port " << port;
 #endif
 		connection_fd = accept(listen_fd, NULL ,NULL);
 		if( connection_fd < SUCCESS ) {
