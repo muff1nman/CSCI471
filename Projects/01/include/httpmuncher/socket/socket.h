@@ -20,7 +20,7 @@
 #include <string.h>
 #include <sys/types.h>
 
-#include "httpmuncher/socket/consumer.h"
+#include "httpmuncher/socket/echo_consumer.h"
 #include "httpmuncher/config.h"
 #include "httpmuncher/util/messages.h"
 #include "httpmuncher/util/sig_handle.h"
@@ -116,7 +116,7 @@ void accept_in_new_threads() {
 
 	while(true) {
 #ifdef LOGGING
-		LOG(INFO) << "Waiting on incoming requests";
+		LOG(INFO) << "Waiting for incoming requests on port " << LISTEN_PORT;
 #endif
 		connection_fd = accept(listen_fd, NULL ,NULL);
 		if( connection_fd < SUCCESS ) {
@@ -128,7 +128,7 @@ void accept_in_new_threads() {
 #ifdef LOGGING
 			LOG(INFO) << "Accepted incoming request";
 #endif
-			Consumer c(connection_fd);
+			EchoConsumer c(connection_fd);
 			c();
 		}
 	}
