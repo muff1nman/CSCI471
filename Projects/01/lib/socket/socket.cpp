@@ -10,6 +10,7 @@
 #include "httpmuncher/util/sig_handle.h"
 #include "httpmuncher/socket/consumer.h"
 #include "httpmuncher/socket/echo_consumer.h"
+#include "httpmuncher/socket/status_consumer.h"
 #include "httpmuncher/config.h"
 
 // Netowkring stuff
@@ -149,7 +150,7 @@ void accept_in_new_threads(unsigned short port) {
 #ifdef LOGGING
 			LOG(INFO) << "Accepted incoming request";
 #endif
-			boost::thread t(&thread_runner, new EchoConsumer(connection_fd));
+			boost::thread t(&thread_runner, new StatusConsumer(connection_fd, 404));
 			t.detach();
 		}
 	}
