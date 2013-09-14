@@ -13,7 +13,7 @@ set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 # Configuration Stuff
 option(DEBUG "Turn debuggin on or off" ON)
 option(LOGGING "Turn loggin on or off" ON)
-option(BOOSTV "Change the boost version" 1.54)
+set(BOOSTV "1.54" CACHE STRING "Boost version")
 if(${BOOSTV} STREQUAL "1.31")
        set( OLDBOOST 1 )
 endif()
