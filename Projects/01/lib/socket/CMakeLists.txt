@@ -6,7 +6,7 @@ set(SRCS
 add_library(httpmuncher_socket ${SRCS})
 
 set(Boost_USE_MULTITHREADED ON)
-find_package(Boost 1.54 COMPONENTS regex thread date_time program_options filesystem system REQUIRED)
+find_package(Boost 1.33 COMPONENTS regex thread date_time program_options filesystem system REQUIRED)
 include_directories(${Boost_INCLUDE_DIR})
 
 find_package(Threads REQUIRED)

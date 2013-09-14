@@ -5,17 +5,22 @@
  * All Rights Reserved.
  */
 
-#include <boost/spirit/include/classic.hpp>
+#include <boost/spirit.hpp>
 
 #include "httpmuncher/domain/http_header.h"
+#ifdef DEBUG
+#include <iostream>
+#endif
 
-namespace bsp = boost::spirit::classic;
+namespace bsp = boost::spirit;
 
 HttpHeader::HttpHeader( const std::string& raw_string ) {
 
-	bsp::rule<> header_line = (*( bsp::anychar_p  - bsp::eol_parser()))[bsp::assign_a(this->initial_line)];
+	bool parsed_successfully = bsp::parse( raw_string.c_str(),(*( bsp::anychar_p  - bsp::eol_parser()))[bsp::assign_a(this->initial_line)], bsp::space_p).full;
 
-	bool parsed_successfully = bsp::parse( raw_string.c_str(), header_line, bsp::space_p).full;
+#ifdef DEBUG
+    std::cout << "header: " << this->initial_line << std::endl;
+#endif
 
 #ifdef LOGGING
 	LOG(INFO) << "parsed successfully? " << parsed_successfully;
