@@ -1,5 +1,6 @@
 set(SRCS
 	socket.cpp
+	header_consumer.cpp
 )
 
 add_library(httpmuncher_socket ${SRCS})
