@@ -28,6 +28,9 @@
 
 // threading
 #include <boost/thread.hpp>
+#ifdef OLDBOOST
+#include <boost/bind.hpp>
+#endif
 
 #ifdef LOGGING
 #include <glog/logging.h>
@@ -151,8 +154,12 @@ void accept_in_new_threads(unsigned short port) {
 #ifdef LOGGING
 			LOG(INFO) << "Accepted incoming request";
 #endif
+#ifndef OLDBOOST
 			boost::thread t(&thread_runner, new HeaderConsumer(connection_fd));
 			t.detach();
+#else
+			boost::thread t(boost::bind(&thread_runner, new HeaderConsumer(connection_fd)));
+#endif
 		}
 	}
 }

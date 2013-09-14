@@ -13,6 +13,8 @@
 
 #define LOG_LEVEL @LOG_LEVEL@
 
+#cmakedefine OLDBOOST
+
 // FOR logging stuffs
 #define sep " "
 #define list_sep ", "

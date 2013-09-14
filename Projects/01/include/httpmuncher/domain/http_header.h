@@ -10,10 +10,13 @@
 
 #include <map>
 #include <string>
+#ifndef OLDBOOST
 #include <boost/algorithm/string.hpp>
+#endif
 
 #include "httpmuncher/util/logging.h"
 
+#ifndef OLDBOOST
 // see:
 // stackoverflow.com/questions/1801892/making-mapfind-operation-case-insensitive
 struct ciLessBoost : std::binary_function<std::string, std::string, bool>
@@ -22,6 +25,7 @@ struct ciLessBoost : std::binary_function<std::string, std::string, bool>
 		return boost::lexicographical_compare(s1, s2, boost::is_iless());
 	}
 };
+#endif
 
 class HttpHeader : public Logging {
 
@@ -46,7 +50,12 @@ class HttpHeader : public Logging {
 		virtual std::string stringify_object() const;
 
 	protected:
+#ifndef OLDBOOST
 		std::map<std::string, std::string, ciLessBoost> header_map;
+#else
+		std::map<std::string, std::string> header_map;
+#endif
+
 		std::string initial_line;
 
 };

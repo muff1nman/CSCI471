@@ -4,18 +4,23 @@
  *
  * All Rights Reserved.
  */
-
+#ifndef OLDBOOST
 #include <boost/spirit/include/classic.hpp>
+#else
+#include <boost/spirit.hpp>
+#endif
 
 #include "httpmuncher/domain/http_header.h"
 
+#ifndef OLDBOOST
 namespace bsp = boost::spirit::classic;
+#else
+namespace bsp = boost::spirit;
+#endif
 
 HttpHeader::HttpHeader( const std::string& raw_string ) {
 
-	bsp::rule<> header_line = (*( bsp::anychar_p  - bsp::eol_parser()))[bsp::assign_a(this->initial_line)];
-
-	bool parsed_successfully = bsp::parse( raw_string.c_str(), header_line, bsp::space_p).full;
+	bool parsed_successfully = bsp::parse( raw_string.c_str(),(*( bsp::anychar_p  - bsp::eol_parser()))[bsp::assign_a(this->initial_line)], bsp::space_p).full;
 
 #ifdef LOGGING
 	LOG(INFO) << "parsed successfully? " << parsed_successfully;
