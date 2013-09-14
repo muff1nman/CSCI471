@@ -8,6 +8,8 @@
 #ifndef __http_header_h__
 #define __http_header_h__
 
+#include "httpmuncher/config.h"
+
 #include <map>
 #include <string>
 #ifndef OLDBOOST

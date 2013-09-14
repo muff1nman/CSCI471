@@ -4,6 +4,9 @@
  *
  * All Rights Reserved.
  */
+
+#include "httpmuncher/config.h"
+
 #ifndef OLDBOOST
 #include <boost/spirit/include/classic.hpp>
 #else
@@ -11,6 +14,9 @@
 #endif
 
 #include "httpmuncher/domain/http_header.h"
+#ifdef DEBUG
+#include <iostream>
+#endif
 
 #ifndef OLDBOOST
 namespace bsp = boost::spirit::classic;
@@ -21,10 +27,13 @@ namespace bsp = boost::spirit;
 HttpHeader::HttpHeader( const std::string& raw_string ) {
 
 	bool parsed_successfully = bsp::parse( raw_string.c_str(),(*( bsp::anychar_p  - bsp::eol_parser()))[bsp::assign_a(this->initial_line)], bsp::space_p).full;
-
+#ifdef DEBUG
 #ifdef LOGGING
 	LOG(INFO) << "parsed successfully? " << parsed_successfully;
 	LOG(INFO) << "initial line is: " << this->initial_line;
+#else
+    std::cout << "parsed initial line: [" << this->initial_line << "]"<< std::endl;
+#endif
 #endif
 }
 
