@@ -12,6 +12,8 @@
 #include <string>
 #include <boost/algorithm/string.hpp>
 
+#include "httpmuncher/util/logging.h"
+
 // see:
 // stackoverflow.com/questions/1801892/making-mapfind-operation-case-insensitive
 struct ciLessBoost : std::binary_function<std::string, std::string, bool>
@@ -21,15 +23,17 @@ struct ciLessBoost : std::binary_function<std::string, std::string, bool>
 	}
 };
 
-class HttpHeader {
+class HttpHeader : public Logging {
 
 	public:
 
 		HttpHeader() { }
 
-		HttpHeader( const char* raw_string );
+		HttpHeader( const std::string& raw_string );
 
 		HttpHeader( const HttpHeader& other );
+
+		~HttpHeader();
 
 		void set_initial_line( const char* value );
 
@@ -38,6 +42,8 @@ class HttpHeader {
 		void set( const char* key, const char* value );
 
 		const char* get( const char* key ) const;
+
+		virtual std::string stringify_object() const;
 
 	protected:
 		std::map<std::string, std::string, ciLessBoost> header_map;

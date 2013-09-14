@@ -1,4 +1,5 @@
 add_subdirectory(socket)
+add_subdirectory(domain)
 
 set(LINK_LIBRARIES httpmuncher_socket)
 if(${LOGGING} STREQUAL "ON")

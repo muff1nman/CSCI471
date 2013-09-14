@@ -17,14 +17,13 @@ class HeaderConsumer: public Consumer {
 
 		virtual void run();
 
-		static const char* split_away_raw_header( int fd );
+		static std::string split_away_raw_header( int fd );
 
 	protected:
 		HttpHeader header;
 
 	private:
 		static const int BUFSIZE = 1026;
-		char buffer[BUFSIZE];
 
 };
 
