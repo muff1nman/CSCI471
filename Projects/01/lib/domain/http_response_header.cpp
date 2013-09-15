@@ -6,6 +6,8 @@
  */
 
 #include "httpmuncher/domain/http_response_header.h"
+#include <sstream>
+#include <string>
 
 HttpResponseHeader::HttpResponseHeader( const HttpResponseHeader& other ) : HttpHeader(other) {
 	this->http_version = other.http_version;
@@ -17,9 +19,18 @@ HttpResponseHeader::~HttpResponseHeader() {
 	// noop
 }
 
+
+template <typename T>
+std::string NumberToString ( T Number )
+{
+    std::ostringstream ss;
+    ss << Number;
+    return ss.str();
+}
+
 std::string internal_update_initial_line( unsigned int status, const std::string& version ) {
 	return std::string("HTTP/") + version + std::string(" ") +
-		boost::lexical_cast<std::string>(status) + std::string(" ") +
+		NumberToString(status) + std::string(" ") +
 		HTTP::MESSAGE(status); 
 }
 

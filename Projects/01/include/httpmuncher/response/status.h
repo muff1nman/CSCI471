@@ -28,6 +28,8 @@ namespace HTTP {
 	static const std::map<unsigned int, const char*> generic_response = boost::assign::map_list_of
 		(404, "HTTP/1.0 404 Not Found\r\nContent-Type: text/html; charset=utf-8\r\nContent-Length: 90\r\n\r\n<html><head><title>404 Not Found</title></head><body><h1>404 Not Found</h1></body></html>\r\n");
 
+	static const std::string debug_404_html = "<html><head><title>404 Not Found</title></head><body><h1>404 Not Found</h1></body></html>\r\n";
+
 }
 
 #endif /* !__status_h__ */

@@ -15,12 +15,18 @@
 class HeaderRequestConsumer : public HeaderConsumer {
 	public:
 	 	HeaderRequestConsumer( int fd ) : HeaderConsumer(fd) {
+            request_header = NULL;
 #ifdef LOGGING
 			LOG(INFO) << "Created header request consumer!";
 #endif
 		}
 
 		virtual void run();
+
+		virtual ~HeaderRequestConsumer();
+
+	protected:
+		HttpRequestHeader* request_header;
 
 };
 #endif /* !__header_request_consumer_h__ */
