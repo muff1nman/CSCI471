@@ -14,12 +14,15 @@
 
 namespace HTTP {
 
-	static const unsigned int CONTINUE = 200;
+	static const unsigned int CONTINUE = 100;
+	static const unsigned int OK = 200;
 	static const unsigned int NOT_FOUND = 404;
 
 	static const std::map< const unsigned int, const std::string > _MESSAGE = boost::assign::map_list_of
 		( CONTINUE  , "Continue"  )
-		( NOT_FOUND , "Not Found" );
+		( OK        , "Ok"        )
+		( NOT_FOUND , "Not Found" ) 
+		;
 
 	static const std::string& MESSAGE( unsigned int code ) {
 		return _MESSAGE.at(code);
