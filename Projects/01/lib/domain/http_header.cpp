@@ -24,13 +24,40 @@ namespace bsp = boost::spirit::classic;
 namespace bsp = boost::spirit;
 #endif
 
+struct save_to_map
+{
+	save_to_map(HttpHeader::Map* map,  std::string* first, std::string* second)
+		: map(map), first(first), second(second) {}
+
+	void
+		operator()(const char* not_used, const char* not_used_two) const
+		{
+#ifdef LOGGING
+			LOG(INFO) << "Saving key: " << *first << " with value: " << *second;
+#endif
+			(*map)[*first] = *second;
+		}
+
+	HttpHeader::Map* map;
+	std::string* first;
+	std::string* second;
+
+};
+
 HttpHeader::HttpHeader( const std::string& raw_string ) {
 
-	bool parsed_successfully = bsp::parse( raw_string.c_str(),(*( bsp::anychar_p  - bsp::eol_parser()))[bsp::assign_a(this->initial_line)], bsp::space_p).full;
+	std::string first;
+	std::string second;
+	save_to_map maper(&this->header_map, &first, &second);
+
+	bool parsed_successfully = bsp::parse( raw_string.c_str(),
+			(*( bsp::anychar_p  - bsp::eol_p))[bsp::assign_a(this->initial_line)] >> bsp::eol_p >> 
+			*(((*( bsp::anychar_p - bsp::ch_p(':')))[bsp::assign_a(first)] >> bsp::ch_p(':') >> bsp::space_p >> (*( bsp::anychar_p - bsp::eol_p))[bsp::assign_a(second)])[maper] >> bsp::eol_p)
+			).full;
 #ifdef DEBUG
 #ifdef LOGGING
 	LOG(INFO) << "parsed successfully? " << parsed_successfully;
-	LOG(INFO) << "initial line is: " << this->initial_line;
+	LOG(INFO) << std::string("HttpHeader: ") + this->to_string();
 #else
     std::cout << "parsed initial line: [" << this->initial_line << "]"<< std::endl;
 #endif
@@ -61,7 +88,11 @@ const char* HttpHeader::get( const char* key ) const {
 
 std::string HttpHeader::stringify_object() const {
 	std::string info("");
-	info += "initial line: " + this->initial_line;
+	info += std::string("initial line: [") + this->initial_line + "]";
+	HttpHeader::Map::const_iterator iter = this->header_map.begin();
+	for( ; iter != this->header_map.end(); ++iter ) {
+		info += std::string("Key: [") + iter->first + "] value: [" + iter->second + "]" + list_sep;
+	}
 	return info;
 }
 

@@ -32,6 +32,11 @@ struct ciLessBoost : std::binary_function<std::string, std::string, bool>
 class HttpHeader : public Logging {
 
 	public:
+#ifndef OLDBOOST
+		typedef std::map<std::string, std::string, ciLessBoost> Map;
+#else
+		typedef std::map<std::string, std::string> Map;
+#endif
 
 		HttpHeader() { }
 
@@ -52,11 +57,7 @@ class HttpHeader : public Logging {
 		virtual std::string stringify_object() const;
 
 	protected:
-#ifndef OLDBOOST
-		std::map<std::string, std::string, ciLessBoost> header_map;
-#else
-		std::map<std::string, std::string> header_map;
-#endif
+		Map header_map;
 
 		std::string initial_line;
 
