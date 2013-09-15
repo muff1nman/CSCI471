@@ -48,15 +48,17 @@ HttpHeader::HttpHeader( const std::string& raw_string ) {
 
 	std::string first;
 	std::string second;
+	std::string remaining;
 	save_to_map maper(&this->header_map, &first, &second);
 
 	bool parsed_successfully = bsp::parse( raw_string.c_str(),
 			(*( bsp::anychar_p  - bsp::eol_p))[bsp::assign_a(this->initial_line)] >> bsp::eol_p >> 
-			*(((*( bsp::anychar_p - bsp::ch_p(':')))[bsp::assign_a(first)] >> bsp::ch_p(':') >> bsp::space_p >> (*( bsp::anychar_p - bsp::eol_p))[bsp::assign_a(second)])[maper] >> bsp::eol_p)
+			*(((*( bsp::anychar_p - bsp::ch_p(':')))[bsp::assign_a(first)] >> bsp::ch_p(':') >> bsp::space_p >> (*( bsp::anychar_p - bsp::eol_p))[bsp::assign_a(second)])[maper] >> bsp::eol_p) >> (bsp::eol_p)[bsp::assign_a(remaining)]
 			).full;
 #ifdef DEBUG
 #ifdef LOGGING
 	LOG(INFO) << "parsed successfully? " << parsed_successfully;
+	LOG(INFO) << "remaining characters: " << remaining << " length: " << remaining.size();
 	LOG(INFO) << std::string("HttpHeader: ") + this->to_string();
 #else
     std::cout << "parsed initial line: [" << this->initial_line << "]"<< std::endl;

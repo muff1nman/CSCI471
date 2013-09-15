@@ -63,9 +63,9 @@ int search_for_double_newline( const char* data, size_t size_of_valid_data ) {
 	if( boost::regex_search(data, data+size_of_valid_data, result, double_newlines) ) {
 		int newlines_at = result.position();
 #ifdef LOGGING
-		LOG(INFO) << "Newlines at:" << newlines_at;
+		LOG(INFO) << "Newlines at:" << newlines_at << "size of match: " << result.length() << " text of match: " << result.str();
 #endif
-		return newlines_at;
+		return newlines_at + result.length();
 	} else {
 		return -1;	
 	}
