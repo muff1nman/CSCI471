@@ -15,12 +15,14 @@ class HeaderConsumer: public Consumer {
 	public:
 	 	HeaderConsumer( int fd ) : Consumer(fd) { }
 
+		virtual ~HeaderConsumer();
+
 		virtual void run();
 
 		static std::string split_away_raw_header( int fd );
 
 	protected:
-		HttpHeader header;
+		HttpHeader* header;
 
 	private:
 		static const int BUFSIZE = 1026;

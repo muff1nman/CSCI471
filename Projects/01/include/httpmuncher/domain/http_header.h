@@ -44,17 +44,19 @@ class HttpHeader : public Logging {
 
 		HttpHeader( const HttpHeader& other );
 
-		~HttpHeader();
+		virtual ~HttpHeader();
 
-		void set_initial_line( const char* value );
+		virtual void set_initial_line( const std::string& value );
 
-		const char* get_initial_line() const;
+		virtual std::string get_initial_line() const;
 
-		void set( const char* key, const char* value );
+		virtual void set( const std::string& key, const std::string& value );
 
-		const char* get( const char* key ) const;
+		virtual std::string get( const std::string& key ) const;
 
+#ifdef LOGGING
 		virtual std::string stringify_object() const;
+#endif
 
 	protected:
 		Map header_map;

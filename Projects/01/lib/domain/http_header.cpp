@@ -51,6 +51,8 @@ HttpHeader::HttpHeader( const std::string& raw_string ) {
 	std::string remaining;
 	save_to_map maper(&this->header_map, &first, &second);
 
+	// TODO pass in iterators to c string instead?
+
 	bool parsed_successfully = bsp::parse( raw_string.c_str(),
 			(*( bsp::anychar_p  - bsp::eol_p))[bsp::assign_a(this->initial_line)] >> bsp::eol_p >> 
 			*(((*( bsp::anychar_p - bsp::ch_p(':')))[bsp::assign_a(first)] >> bsp::ch_p(':') >> bsp::space_p >> (*( bsp::anychar_p - bsp::eol_p))[bsp::assign_a(second)])[maper] >> bsp::eol_p) >> (bsp::eol_p)[bsp::assign_a(remaining)]
@@ -66,28 +68,32 @@ HttpHeader::HttpHeader( const std::string& raw_string ) {
 #endif
 }
 
-HttpHeader::HttpHeader( const HttpHeader& other ) { }
+HttpHeader::HttpHeader( const HttpHeader& other ) {
+	this->header_map = other.header_map;
+	this->initial_line = other.initial_line;
+}
 
-void HttpHeader::set_initial_line( const char* value ) {
-
+void HttpHeader::set_initial_line( const std::string& value ) {
+	this->initial_line = std::string(value);
 }
 
 HttpHeader::~HttpHeader() {
-
+	// no op
 }
 
-const char* HttpHeader::get_initial_line() const {
-
+std::string HttpHeader::get_initial_line() const {
+	return this->initial_line;
 }
 
-void HttpHeader::set( const char* key, const char* value ) {
-
+void HttpHeader::set( const std::string& key, const std::string& value ) {
+	this->header_map[key] = value;
 }
 
-const char* HttpHeader::get( const char* key ) const {
-
+std::string HttpHeader::get( const std::string& key ) const {
+	return this->header_map.at(key);
 }
 
+#ifdef LOGGING
 std::string HttpHeader::stringify_object() const {
 	std::string info("");
 	info += std::string("initial line: [") + this->initial_line + "]";
@@ -97,4 +103,5 @@ std::string HttpHeader::stringify_object() const {
 	}
 	return info;
 }
+#endif
 

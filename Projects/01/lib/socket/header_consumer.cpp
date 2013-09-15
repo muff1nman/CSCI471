@@ -10,7 +10,11 @@
 #include <boost/lexical_cast.hpp>
 
 void HeaderConsumer::run() {
-	HttpHeader h(split_away_raw_header( socket_fd ));
+	this->header = new HttpHeader(split_away_raw_header( socket_fd ));
+}
+
+HeaderConsumer::~HeaderConsumer() {
+	delete this->header;
 }
 
 // returns the index of the occurance, otherwise returns -1
