@@ -14,6 +14,7 @@
 #include <fstream>
 #include <boost/filesystem.hpp>
 #include "httpmuncher/util/number.h"
+#include "httpmuncher/util/extension.h"
 
 class HeaderProducer: public HeaderRequestConsumer {
 
@@ -52,7 +53,11 @@ class HeaderProducer: public HeaderRequestConsumer {
 				std::string content = body_contents();
 				h.set_status(HTTP::OK);
 				h.set("Content-Length", NumberToString(content.length()));
-				h.set("Content-Type", "text/text");
+				std::string ext = boost::filesystem::extension(get_path());
+#ifdef LOGGING
+				LOG(INFO) << "Requested ext: " << ext;
+#endif
+				h.set("Content-Type",mime_type( ext ));
 				return h.as_socket_data() + content;
 			} else {
 				h.set("Content-Length", "91");
