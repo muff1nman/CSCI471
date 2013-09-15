@@ -11,6 +11,8 @@
 #include "httpmuncher/socket/consumer.h"
 #include "httpmuncher/socket/echo_consumer.h"
 #include "httpmuncher/socket/status_consumer.h"
+#include "httpmuncher/socket/header_consumer.h"
+#include "httpmuncher/socket/header_request_consumer.h"
 #include "httpmuncher/config.h"
 
 // Netowkring stuff
@@ -27,6 +29,9 @@
 
 // threading
 #include <boost/thread.hpp>
+#ifdef OLDBOOST
+#include <boost/bind.hpp>
+#endif
 
 #ifdef LOGGING
 #include <glog/logging.h>
@@ -150,8 +155,14 @@ void accept_in_new_threads(unsigned short port) {
 #ifdef LOGGING
 			LOG(INFO) << "Accepted incoming request";
 #endif
-			boost::thread t(&thread_runner, new StatusConsumer(connection_fd, 404));
+
+			Consumer* c = new HeaderRequestConsumer(connection_fd);
+#ifndef OLDBOOST
+			boost::thread t(&thread_runner, c);
 			t.detach();
+#else
+			boost::thread t(boost::bind(&thread_runner, c));
+#endif
 		}
 	}
 }

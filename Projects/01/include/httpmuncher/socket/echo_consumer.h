@@ -23,6 +23,9 @@ class EchoConsumer : public Consumer {
 
 		virtual void run() {
 			while(true) {
+#ifdef LOGGING
+				LOG(INFO) << "Reading from socket...";
+#endif
 				int read_status = read(socket_fd, buffer, BUFSIZE - 1);
 
 				if( read_status > 0 ) {
