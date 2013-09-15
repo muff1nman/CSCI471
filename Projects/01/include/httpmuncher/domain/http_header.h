@@ -54,6 +54,8 @@ class HttpHeader : public Logging {
 
 		virtual std::string get( const std::string& key ) const;
 
+		virtual std::string as_socket_data() const;
+
 #ifdef LOGGING
 		virtual std::string stringify_object() const;
 #endif
