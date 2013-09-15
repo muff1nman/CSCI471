@@ -13,51 +13,8 @@ void HeaderConsumer::run() {
 	HttpHeader h(split_away_raw_header( socket_fd ));
 }
 
-bool matches_newline( size_t index, const char* data, size_t size ) {
-	if( index + 1 == size ) {
-		return data[index] == '\n';
-	} else if ( index + 1 < size ) {
-		return data[index] == '\n' || (data[index] == '\r' && data[index + 1] == '\n');
-	} else {
-		return false;
-	}
-}
-
-size_t characters_remaining( size_t index, size_t size ) {
-	return size - index;
-}
-
-// not safe
-bool matches_double_newline_chars( size_t index, const char* data ) {
-	return data[index] == '\n' && data[index+1] == '\n';
-}
-
-bool matches_double_newline( size_t index, const char* data, size_t size ) {
-	size_t left = characters_remaining( index, size );
-	if ( left > 0 && left < 4 ) {
-		// only check for two newlines
-	} else {
-		// check for two newlines or (two carriadge returns and two newlines)
-	}
-}
-
 // returns the index of the occurance, otherwise returns -1
 int search_for_double_newline( const char* data, size_t size_of_valid_data ) {
-/*
- *  for( unsigned int i = 0; i< size_of_valid_data; ++i ) {
- *    if( matches_newline( 
- *#ifdef LOGGING
- *      LOG(INFO) << "Found double newline at: " << i;
- *#endif
- *      return i;
- *    }
- *  }
- *#ifdef LOGGING
- *  LOG(INFO) << "Did not find newline";
- *#endif
- *  return -1;
- */
-
 	boost::match_results<const char*> result;
 	static const boost::regex double_newlines("([\r]?\n){2}");
 	if( boost::regex_search(data, data+size_of_valid_data, result, double_newlines) ) {
@@ -69,7 +26,6 @@ int search_for_double_newline( const char* data, size_t size_of_valid_data ) {
 	} else {
 		return -1;	
 	}
-
 }
 
 void add_to_string( std::string& data, const char* new_data, size_t size_of_new_data ) {
