@@ -29,6 +29,8 @@ class HeaderProducer: public HeaderRequestConsumer {
 
 		virtual std::string body_contents();
 
+		virtual std::string error_contents();
+
 		virtual std::string send_back();
 
 		virtual ~HeaderProducer() { /*noop*/ }

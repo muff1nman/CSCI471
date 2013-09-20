@@ -32,25 +32,30 @@ std::string HeaderProducer::body_contents() {
 			(std::istreambuf_iterator<char>() ));
 }
 
+std::string HeaderProducer::error_contents() {
+	return HTTP::debug_404_html;
+}
+
 std::string HeaderProducer::send_back() {
 	HttpResponseHeader h;
+	std::string content;
+	std::string type;
 
 	if( file_exists() ) {
-		std::string content = body_contents();
-		h.set_status(HTTP::OK);
-		h.set("Content-Length", NumberToString(content.length()));
-		std::string ext = boost::filesystem::extension(get_path());
-#ifdef LOGGING
-		LOG(INFO) << "Requested ext: " << ext;
-#endif
-		h.set("Content-Type",mime_type( ext ));
-		return h.as_socket_data() + content;
+		h.set_status( HTTP::OK );
+		// TODO create a new datatype binding content to type
+		content = body_contents();
+		type  = mime_type(boost::filesystem::extension(get_path()));
 	} else {
-		h.set("Content-Length", "91");
-		h.set("Content-Type", "text/html");
-		return h.as_socket_data() + HTTP::debug_404_html;
+		h.set_status( HTTP::NOT_FOUND );
+		content = error_contents();
+		type = "text/html";
 	}
 
+	h.set("Content-Length", NumberToString(content.length()));
+	h.set("Content-Type", type);
+
+	return h.as_socket_data() + content;
 }
 
 

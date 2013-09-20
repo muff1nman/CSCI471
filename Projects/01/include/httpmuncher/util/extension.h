@@ -13,6 +13,8 @@
 #include <string>
 #include <boost/assign/list_of.hpp>
 
+// TODO wrap all this in a namespace
+
 static const std::map< const std::string, const std::string > EXT_MAP = boost::assign::map_list_of
 (".txt", "text/text")
 (".html", "text/html")
