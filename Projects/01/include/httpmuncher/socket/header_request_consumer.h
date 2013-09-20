@@ -14,11 +14,8 @@
 
 class HeaderRequestConsumer : public HeaderConsumer {
 	public:
-	 	HeaderRequestConsumer( int fd ) : HeaderConsumer(fd) {
-            request_header = NULL;
-#ifdef LOGGING
-			LOG(INFO) << "Created header request consumer!";
-#endif
+		HeaderRequestConsumer( int fd ) : HeaderConsumer(fd) {
+			request_header = NULL;
 		}
 
 		virtual void run();

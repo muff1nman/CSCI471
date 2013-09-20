@@ -8,9 +8,6 @@
 #include "httpmuncher/socket/header_request_consumer.h"
 
 void HeaderRequestConsumer::run() {
-#ifdef LOGGING
-	LOG(INFO) << "How about here?";
-#endif
 	this->request_header = new HttpRequestHeader(split_away_raw_header( socket_fd ));
 #ifdef LOGGING
 	LOG(INFO) << "request header is: " << this->request_header->to_string();
