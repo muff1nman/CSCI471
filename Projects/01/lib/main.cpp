@@ -6,6 +6,12 @@
  */
 
 #include "httpmuncher/config.h"
+#include "httpmuncher/socket/socket.h"
+#include "httpmuncher/util/number.h"
+
+#ifdef LOGGING
+#include <glog/logging.h>
+#endif
 
 #include <iostream>
 #include <string>
@@ -21,6 +27,7 @@ string print_usage( int argc, char** argv ) {
 
 string print_info( int argc, char** argv ) {
 	string info = std::string("info:\n");
+    info += "PORT " + NumberToString(LISTEN_PORT) + string("\n");
 #ifdef DEBUG
 	info += "DEBUG ON\n";
 #endif
@@ -31,9 +38,21 @@ string print_info( int argc, char** argv ) {
 	return info;
 }
 
+void init_log() {
+#ifdef LOGGING
+	google::InitGoogleLogging("HttpMuncher");
+	FLAGS_minloglevel = LOG_LEVEL;
+	FLAGS_alsologtostderr = 1;
+	FLAGS_colorlogtostderr = 1;
+#endif
+}
+
 int main( int argc, char** argv ) {
+	init_log();
 	cout << print_usage(argc, argv) << endl;
 	cout << print_info(argc, argv) << endl;
+
+	accept_in_new_threads(LISTEN_PORT);
 
 	return 0;
 }
