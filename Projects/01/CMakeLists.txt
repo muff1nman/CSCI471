@@ -12,7 +12,7 @@ set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 
 # Configuration Stuff
 option(DEBUG "Turn debuggin on or off" ON)
-option(LOGGING "Turn loggin on or off" ON)
+option(LOGGING "Turn loggin on or off" OFF)
 set( LOG_LEVEL 1 )
 if(DEBUG)
 	set( LOG_LEVEL 0 )
