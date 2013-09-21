@@ -7,6 +7,7 @@
 
 #include "httpmuncher/config.h"
 #include "httpmuncher/socket/socket.h"
+#include "httpmuncher/util/number.h"
 
 #ifdef LOGGING
 #include <glog/logging.h>
@@ -26,6 +27,7 @@ string print_usage( int argc, char** argv ) {
 
 string print_info( int argc, char** argv ) {
 	string info = std::string("info:\n");
+    info += "PORT " + NumberToString(LISTEN_PORT) + string("\n");
 #ifdef DEBUG
 	info += "DEBUG ON\n";
 #endif
