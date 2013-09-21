@@ -13,7 +13,7 @@
 
 class HeaderConsumer: public Consumer {
 	public:
-	 	HeaderConsumer( int fd ) : Consumer(fd) { }
+	 	HeaderConsumer( int fd ) : Consumer(fd) { header = NULL; }
 
 		virtual ~HeaderConsumer();
 

@@ -14,7 +14,10 @@ void HeaderConsumer::run() {
 }
 
 HeaderConsumer::~HeaderConsumer() {
-	delete this->header;
+	if( this->header != NULL ) {
+		delete this->header;
+		this->header = NULL;
+	}
 }
 
 // returns the index of the occurance, otherwise returns -1

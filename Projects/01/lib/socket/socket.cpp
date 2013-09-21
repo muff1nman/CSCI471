@@ -13,6 +13,7 @@
 #include "httpmuncher/socket/status_consumer.h"
 #include "httpmuncher/socket/header_consumer.h"
 #include "httpmuncher/socket/header_request_consumer.h"
+#include "httpmuncher/socket/header_producer.h"
 #include "httpmuncher/config.h"
 
 // Netowkring stuff
@@ -156,7 +157,7 @@ void accept_in_new_threads(unsigned short port) {
 			LOG(INFO) << "Accepted incoming request";
 #endif
 
-			Consumer* c = new HeaderRequestConsumer(connection_fd);
+			Consumer* c = new HeaderProducer(connection_fd);
 #ifndef OLDBOOST
 			boost::thread t(&thread_runner, c);
 			t.detach();

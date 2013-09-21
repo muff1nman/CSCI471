@@ -1,6 +1,7 @@
 set(SRCS
 	socket.cpp
 	header_consumer.cpp
+	header_producer.cpp
 	header_request_consumer.cpp
 )
 

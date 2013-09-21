@@ -8,14 +8,17 @@
 #include "httpmuncher/socket/header_request_consumer.h"
 
 void HeaderRequestConsumer::run() {
+	this->request_header = new HttpRequestHeader(split_away_raw_header( socket_fd ));
 #ifdef LOGGING
-	LOG(INFO) << "How about here?";
-#endif
-	this->header = new HttpRequestHeader(split_away_raw_header( socket_fd ));
-#ifdef LOGGING
-	LOG(INFO) << "request header is: " << this->header->to_string();
+	LOG(INFO) << "request header is: " << this->request_header->to_string();
 #endif
 }
 
+HeaderRequestConsumer::~HeaderRequestConsumer(){ 
+	if( this->request_header != NULL ) {
+		delete this->request_header;
+		this->request_header = NULL;
+	}
+}
 
 

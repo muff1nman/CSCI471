@@ -68,6 +68,17 @@ HttpHeader::HttpHeader( const std::string& raw_string ) {
 #endif
 }
 
+std::string HttpHeader::as_socket_data() const {
+	std::string header = this->initial_line + "\n";
+	HttpHeader::Map::const_iterator iter = this->header_map.begin();
+	for( ; iter != this->header_map.end(); ++iter ) {
+		header += iter->first + ": " + iter->second + "\n";
+	}
+	header += "\n";
+
+	return header;
+}
+
 HttpHeader::HttpHeader( const HttpHeader& other ) {
 	this->header_map = other.header_map;
 	this->initial_line = other.initial_line;
@@ -95,13 +106,7 @@ std::string HttpHeader::get( const std::string& key ) const {
 
 #ifdef LOGGING
 std::string HttpHeader::stringify_object() const {
-	std::string info("");
-	info += std::string("initial line: [") + this->initial_line + "]";
-	HttpHeader::Map::const_iterator iter = this->header_map.begin();
-	for( ; iter != this->header_map.end(); ++iter ) {
-		info += std::string("Key: [") + iter->first + "] value: [" + iter->second + "]" + list_sep;
-	}
-	return info;
+	return this->as_socket_data();
 }
 #endif
 

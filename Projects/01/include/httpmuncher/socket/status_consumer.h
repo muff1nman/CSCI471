@@ -9,7 +9,7 @@
 #define __status_consumer_h__
 
 #include "httpmuncher/socket/consumer.h"
-#include "httpmuncher/response/generic.h"
+#include "httpmuncher/response/status.h"
 
 #include <cstring>
 
@@ -27,7 +27,7 @@ class StatusConsumer: public Consumer {
 		}
 
 		static const char* response( unsigned int status ) {
-			return generic_response[status];
+			return HTTP::generic_response.at(status);
 		}
 
 	protected:
