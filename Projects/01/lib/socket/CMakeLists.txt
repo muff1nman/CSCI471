@@ -9,8 +9,7 @@ add_library(httpmuncher_socket ${SRCS})
 
 set(Boost_USE_MULTITHREADED ON)
 include_directories(${Boost_INCLUDE_DIR})
-set(BOOSTV "1.33.1" CACHE STRING "Boost version")
-find_package(Boost ${BOOSTV} EXACT COMPONENTS regex thread date_time program_options filesystem system REQUIRED)
+find_package(Boost 1.54 COMPONENTS regex thread date_time program_options filesystem system REQUIRED)
 
 find_package(Threads REQUIRED)
 
