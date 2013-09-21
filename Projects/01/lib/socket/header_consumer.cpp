@@ -25,11 +25,7 @@ int search_for_double_newline( const char* data, size_t size_of_valid_data ) {
 	boost::match_results<const char*> result;
 	static const boost::regex double_newlines("([\r]?\n){2}");
 	if( boost::regex_search(data, data+size_of_valid_data, result, double_newlines) ) {
-		int newlines_at = result.position();
-#ifdef LOGGING
-		LOG(INFO) << "Newlines at:" << newlines_at << "size of match: " << result.length() << " text of match: " << result.str();
-#endif
-		return newlines_at + result.length();
+		return result.position() + result.length();
 	} else {
 		return -1;	
 	}
@@ -52,22 +48,14 @@ std::string HeaderConsumer::split_away_raw_header( int fd ) {
 		if( read_status > 0 ) {
 #ifdef LOGGING
 			LOG(INFO) << "Read " << read_status << " bytes";
-			for( size_t  i = 100; i < read_status; ++i ) {
-				LOG(INFO) << "byte: " << buffer[i];
-			}
 #endif
 			int index_of_newline = search_for_double_newline( buffer, read_status );
-#ifdef LOGGING
-			LOG(INFO) << "newline at: " << index_of_newline;
-			LOG(INFO) << "character before: " << buffer[index_of_newline - 1];
-#endif
 
 			if (index_of_newline > 0 ) { // if there is a newline
 				add_to_string( header, buffer, index_of_newline );
 				// TODO push back fd?
 #ifdef LOGGING
 				LOG(INFO) << header;
-				LOG(INFO) << "Found newline";
 #endif
 				break;
 			} else { // no new line
