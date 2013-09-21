@@ -6,6 +6,22 @@
  */
 
 #include "httpmuncher/socket/header_producer.h"
+#include "httpmuncher/util/number.h"
+#include "httpmuncher/util/extension.h"
+#include "httpmuncher/response/status.h"
+#include "httpmuncher/domain/http_response_header.h"
+#include <fstream>
+#ifndef OLDBOOST
+#include <boost/filesystem.hpp>
+#else
+#include <boost/filesystem/operations.hpp>
+#include <boost/filesystem/convenience.hpp>
+#include <boost/filesystem/path.hpp>
+#endif
+
+#ifdef DEBUG
+#include <iostream>
+#endif
 
 void HeaderProducer::run() {
 	HeaderRequestConsumer::run();
@@ -21,6 +37,9 @@ bool HeaderProducer::file_exists() {
 	std::string path = get_path();
 #ifdef LOGGING
 	LOG(INFO) << "Requesting path: " << path;
+#endif
+#ifdef DEBUG
+    std::cout << "Requesting path: " << path << std::endl;
 #endif
 	return boost::filesystem::exists( path.c_str() );
 }
@@ -42,11 +61,17 @@ std::string HeaderProducer::send_back() {
 	std::string type;
 
 	if( file_exists() ) {
+#ifdef DEBUG
+        std::cout << "Returning valid file" << std::endl;
+#endif
 		h.set_status( HTTP::OK );
 		// TODO create a new datatype binding content to type
 		content = body_contents();
 		type  = mime_type(boost::filesystem::extension(get_path()));
 	} else {
+#ifdef DEBUG
+        std::cout << "No file found" << std::endl;
+#endif
 		h.set_status( HTTP::NOT_FOUND );
 		content = error_contents();
 		type = "text/html";
@@ -54,6 +79,10 @@ std::string HeaderProducer::send_back() {
 
 	h.set("Content-Length", NumberToString(content.length()));
 	h.set("Content-Type", type);
+
+#ifdef DEBUG
+
+#endif
 
 	return h.as_socket_data() + content;
 }

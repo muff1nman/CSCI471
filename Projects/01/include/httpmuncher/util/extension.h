@@ -15,15 +15,24 @@
 
 // TODO wrap all this in a namespace
 
-static const std::map< const std::string, const std::string > EXT_MAP = boost::assign::map_list_of
+typedef std::map< const std::string, const std::string > MimeMap;
+
+static const MimeMap EXT = boost::assign::map_list_of
 (".txt", "text/text")
 (".html", "text/html")
 (".jpg", "image/jpeg")
 ;
 
-// TODO do something meaningful if we dont find an ext
+static const std::string NO_VALUE("UNKNOWN");
+static const std::string DEFAULT("text/text");
+
 static const std::string& mime_type( const std::string& ext ) {
-	return EXT_MAP.at(ext);
+    MimeMap::const_iterator found = EXT.find(ext);
+    if( found != EXT.end() ) {
+        return found->second;
+    } else {
+        return DEFAULT;
+    }
 }
 
 #endif /* !__extension_h__ */

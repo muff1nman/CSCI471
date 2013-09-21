@@ -8,13 +8,8 @@
 #ifndef __header_producer_h__
 #define __header_producer_h__
 
-#include "httpmuncher/response/status.h"
 #include "httpmuncher/socket/header_request_consumer.h"
-#include "httpmuncher/domain/http_response_header.h"
-#include <fstream>
-#include <boost/filesystem.hpp>
-#include "httpmuncher/util/number.h"
-#include "httpmuncher/util/extension.h"
+#include "httpmuncher/config.h"
 
 class HeaderProducer: public HeaderRequestConsumer {
 
