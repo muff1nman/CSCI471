@@ -1,3 +1,14 @@
+Andrew DeMaria
+
+Grader
+--------
+If you really don't want to use any of the cmake commands as the rest of this document
+outlines, you can use the Makefile provided and just run
+
+```
+make
+```
+
 To Build
 -------
 ```
