@@ -31,7 +31,15 @@ std::string HeaderProducer::get_path() {
 
 bool HeaderProducer::file_exists() {
 	std::string path = get_path();
-	return boost::filesystem::exists( path.c_str() );
+	bool exists = boost::filesystem::exists( path.c_str() ) && boost::filesystem::is_regular_file( path.c_str() );
+#ifdef LOGGING
+	if( exists ) {
+		LOG(INFO) << "File: " << path << " exists";
+	} else {
+		LOG(INFO) << "File: " << path << " does not exist";
+	}
+#endif
+	return exists;
 }
 
 std::string HeaderProducer::body_contents() {
