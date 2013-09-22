@@ -20,8 +20,8 @@
 using namespace std;
 
 string print_usage( int argc, char** argv ) {
-	string usage = std::string(argv[0]) + " usage";
-	usage += "\n";
+	string usage = std::string("HTTPMuncher usage:\n");
+	usage += "Run from a directory to serve files at that directory or in any subdirectories. Control-C to quit.";
 	return usage;
 }
 
