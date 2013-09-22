@@ -62,8 +62,6 @@ HttpHeader::HttpHeader( const std::string& raw_string ) {
 	LOG(INFO) << "parsed successfully? " << parsed_successfully;
 	LOG(INFO) << "remaining characters: " << remaining << " length: " << remaining.size();
 	LOG(INFO) << std::string("HttpHeader: ") + this->to_string();
-#else
-    std::cout << "parsed initial line: [" << this->initial_line << "]"<< std::endl;
 #endif
 #endif
 }
