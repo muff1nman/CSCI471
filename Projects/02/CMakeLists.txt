@@ -13,6 +13,8 @@ set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 # Configuration Stuff
 option(DEBUG "Turn debuggin on or off" ON)
 option(LOGGING "Turn loggin on or off" OFF)
+option(TEST "Turn testing on or off" ON)
+
 set( LOG_LEVEL 1 )
 if(DEBUG)
 	set( LOG_LEVEL 0 )
@@ -40,3 +42,9 @@ include_directories( ${PROJECT_INCLUDE_DIR}
 
 # Go do work CMake!
 add_subdirectory( lib )
+
+# if testing do some tests!
+if( ${TEST} STREQUAL "ON" )
+	enable_testing()
+	add_subdirectory( test )
+endif()
