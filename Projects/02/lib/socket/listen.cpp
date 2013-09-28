@@ -6,11 +6,11 @@
  */
 
 #include "dnsmuncher/socket/listen.h"
-#include "dnsmuncher/util/messages.h"
 #include "dnsmuncher/util/sig_handle.h"
 #include "dnsmuncher/socket/consumer.h"
 //#include "dnsmuncher/socket/echo_consumer.h"
 #include "dnsmuncher/config.h"
+#include "messages.h"
 #include "socket_config.h"
 
 // Netowkring stuff
@@ -27,9 +27,7 @@
 
 // threading
 #include <boost/thread.hpp>
-#ifdef OLDBOOST
 #include <boost/bind.hpp>
-#endif
 
 #ifdef LOGGING
 #include <glog/logging.h>
@@ -70,9 +68,9 @@ int create_listening_tcp_port( unsigned short port_number ) {
 	int listening_fd = open_listening_socket();
 	if( listening_fd < SUCCESS ) {
 #ifdef LOGGING
-		LOG(FATAL) << ERROR_LISTENING_SOCKET << ": " << listening_fd << " [" << strerror(errno) << "]";
+		LOG(FATAL) << ERROR_CREATE_SOCKET << ": " << listening_fd << " [" << strerror(errno) << "]";
 #else
-		perror(ERROR_LISTENING_SOCKET);
+		perror(ERROR_CREATE_SOCKET);
 #endif
 		return listening_fd;
 	}

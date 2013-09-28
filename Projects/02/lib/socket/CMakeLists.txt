@@ -1,6 +1,7 @@
 set(SRCS
 	listen.cpp
 	consumer.cpp
+	connect.cpp
 )
 
 add_library(muncher_socket ${SRCS})

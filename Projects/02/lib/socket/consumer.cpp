@@ -7,6 +7,11 @@
 
 #include "dnsmuncher/socket/consumer.h"
 #include "socket_config.h"
+#include "dnsmuncher/config.h"
+
+#ifdef DEBUG
+#include <iostream>
+#endif
 
 #include <unistd.h>
 

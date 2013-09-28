@@ -6,12 +6,16 @@
  */
 
 #include "dnsmuncher/config.h"
-#include "dnsmuncher/socket/listen.h"
+#include "dnsmuncher/socket/connect.h"
 #include "dnsmuncher/socket/consumer.h"
 
 #include <iostream>
 #include <string>
 #include <boost/optional.hpp>
+
+#ifdef LOGGING
+#include <glog/logging.h>
+#endif
 
 using namespace std;
 
@@ -66,7 +70,17 @@ string print_info( int argc, char** argv ) {
 	return info;
 }
 
+void init_log() {
+#ifdef LOGGING
+	google::InitGoogleLogging("DNSMuncher");
+	FLAGS_minloglevel = LOG_LEVEL;
+	FLAGS_alsologtostderr = 1;
+	FLAGS_colorlogtostderr = 1;
+#endif
+}
+
 int main( int argc, char** argv ) {
+	init_log();
 	cout << print_usage(argc, argv) << endl;
 	cout << print_info(argc, argv) << endl;
 	boost::optional<string> host, ip;
@@ -84,7 +98,8 @@ int main( int argc, char** argv ) {
 	cout << "Server ip: " << *ip << endl;
 #endif
 
-	accept_in_new_threads( LISTEN_PORT, &thread_runner );
+	LOG(INFO) << "Connecting in new thread";
+	connect_in_new_thread( "8.8.8.8", 52, &thread_runner );
 
 	return 0;
 }
