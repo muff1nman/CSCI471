@@ -16,6 +16,11 @@
 #include <glog/logging.h>
 #endif
 
+#define sep " "
+#define list_sep ", "
+#define nested_start "[ "
+#define nested_finish  "]"
+
 class Logging {
 
 #ifdef LOGGING
