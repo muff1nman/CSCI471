@@ -7,12 +7,27 @@
 
 #include "dnsmuncher/config.h"
 #include "dnsmuncher/socket/listen.h"
+#include "dnsmuncher/socket/consumer.h"
 
 #include <iostream>
 #include <string>
 #include <boost/optional.hpp>
 
 using namespace std;
+
+// Runs a consumer and deletes it after completion.
+void thread_runner(int fd) {
+	Consumer* c = new Consumer(fd);
+	c->run();
+#ifdef LOGGING
+	LOG(INFO) << "Thread finalizing";
+#endif
+	delete c;
+#ifdef LOGGING
+	LOG(INFO) << "Thread released";
+#endif
+}
+
 
 string print_usage( int argc, char** argv ) {
 	string use = 
@@ -69,7 +84,7 @@ int main( int argc, char** argv ) {
 	cout << "Server ip: " << *ip << endl;
 #endif
 
-	accept_in_new_threads( LISTEN_PORT );
+	accept_in_new_threads( LISTEN_PORT, &thread_runner );
 
 	return 0;
 }

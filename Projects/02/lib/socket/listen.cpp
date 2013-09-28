@@ -113,19 +113,7 @@ void handle_c( int sig ) {
 	}
 }
 
-// Runs a consumer and deletes it after completion.
-void thread_runner(Consumer* c) {
-	c->run();
-#ifdef LOGGING
-	LOG(INFO) << "Thread finalizing";
-#endif
-	delete c;
-#ifdef LOGGING
-	LOG(INFO) << "Thread released";
-#endif
-}
-
-void accept_in_new_threads(unsigned short port) {
+void accept_in_new_threads(unsigned short port, boost::function<void(int)> func) {
 	int connection_fd;
 	int listen_fd = create_listening_tcp_port( port );
 	// we may assume listen_fd has already been checked...
@@ -154,13 +142,7 @@ void accept_in_new_threads(unsigned short port) {
 			LOG(INFO) << "Accepted incoming request";
 #endif
 
-			Consumer* c = new Consumer(connection_fd);
-#ifndef OLDBOOST
-			boost::thread t(&thread_runner, c);
-			t.detach();
-#else
-			boost::thread t(boost::bind(&thread_runner, c));
-#endif
+			boost::thread t(boost::bind(func, connection_fd));
 		}
 	}
 }
