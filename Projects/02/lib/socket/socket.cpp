@@ -9,8 +9,9 @@
 #include "dnsmuncher/util/messages.h"
 #include "dnsmuncher/util/sig_handle.h"
 #include "dnsmuncher/socket/consumer.h"
-#include "dnsmuncher/socket/echo_consumer.h"
+//#include "dnsmuncher/socket/echo_consumer.h"
 #include "dnsmuncher/config.h"
+#include "socket_config.h"
 
 // Netowkring stuff
 #include <sys/socket.h>
@@ -153,7 +154,7 @@ void accept_in_new_threads(unsigned short port) {
 			LOG(INFO) << "Accepted incoming request";
 #endif
 
-			Consumer* c = new HeaderProducer(connection_fd);
+			Consumer* c = new Consumer(connection_fd);
 #ifndef OLDBOOST
 			boost::thread t(&thread_runner, c);
 			t.detach();

@@ -1,5 +1,6 @@
 set(SRCS
 	socket.cpp
+	consumer.cpp
 )
 
 add_library(dnsmuncher_socket ${SRCS})

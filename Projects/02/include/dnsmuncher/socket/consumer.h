@@ -10,34 +10,17 @@
 
 #include "dnsmuncher/util/logging.h"
 
-#include <unistd.h>
-
 class Consumer : public Logging {
 
 	public:
 
 		Consumer(int socket_fd) : socket_fd(socket_fd) { }
 
-		virtual void run() {
-#ifdef LOGGING
-			LOG(INFO) << "Doing operation with open socket";
-#endif
-		}
+		virtual void run();
 
-		virtual ~Consumer() {
-			close_socket();
-		}
+		virtual ~Consumer();
 
-		virtual void close_socket() {
-			int close_status = close(socket_fd);
-			if( close_status != SUCCESS ) {
-#ifdef LOGGING
-				// TODO put error code here
-				LOG(ERROR) << "Could not close socket: ";
-				// TODO do something better?
-#endif
-			}
-		}
+		virtual void close_socket();
 
 	protected:
 		int socket_fd;
