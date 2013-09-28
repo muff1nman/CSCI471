@@ -6,7 +6,7 @@
  */
 
 #include "dnsmuncher/config.h"
-#include "dnsmuncher/socket/socket.h"
+#include "dnsmuncher/socket/listen.h"
 
 #include <iostream>
 #include <string>

@@ -1,11 +1,11 @@
 /*
- * socket.cpp
+ * listen.cpp
  * Copyright (C) 2013 Andrew DeMaria (muff1nman) <ademaria@mines.edu>
  *
  * All Rights Reserved.
  */
 
-#include "dnsmuncher/socket/socket.h"
+#include "dnsmuncher/socket/listen.h"
 #include "dnsmuncher/util/messages.h"
 #include "dnsmuncher/util/sig_handle.h"
 #include "dnsmuncher/socket/consumer.h"
