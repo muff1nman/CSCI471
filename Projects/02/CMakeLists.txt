@@ -16,6 +16,9 @@ option(LOGGING "Turn loggin on or off" OFF)
 set( LOG_LEVEL 1 )
 if(DEBUG)
 	set( LOG_LEVEL 0 )
+	set( CMAKE_BUILD_TYPE debug)
+else()
+	set( CMAKE_BUILD_TYPE release)
 endif(DEBUG)
 
 # for boost lexical cast 
@@ -27,7 +30,6 @@ if( Boost_MINOR_VERSION LESS "54" )
 	message(STATUS "Setting to old boost")
 	set( OLDBOOST 1 )
 endif()
-include_directories(${Boost_INCLUDE_DIR})
 
 #ensure this is after we find the boost version
 configure_file( 

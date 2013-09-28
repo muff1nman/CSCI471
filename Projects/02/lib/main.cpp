@@ -21,6 +21,7 @@ using namespace std;
 
 // Runs a consumer and deletes it after completion.
 void thread_runner(int fd) {
+
 	Consumer* c = new Consumer(fd);
 	c->run();
 #ifdef LOGGING
@@ -99,7 +100,9 @@ int main( int argc, char** argv ) {
 #endif
 
 	LOG(INFO) << "Connecting in new thread";
-	connect_in_new_thread( "8.8.8.8", 52, &thread_runner );
+	connect_in_new_thread( "8.8.8.8", 53, &thread_runner );
+
+	sleep(12312);
 
 	return 0;
 }
