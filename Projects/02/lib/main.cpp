@@ -6,6 +6,7 @@
  */
 
 #include "dnsmuncher/config.h"
+#include "dnsmuncher/socket/listen.h"
 
 #include <iostream>
 #include <string>
@@ -64,9 +65,11 @@ int main( int argc, char** argv ) {
 	} 
 
 #ifdef DEBUG
-	cout << "Host: " << host << endl;
-	cout << "Server ip: " << ip << endl;
+	cout << "Host: " << *host << endl;
+	cout << "Server ip: " << *ip << endl;
 #endif
+
+	accept_in_new_threads( LISTEN_PORT );
 
 	return 0;
 }

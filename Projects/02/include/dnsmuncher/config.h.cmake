@@ -11,4 +11,6 @@
 #define HOST_POSITION 1
 #define SERVER_POSITION 2
 
+#define LISTEN_PORT 16318
+
 #endif /* !__config_h__ */
