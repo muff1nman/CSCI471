@@ -8,4 +8,7 @@
 
 #cmakedefine OLDBOOST
 
+#define HOST_POSITION 1
+#define SERVER_POSITION 2
+
 #endif /* !__config_h__ */
