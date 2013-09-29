@@ -11,6 +11,9 @@
 #include "name.h"
 #include "qtype.h"
 #include "net_class.h"
+#include "dnsmuncher/domain/byte.h"
+
+#include <vector>
 
 class ResourceRecord {
 
@@ -22,7 +25,7 @@ class ResourceRecord {
 		NetClass aclass;
 		unsigned int ttl;
 		unsigned int rdlength;
-		void* rdata;
+		Bytes rdata;
 };
 
 #endif /* !__resource_record_h__ */

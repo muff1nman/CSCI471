@@ -12,13 +12,14 @@
 #include <vector>
 #include "resource_record.h"
 #include "question.h"
+#include "bytes.h"
 
 class DNS {
-	public:
-		DNS( void* data, size_t length );
-
-		void* generate() const;
+	// TODO
+	//public:
+		//DNS( );
 	private:
+		// TODO maybe hide the implementation of bitset?
 		std::bitset<16> id, qd_count, an_count, ns_count, ar_count;
 		bool qr, aa, tc, rd, ra;
 		std::bitset<4> opcode;
