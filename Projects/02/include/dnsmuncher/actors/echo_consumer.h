@@ -8,7 +8,7 @@
 #ifndef __echo_consumer_h__
 #define __echo_consumer_h__
 
-#include "dnsmuncher/socket/consumer.h"
+#include "consumer.h"
 
 #include <stdio.h>
 

@@ -7,7 +7,7 @@
 
 #include "dnsmuncher/config.h"
 #include "dnsmuncher/socket/connect.h"
-#include "dnsmuncher/socket/consumer.h"
+#include "dnsmuncher/actors/consumer.h"
 
 #include <iostream>
 #include <string>
@@ -99,7 +99,9 @@ int main( int argc, char** argv ) {
 	cout << "Server ip: " << *ip << endl;
 #endif
 
+#ifdef LOGGING
 	LOG(INFO) << "Connecting in new thread";
+#endif
 	connect_in_new_thread( "8.8.8.8", 53, &thread_runner );
 
 	sleep(12312);

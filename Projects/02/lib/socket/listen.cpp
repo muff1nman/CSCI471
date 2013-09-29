@@ -7,8 +7,6 @@
 
 #include "dnsmuncher/socket/listen.h"
 #include "dnsmuncher/util/sig_handle.h"
-#include "dnsmuncher/socket/consumer.h"
-//#include "dnsmuncher/socket/echo_consumer.h"
 #include "dnsmuncher/config.h"
 #include "messages.h"
 #include "socket_config.h"

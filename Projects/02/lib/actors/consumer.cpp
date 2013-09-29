@@ -5,8 +5,7 @@
  * All Rights Reserved.
  */
 
-#include "dnsmuncher/socket/consumer.h"
-#include "socket_config.h"
+#include "dnsmuncher/actors/consumer.h"
 #include "dnsmuncher/config.h"
 
 #ifdef DEBUG
@@ -28,7 +27,7 @@ Consumer::~Consumer() {
 
 void Consumer::close_socket() {
 	int close_status = close(socket_fd);
-	if( close_status != SUCCESS ) {
+	if( close_status < 0 ) {
 #ifdef LOGGING
 		// TODO put error code here
 		LOG(ERROR) << "Could not close socket: ";

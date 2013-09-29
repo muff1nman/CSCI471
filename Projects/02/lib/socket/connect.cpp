@@ -59,7 +59,6 @@ void connect_in_new_thread(const char* server, unsigned short port, boost::funct
 		return;
 	}
 	boost::function<void()> bound_func = boost::bind(func, connection_fd);
-	LOG(INFO) << "Spawning thread!";
 	boost::thread t(bound_func);
 }
 

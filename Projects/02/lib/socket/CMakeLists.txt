@@ -1,6 +1,5 @@
 set(SRCS
 	listen.cpp
-	consumer.cpp
 	connect.cpp
 )
 
