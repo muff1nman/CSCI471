@@ -22,16 +22,6 @@ void Consumer::run() {
 
 
 Consumer::~Consumer() {
-	close_socket();
+	// noop, not the consumers responsiblity of closing the socket
 }
 
-void Consumer::close_socket() {
-	int close_status = close(socket_fd);
-	if( close_status < 0 ) {
-#ifdef LOGGING
-		// TODO put error code here
-		LOG(ERROR) << "Could not close socket: ";
-		// TODO do something better?
-#endif
-	}
-}

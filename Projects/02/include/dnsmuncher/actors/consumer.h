@@ -20,8 +20,6 @@ class Consumer : public Logging {
 
 		virtual ~Consumer();
 
-		virtual void close_socket();
-
 	protected:
 		int socket_fd;
 };

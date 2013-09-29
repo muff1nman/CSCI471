@@ -7,6 +7,7 @@
 
 #include "dnsmuncher/config.h"
 #include "dnsmuncher/socket/connect.h"
+#include "dnsmuncher/socket/helper.h"
 #include "dnsmuncher/actors/consumer.h"
 
 #include <iostream>
@@ -27,7 +28,16 @@ void thread_runner(int fd) {
 #ifdef LOGGING
 	LOG(INFO) << "Thread finalizing";
 #endif
+
+#ifdef LOGGING
+	LOG(INFO) << "Releasing resources";
+#endif
 	delete c;
+
+#ifdef LOGGING
+	LOG(INFO) << "Closing spawned socket(not the listening one)";
+#endif
+	close_socket(fd);
 #ifdef LOGGING
 	LOG(INFO) << "Thread released";
 #endif
