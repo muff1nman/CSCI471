@@ -7,9 +7,9 @@
 
 #include "dnsmuncher/data/dns_convert.h"
 
-Bytes DNSConvert::to_data() const {
+BytesContainer DNSConvert::to_data() const {
 	// TODO
-	return NULL;
+	//Bytes b(new Byte());
 }
 
 

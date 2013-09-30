@@ -8,8 +8,17 @@
 #ifndef __byte_h__
 #define __byte_h__
 
+#include <boost/shared_ptr.hpp>
+
 typedef unsigned char Byte;
-typedef Byte* Bytes;
+typedef boost::shared_ptr<Byte> Bytes;
+
+class BytesContainer {
+	public:
+		size_t size;
+		Bytes data;
+};
+
 
 #endif /* !__byte_h__ */
 
