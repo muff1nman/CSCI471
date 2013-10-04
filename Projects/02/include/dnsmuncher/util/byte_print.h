@@ -27,7 +27,7 @@ std::string to_string( const char* data, size_t length, size_t group_space, size
 		if( i % group_newline == 0 && i != 0 ) { 
 			ss << '|' << '\n' << '|';
 		}
-		ss << std::hex << std::setfill('0') << std::setw(2) << (short) data[i];
+		ss << std::hex << std::setfill('0') << std::setw(2) << (unsigned int) (unsigned char) data[i];
 		ss << " ";
 	}
 	return ss.str();
