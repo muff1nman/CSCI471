@@ -9,3 +9,6 @@ endif()
 
 add_executable(dnsmuncher main.cpp)
 target_link_libraries(dnsmuncher ${LINK_LIBRARIES})
+
+add_executable(udplisten listen.cpp)
+target_link_libraries(udplisten ${LINK_LIBRARIES})

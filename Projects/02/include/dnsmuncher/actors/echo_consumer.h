@@ -11,6 +11,8 @@
 #include "consumer.h"
 
 #include <stdio.h>
+#include <sys/types.h>
+#include <sys/socket.h>
 
 class EchoConsumer : public Consumer {
 	public:
@@ -30,7 +32,7 @@ class EchoConsumer : public Consumer {
 
 				if( read_status > 0 ) {
 #ifdef LOGGING
-					LOG(INFO) << "Content read from connection" << "\nSTART REQUEST\n" << buffer << "\nPOSSIBLE END REQUEST (more content in next buffer?)";
+					LOG(INFO) << "Read " << read_status << " bytes from connection" << "\nSTART REQUEST\n" << buffer << "\nPOSSIBLE END REQUEST (more content in next buffer?)";
 #endif
 				} else if(read_status == 0 ) {
 #ifdef LOGGING
