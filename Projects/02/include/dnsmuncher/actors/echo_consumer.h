@@ -9,6 +9,7 @@
 #define __echo_consumer_h__
 
 #include "consumer.h"
+#include "dnsmuncher/util/byte_print.h"
 
 #include <stdio.h>
 #include <sys/types.h>
@@ -33,6 +34,7 @@ class EchoConsumer : public Consumer {
 				if( read_status > 0 ) {
 #ifdef LOGGING
 					LOG(INFO) << "Read " << read_status << " bytes from connection" << "\nSTART REQUEST\n" << buffer << "\nPOSSIBLE END REQUEST (more content in next buffer?)";
+					LOG(INFO) << std::endl << demaria_util::to_string(buffer, read_status, 4, 12 );
 #endif
 				} else if(read_status == 0 ) {
 #ifdef LOGGING
