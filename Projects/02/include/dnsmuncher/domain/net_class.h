@@ -10,7 +10,7 @@
 
 class NetClass {
 	public:
-		static size_t IN = 1;
+		static const size_t IN = 1;
 	private:
 		size_t net_class;
 };

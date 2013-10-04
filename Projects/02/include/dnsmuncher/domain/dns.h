@@ -12,7 +12,7 @@
 #include <vector>
 #include "resource_record.h"
 #include "question.h"
-#include "bytes.h"
+#include "dnsmuncher/util/byte.h"
 
 class DNS {
 	// TODO

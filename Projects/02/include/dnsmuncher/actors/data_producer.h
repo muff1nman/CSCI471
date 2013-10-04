@@ -15,16 +15,16 @@
 
 class DataProducer : public Consumer {
 	public:
-		DataProducer(int socket_fd, Convert obj) : Consumer(socket_fd), convertable(obj) { }
+		DataProducer(int socket_fd, boost::shared_ptr<Convert> obj_ptr) : Consumer(socket_fd), convertable(obj_ptr) { }
 
 		virtual void run() {
-			BytesContainer bytes = convertable.to_data();
+			BytesContainer bytes = convertable->to_data();
 			write(socket_fd, bytes.data.get(), bytes.size);
 			// TODO need to call sync?
 		}
 
 	private:
-		Convert convertable;
+		boost::shared_ptr<Convert> convertable;
 
 };
 

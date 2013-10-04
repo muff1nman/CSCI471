@@ -8,6 +8,8 @@
 #ifndef __qtype_h__
 #define __qtype_h__
 
+#include "type.h"
+
 class QType : public Type {
 	// TODO
 };

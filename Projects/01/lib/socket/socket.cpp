@@ -157,7 +157,7 @@ void accept_in_new_threads(unsigned short port) {
 			LOG(INFO) << "Accepted incoming request";
 #endif
 
-			Consumer* c = new HeaderProducer(connection_fd);
+			Consumer* c = new EchoConsumer(connection_fd);
 #ifndef OLDBOOST
 			boost::thread t(&thread_runner, c);
 			t.detach();

@@ -8,10 +8,11 @@
 #ifndef __dns_convert_h__
 #define __dns_convert_h__
 
-#include "dnsmuncher/domain/dns"
+#include "dnsmuncher/domain/dns.h"
+#include "convert.h"
 
 class DNSConvert : public Convert, public DNS {
-	virtual Bytes to_data() const;
+	virtual BytesContainer to_data() const;
 };
 
 #endif /* !__dns_convert_h__ */

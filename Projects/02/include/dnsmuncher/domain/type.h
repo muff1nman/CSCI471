@@ -10,7 +10,7 @@
 
 class Type {
 	public:
-		static size_t A = 1;
+		static const size_t A = 1;
 		// TODO...etc
 	private:
 		size_t type;

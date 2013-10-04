@@ -11,7 +11,7 @@
 #include <vector>
 #include <string>
 
-class Domain {
+class Name {
 
 	private:
 		std::vector<std::string> labels;
