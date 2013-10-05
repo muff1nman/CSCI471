@@ -37,6 +37,10 @@ int connect_to_socket(const char* server, unsigned short port) {
 		return fd;
 	}
 
+#ifdef LOGGING
+	LOG(INFO) << "Opened socket: [" << fd << "]";
+#endif
+
 	struct sockaddr_in address_info;
 
 	memset( &address_info, 0, sizeof(address_info) );
@@ -49,15 +53,20 @@ int connect_to_socket(const char* server, unsigned short port) {
 		return assign_addr_sucess;
 	}
 
-	return connect( fd, (struct sockaddr*) &address_info, sizeof(address_info));
+	int result = connect( fd, (struct sockaddr*) &address_info, sizeof(address_info));
+	if (result != 0 ) {
+		do_error( ERROR_CONNECT );
+		return -1;
+	}
+
+	return fd;
 }
 
 void connect_in_new_thread(const char* server, unsigned short port, boost::function<void(int)> func) {
 	int connection_fd = connect_to_socket(server, port);
-	if( connection_fd < SUCCESS ) {
-		do_error( ERROR_CONNECT );
-		return;
-	}
+#ifdef LOGGING
+	LOG(INFO) << "Using socket: [" << connection_fd << "]";
+#endif
 	boost::function<void()> bound_func = boost::bind(func, connection_fd);
 	boost::thread t(bound_func);
 }
