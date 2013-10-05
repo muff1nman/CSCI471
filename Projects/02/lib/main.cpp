@@ -15,6 +15,7 @@
 #include <iostream>
 #include <string>
 #include <boost/optional.hpp>
+#include <boost/bind.hpp>
 
 #ifdef LOGGING
 #include <glog/logging.h>
@@ -22,11 +23,10 @@
 
 using namespace std;
 
+
 // Runs a consumer and deletes it after completion.
-void thread_runner(int fd) {
-	boost::shared_ptr<Convert> convert( new DNSConvert() );
-	Consumer* c = new DataProducer(fd,convert);
-	c->run();
+void socket_thread_runner(int fd, boost::shared_ptr<Consumer> c) {
+	c->run(fd);
 #ifdef LOGGING
 	LOG(INFO) << "Thread finalizing";
 #endif
@@ -34,7 +34,7 @@ void thread_runner(int fd) {
 #ifdef LOGGING
 	LOG(INFO) << "Releasing resources";
 #endif
-	delete c;
+	c.reset();
 
 #ifdef LOGGING
 	LOG(INFO) << "Closing spawned socket(not the listening one)";
@@ -114,8 +114,16 @@ int main( int argc, char** argv ) {
 #ifdef LOGGING
 	LOG(INFO) << "Connecting in new thread";
 #endif
-	//connect_in_new_thread( "8.8.8.8", 53, &thread_runner );
-	//connect_in_new_thread( "127.0.0.1", 16318, &thread_runner );
+
+	boost::shared_ptr<Convert> convert( new DNSConvert() );
+	boost::shared_ptr<Consumer> c(new DataProducer(convert));
+	boost::function<void(int)> func = boost::bind(&socket_thread_runner, _1, c);
+	//connect_in_new_thread( "8.8.8.8", 53, func );
+	connect_in_new_thread( "127.0.0.1", 16318, func );
+
+#ifdef LOGGING
+	LOG(INFO) << "Done with connection";
+#endif
 
 	sleep(12312);
 
