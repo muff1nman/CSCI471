@@ -11,8 +11,14 @@
 #include "name.h"
 #include "qtype.h"
 #include "net_class.h"
+#include <string>
 
 class Question {
+	public:
+		Question( Name domain_name ) {
+			// TODO
+		}
+
 	private:
 		Name qname;
 		QType type;

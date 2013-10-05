@@ -115,7 +115,8 @@ int main( int argc, char** argv ) {
 	LOG(INFO) << "Connecting in new thread";
 #endif
 
-	boost::shared_ptr<Convert> convert( new DNSConvert() );
+	boost::shared_ptr<DNS> query( new DNS());
+	boost::shared_ptr<Convert> convert( new DNSConvert(query) );
 	boost::shared_ptr<Consumer> c(new DataProducer(convert));
 	boost::function<void(int)> func = boost::bind(&socket_thread_runner, _1, c);
 	//connect_in_new_thread( "8.8.8.8", 53, func );

@@ -19,6 +19,11 @@ void close_socket(int socket_fd) {
 		// TODO do something better?
 #endif
 	}
+#ifdef LOGGING
+	else {
+		LOG(INFO) << "Closed socket";
+	}
+#endif
 }
 
 #endif /* !__helper_h__ */

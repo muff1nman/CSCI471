@@ -12,10 +12,18 @@
 #include <string>
 
 class Name {
+	public:
+		Name( const std::string& domain_name ) {
+			// TODO
+		}
+
+		Name() {
+			// TODO
+		}
 
 	private:
 		std::vector<std::string> labels;
-		
+
 };
 
 #endif /* !__name_h__ */

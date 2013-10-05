@@ -11,8 +11,16 @@
 #include "dnsmuncher/domain/dns.h"
 #include "convert.h"
 
-class DNSConvert : public Convert, public DNS {
-	virtual BytesContainer to_data() const;
+#include <boost/shared_ptr.hpp>
+
+class DNSConvert : public Convert {
+
+	public:
+		DNSConvert(boost::shared_ptr<DNS> dns);
+		virtual BytesContainer to_data() const;
+
+	private:
+		boost::shared_ptr<DNS> dns;
 };
 
 #endif /* !__dns_convert_h__ */
