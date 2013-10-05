@@ -14,14 +14,10 @@ class Consumer : public Logging {
 
 	public:
 
-		Consumer(int socket_fd) : socket_fd(socket_fd) { }
-
-		virtual void run();
+		virtual void run(int socket_fd);
 
 		virtual ~Consumer();
 
-	protected:
-		int socket_fd;
 };
 
 #endif /* !__consumer_h__ */

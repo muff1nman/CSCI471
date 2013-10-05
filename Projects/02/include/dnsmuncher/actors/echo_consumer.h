@@ -18,13 +18,7 @@
 class EchoConsumer : public Consumer {
 	public:
 
-		EchoConsumer(int fd) : Consumer(fd) {
-#ifdef LOGGING
-			LOG(INFO) << "Echo Consumer created with fd: " << fd;
-#endif
-		}
-
-		virtual void run() {
+		virtual void run(int socket_fd) {
 			while(true) {
 #ifdef LOGGING
 				LOG(INFO) << "Reading from socket...";
