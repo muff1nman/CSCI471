@@ -31,13 +31,13 @@ class DataProducer : public Consumer {
 #endif
 			//int result = write(socket_fd, bytes.data.get(), bytes.size);
 			int result = send(socket_fd, bytes.data.get(), bytes.size, 0);
-			if( result < 0 ) {
 #ifdef LOGGING
+			if( result < 0 ) {
 				LOG(INFO) << "Could not write to socket: " << strerror(errno);
-#endif
 			} else {
 				LOG(INFO) << "[" << result << "] bytes written";
 			}
+#endif
 			// TODO need to call sync?
 		}
 
