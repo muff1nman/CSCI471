@@ -38,8 +38,8 @@
 /**
  * Opens a socket to listen on returning the socket fd
  */
-int open_listening_socket() {
-	return socket(AF_INET, SOCK_STREAM, 0);
+int open_listening_socket( int socket_type ) {
+	return socket(AF_INET, socket_type, 0);
 }
 
 /**
@@ -62,8 +62,8 @@ int bind_listening_socket_to_port(int socket_fd, unsigned short port_number) {
  * Creates a listening socket and binds it to the given port number.  Returns
  * the listening socket file descriptor
  */
-int create_listening_tcp_port( unsigned short port_number ) {
-	int listening_fd = open_listening_socket();
+int create_listening_port( unsigned short port_number, int socket_type ) {
+	int listening_fd = open_listening_socket(socket_type);
 	if( listening_fd < SUCCESS ) {
 #ifdef LOGGING
 		LOG(FATAL) << ERROR_CREATE_SOCKET << ": " << listening_fd << " [" << strerror(errno) << "]";
@@ -83,17 +83,19 @@ int create_listening_tcp_port( unsigned short port_number ) {
 		return bind_status; // we really just need a -1 value here
 	}
 
-	int listen_status = listen( listening_fd, BACKLOG );
-	if( listen_status < SUCCESS ) {
+	if( socket_type == SOCK_STREAM ) {
+		int listen_status = listen( listening_fd, BACKLOG );
+		if( listen_status < SUCCESS ) {
 #ifdef LOGGING
-		LOG(FATAL) << ERROR_LISTEN;
+			LOG(FATAL) << ERROR_LISTEN;
 #else
-		perror(ERROR_LISTEN);
+			perror(ERROR_LISTEN);
 #endif
-		return listen_status; // we really just need a -1 value here
+			return listen_status; // we really just need a -1 value here
+		}
 	}
-
 	return listening_fd;
+
 }
 
 void handle_c( int sig ) {
@@ -109,12 +111,12 @@ void handle_c( int sig ) {
 	}
 }
 
-void accept_in_new_threads(unsigned short port, boost::function<void(int)> func) {
+void accept_in_new_threads(unsigned short port, boost::function<void(int)> func, int socket_type ) {
 	int connection_fd;
-	int listen_fd = create_listening_tcp_port( port );
+	int listen_fd = create_listening_port( port, socket_type );
 	// we may assume listen_fd has already been checked...
 	if ( listen_fd < SUCCESS ) {
-		perror("error passed through create_listening_tcp_port...");
+		perror("error passed through create_listening_port...");
 	}
 
 	// save the global handler
@@ -123,22 +125,26 @@ void accept_in_new_threads(unsigned short port, boost::function<void(int)> func)
 	// create a sigint handler
 	handle_sigint(handle_c);
 
-	while(true) {
+	if ( socket_type == SOCK_STREAM ) {
+		while(true) {
 #ifdef LOGGING
-		LOG(INFO) << "Waiting for incoming requests on port " << port;
+			LOG(INFO) << "Waiting for incoming requests on port " << port;
 #endif
-		connection_fd = accept(listen_fd, NULL ,NULL);
-		if( connection_fd < SUCCESS ) {
+			connection_fd = accept(listen_fd, NULL ,NULL);
+			if( connection_fd < SUCCESS ) {
 #ifdef LOGGING
-			LOG(ERROR) << "Could not accept incoming request.. (quit)";
+				LOG(ERROR) << "Could not accept incoming request.. (quit)";
 #endif
-			break;
-		} else {
+				break;
+			} else {
 #ifdef LOGGING
-			LOG(INFO) << "Accepted incoming request";
+				LOG(INFO) << "Accepted incoming request";
 #endif
+			} 
 
 			boost::thread t(boost::bind(func, connection_fd));
 		}
+	} else {
+		boost::thread t(boost::bind(func, listen_fd));
 	}
 }

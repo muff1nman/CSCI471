@@ -14,7 +14,7 @@
 
 #include <unistd.h>
 
-void Consumer::run() {
+void Consumer::run(int socket_fd) {
 #ifdef LOGGING
 	LOG(INFO) << "Doing operation with open socket";
 #endif
