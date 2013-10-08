@@ -4,5 +4,5 @@ add_subdirectory( ${GTEST_DIR} )
 
 include_directories( ${GTEST_DIR}/include )
 
-add_subdirectory( random )
+add_subdirectory( dnsmuncher )
 

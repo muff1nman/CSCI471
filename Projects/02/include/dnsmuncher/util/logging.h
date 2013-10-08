@@ -15,6 +15,7 @@
 #include <boost/lexical_cast.hpp>
 #include <glog/logging.h>
 #endif
+#include <cstdio>
 
 #define sep " "
 #define list_sep ", "
@@ -22,16 +23,23 @@
 #define nested_finish  "]"
 
 class Logging {
+	public:
+		static void do_error(const char* msg) { 
+#ifdef LOGGING
+			LOG(FATAL) << msg;
+#endif
+			perror(msg);
+		}
 
 #ifdef LOGGING
-	public:
 		virtual std::string to_string() const { return std::string(nested_start) + stringify_object() + std::string(nested_finish); }
 		virtual std::string stringify_object() const { return std::string("UNKNOWN"); }
-#endif
 	protected:
 		virtual ~Logging() { }
+#endif
 
 };
+
 
 #endif /* !__logging_h__ */
 

@@ -12,6 +12,8 @@
 #include <bitset>
 #include <string>
 
+#include "dnsmuncher/util/logging.h"
+
 typedef unsigned char Byte;
 typedef boost::shared_ptr<Byte> Bytes;
 
@@ -31,12 +33,57 @@ std::bitset<N1 + N2> concat( const std::bitset<N1> & b1, const std::bitset<N2> &
 
 template <size_t n>
 BytesContainer convert_big_endian( const std::bitset<8 * n>& bits ) {
-
+	std::string result = "";
+	for( size_t i = 0; i < n; ++i ) {
+		result += bits.to_string();
+	}
 }
 
 template <size_t n>
 BytesContainer convert_little_endian( const std::bitset<8 * n>& bits ) {
+	// TODO
+}
 
+/**
+ * For example with the following call
+ * convert_to_char_big_endian<3,6>( std::string("110100"), 1 );
+ *
+ * index would count starting at the far right (index zero) and land at the 3rd
+ * zero from the right to point at  "110"
+ *
+ * and 6 would be returned (in char form)
+ *
+ */
+template <size_t width, size_t n>
+unsigned char convert_to_char_big_endian( const std::bitset<n>& bits, size_t index = 0 ) {
+
+	if ( n < width ) {
+		Logging::do_error("Width too large");
+	}
+
+	if ( n/width <= index ) {
+		Logging::do_error("Out of Bounds");
+	}
+
+#ifdef LOGGING
+	LOG(INFO) << "convert called with width: [" << width << "]  and n: [" << n << "]";
+#endif
+	std::bitset<n> shifted_left = (bits << (( n/width - (index + 1 )) * width));
+
+#ifdef LOGGING
+	LOG(INFO) << "shifted left: " << shifted_left.to_ulong() << " " << shifted_left.to_string();
+	LOG(INFO) << "Shifting left by: " << (n/width - (index + 1)) * width;
+#endif
+
+	std::bitset<n> shifted_right = (shifted_left >> ((n/width-1)*width));
+
+#ifdef LOGGING
+	LOG(INFO) << "Shifted right by: " << (n/width - 1)*width;
+	LOG(INFO) << "Ret value: " << shifted_right.to_string();
+#endif
+	return shifted_right.to_ulong();
+
+	//return (unsigned char) ((bits << ( n - (index + 1) ) * width) >> ((n-1)*width)).to_ulong();
 }
 
 
