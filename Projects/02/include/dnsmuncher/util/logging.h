@@ -16,6 +16,7 @@
 #include <glog/logging.h>
 #endif
 #include <cstdio>
+#include <cstdlib>
 
 #define sep " "
 #define list_sep ", "
@@ -27,8 +28,10 @@ class Logging {
 		static void do_error(const char* msg) { 
 #ifdef LOGGING
 			LOG(FATAL) << msg;
-#endif
+#else
 			perror(msg);
+#endif
+			exit(1);
 		}
 
 #ifdef LOGGING

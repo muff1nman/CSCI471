@@ -65,25 +65,7 @@ unsigned char convert_to_char_big_endian( const std::bitset<n>& bits, size_t ind
 		Logging::do_error("Out of Bounds");
 	}
 
-#ifdef LOGGING
-	LOG(INFO) << "convert called with width: [" << width << "]  and n: [" << n << "]";
-#endif
-	std::bitset<n> shifted_left = (bits << (( n/width - (index + 1 )) * width));
-
-#ifdef LOGGING
-	LOG(INFO) << "shifted left: " << shifted_left.to_ulong() << " " << shifted_left.to_string();
-	LOG(INFO) << "Shifting left by: " << (n/width - (index + 1)) * width;
-#endif
-
-	std::bitset<n> shifted_right = (shifted_left >> ((n/width-1)*width));
-
-#ifdef LOGGING
-	LOG(INFO) << "Shifted right by: " << (n/width - 1)*width;
-	LOG(INFO) << "Ret value: " << shifted_right.to_string();
-#endif
-	return shifted_right.to_ulong();
-
-	//return (unsigned char) ((bits << ( n - (index + 1) ) * width) >> ((n-1)*width)).to_ulong();
+	return (unsigned char) ((bits << ( n/width - (index + 1) ) * width) >> ((n/width-1)*width)).to_ulong();
 }
 
 
