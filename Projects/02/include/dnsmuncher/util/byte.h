@@ -19,6 +19,24 @@ class BytesContainer {
 		Bytes data;
 };
 
+//http://stackoverflow.com/questions/3061721/concatenate-boostdynamic-bitset-or-stdbitset
+template <size_t N1, size_t N2 >
+bitset<N1 + N2> concat( const bitset<N1> & b1, const bitset<N2> & b2 ) {
+	string s1 = b1.to_string();
+	string s2 = b2.to_string();
+	return bitset <N1 + N2>( s1 + s2 );
+}
+
+template <size_t n>
+BytesContainer convert_big_endian( const bitset<8 * n>& bits ) {
+
+}
+
+template <size_t n>
+BytesContainer convert_little_endian( const bitset<8 * n>& bits ) {
+
+}
+
 
 #endif /* !__byte_h__ */
 

@@ -11,6 +11,7 @@
 #include <bitset>
 #include <vector>
 #include <string>
+#include <cstdlib>
 #include "resource_record.h"
 #include "question.h"
 #include "dnsmuncher/util/byte.h"
@@ -19,6 +20,7 @@ class DNS {
 	// TODO
 	public:
 		DNS() {
+			this->generate_id();
 			this->set_is_query();
 		}
 
@@ -90,7 +92,7 @@ class DNS {
 		}
 
 		void generate_id() {
-			// TODO
+			id = std::bitset<16>(rand());
 		}
 		
 };
