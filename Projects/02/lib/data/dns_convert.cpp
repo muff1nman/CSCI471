@@ -17,18 +17,8 @@ DNSConvert::DNSConvert(boost::shared_ptr<DNS> dns) : dns(dns) {
 }
 
 BytesContainer DNSConvert::to_data() const {
-	const char* data = "HelloWorld";
-#ifdef LOGGING
-	LOG(INFO) << "Is it a query? " << this->dns->qr;
-#endif
 	BytesContainer c;
-	c.data = Bytes( new Byte[strlen(data)] );
-	strcpy(reinterpret_cast<char*>(c.data.get()), data);
-	c.data.get()[0] = (Byte) this->dns->qr;
-	c.size = strlen(data);
-#ifdef LOGGING
-	LOG(INFO) << "Estimated message size: " << c.size;
-#endif
+	c = convert_big_endian<2>(this->dns->id);
 	return c;
 }
 
