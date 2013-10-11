@@ -33,20 +33,47 @@ std::bitset<N1 + N2> concat( const std::bitset<N1> & b1, const std::bitset<N2> &
 
 template <size_t n>
 BytesContainer convert_big_endian( const std::bitset<8 * n>& bits ) {
-	std::string result = "";
+	BytesContainer toReturn;
+	toReturn.data = Bytes( new Byte[n] );
+	toReturn.size = n;
+
 	for( size_t i = 0; i < n; ++i ) {
-		result += bits.to_string();
+		toReturn.data.get()[i] = convert_to_char_big_endian( bits, i );
 	}
+
+	return toReturn;
 }
 
 template <size_t n>
 BytesContainer convert_little_endian( const std::bitset<8 * n>& bits ) {
-	// TODO
+	BytesContainer toReturn;
+	toReturn.data = Bytes( new Byte[n] );
+	toReturn.size = n;
+
+	for( size_t i = 0; i < n; ++i ) {
+		toReturn.data.get()[i] = convert_to_char_little_endian( bits, i );
+	}
+
+	return toReturn;
+}
+
+template <size_t width, size_t n>
+BytesContainer convert_to_char_big_endian( const std::bitset<8 * n>& bits, size_t index = 0 ) {
+	// TODO refactor common code
+	if ( n < width ) {
+		Logging::do_error("Width too large");
+	}
+
+	if ( n/width <= index ) {
+		Logging::do_error("Out of Bounds");
+	}
+	//  TODO
+	//return convert_to_char_little_endian<w>( bits, n / width - index );
 }
 
 /**
  * For example with the following call
- * convert_to_char_big_endian<3,6>( std::string("110100"), 1 );
+ * convert_to_char_little_endian<3,6>( std::string("110100"), 1 );
  *
  * index would count starting at the far right (index zero) and land at the 3rd
  * zero from the right to point at  "110"
@@ -55,7 +82,7 @@ BytesContainer convert_little_endian( const std::bitset<8 * n>& bits ) {
  *
  */
 template <size_t width, size_t n>
-unsigned char convert_to_char_big_endian( const std::bitset<n>& bits, size_t index = 0 ) {
+unsigned char convert_to_char_little_endian( const std::bitset<n>& bits, size_t index = 0 ) {
 
 	if ( n < width ) {
 		Logging::do_error("Width too large");
