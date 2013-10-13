@@ -9,7 +9,7 @@
 #define __dns_h__
 
 #include "dnsmuncher/util/logging.h"
-#include "dnsmuncher/util/byte.h"
+#include "dnsmuncher/util/byte/byte.h"
 
 #include <bitset>
 #include <vector>

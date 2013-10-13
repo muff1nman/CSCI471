@@ -9,7 +9,7 @@
 #define __echo_consumer_h__
 
 #include "consumer.h"
-#include "dnsmuncher/util/byte_print.h"
+#include "dnsmuncher/util/byte/print.h"
 #include "dnsmuncher/socket/helper.h"
 
 #include <stdio.h>

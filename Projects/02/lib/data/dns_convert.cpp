@@ -7,6 +7,8 @@
 
 #include "dnsmuncher/config.h"
 #include "dnsmuncher/data/dns_convert.h"
+#include "dnsmuncher/util/byte/convert.h"
+
 #include <cstring>
 #ifdef LOGGING
 #include <glog/logging.h>

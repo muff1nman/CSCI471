@@ -8,7 +8,7 @@
 #ifndef __convert_h__
 #define __convert_h__
 
-#include "dnsmuncher/util/byte.h"
+#include "dnsmuncher/util/byte/byte.h"
 
 class Convert {
 	public:

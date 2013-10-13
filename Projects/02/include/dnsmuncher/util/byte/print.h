@@ -1,12 +1,12 @@
 /*
- * byte_print.h
+ * print.h
  * Copyright (C) 2013 Andrew DeMaria (muff1nman) <ademaria@mines.edu>
  *
  * All Rights Reserved.
  */
 
-#ifndef __byte_print_h__
-#define __byte_print_h__
+#ifndef __print_h__
+#define __print_h__
 
 #include "byte.h"
 
@@ -35,5 +35,5 @@ inline std::string to_string( const unsigned char* data, size_t length, size_t g
 
 }
 
-#endif /* !__byte_print_h__ */
+#endif /* !__print_h__ */
 

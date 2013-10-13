@@ -10,7 +10,7 @@
 
 #include "consumer.h"
 #include "dnsmuncher/data/convert.h"
-#include "dnsmuncher/util/byte.h"
+#include "dnsmuncher/util/byte/byte.h"
 #include <unistd.h>
 #ifdef LOGGING
 #include <glog/logging.h>

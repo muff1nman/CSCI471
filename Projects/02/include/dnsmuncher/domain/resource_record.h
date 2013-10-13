@@ -11,7 +11,7 @@
 #include "name.h"
 #include "qtype.h"
 #include "net_class.h"
-#include "dnsmuncher/util/byte.h"
+#include "dnsmuncher/util/byte/byte.h"
 
 #include <vector>
 
