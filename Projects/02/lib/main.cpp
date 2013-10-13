@@ -85,7 +85,7 @@ string print_info( int argc, char** argv ) {
 
 void init_log() {
 #ifdef LOGGING
-	google::InitGoogleLogging("DNSMuncher");
+	google::InitGoogleLogging(PROJECT_NAME);
 	FLAGS_minloglevel = LOG_LEVEL;
 	FLAGS_alsologtostderr = 1;
 	FLAGS_colorlogtostderr = 1;

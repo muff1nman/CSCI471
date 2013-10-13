@@ -5,13 +5,10 @@
  * All Rights Reserved.
  */
 
-#include "dnsmuncher/config.h"
+#include "test_helper.h"
+
 #include "dnsmuncher/util/byte/byte.h"
 #include "dnsmuncher/util/byte/convert.h"
-#include "gtest/gtest.h"
-#ifdef LOGGING
-#include <glog/logging.h>
-#endif
 
 #include <bitset>
 #include <string>

@@ -13,4 +13,6 @@
 
 #define LISTEN_PORT 16318
 
+#cmakedefine PROJECT_NAME "${CMAKE_PROJECT_NAME}"
+
 #endif /* !__config_h__ */
