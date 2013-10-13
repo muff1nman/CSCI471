@@ -1,4 +1,4 @@
-
+set( TESTNAME Util )
 set( SRCS
 	util_test.cpp
 )
@@ -9,8 +9,8 @@ if(${LOGGING} STREQUAL "ON")
 	set(LINK_LIBRARIES ${LINK_LIBRARIES} glog)
 endif()
 
-add_executable(TestUtil ${SRCS})
-target_link_libraries(TestUtil ${LINK_LIBRARIES})
+add_executable( "Test${TESTNAME}" ${SRCS})
+target_link_libraries( "Test${TESTNAME}" ${LINK_LIBRARIES})
 
-add_test( util TestUtil )
+add_test( ${TESTNAME} "Test${TESTNAME}" )
 

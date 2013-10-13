@@ -19,8 +19,13 @@
 #include "question.h"
 
 class DNS : public Logging {
-	// TODO
 	public:
+
+		static const size_t GENERIC_HEADER_FIELD_LENGTH = 16;
+		static const size_t OPCODE_FIELD_LENGTH = 4;
+		static const size_t Z_FIELD_LENGTH = 3;
+		static const size_t RCODE_FIELD_LENGTH = 4;
+
 		DNS() {
 			this->generate_id();
 			this->set_is_query();
@@ -75,16 +80,12 @@ class DNS : public Logging {
 			this->ra = ra;
 		}
 
-		DNS( std::bitset<GENERIC_HEADER_LENGTH> id ) : id(id) { }
+		DNS( std::bitset<GENERIC_HEADER_FIELD_LENGTH> id ) : id(id) { }
 
-		static const size_t GENERIC_HEADER_FIELD_LENGTH = 16;
-		static const size_t OPCODE_FIELD_LENGTH = 4;
-		static const size_t Z_FIELD_LENGTH = 3;
-		static const size_t RCODE_FIELD_LENGTH = 4;
 
 	private:
 		// TODO maybe hide the implementation of bitset?
-		std::bitset<GENERIC_HEADER_LENGTH> id, qd_count, an_count, ns_count, ar_count;
+		std::bitset<GENERIC_HEADER_FIELD_LENGTH> id, qd_count, an_count, ns_count, ar_count;
 		bool qr, aa, tc, rd, ra;
 		std::bitset<OPCODE_FIELD_LENGTH> opcode;
 		std::bitset<Z_FIELD_LENGTH> z;
@@ -105,7 +106,7 @@ class DNS : public Logging {
 		}
 
 		void generate_id() {
-			id = std::bitset<GENERIC_HEADER_LENGTH>(rand());
+			id = std::bitset<GENERIC_HEADER_FIELD_LENGTH>(rand());
 		}
 		
 };

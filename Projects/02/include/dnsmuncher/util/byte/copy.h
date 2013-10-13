@@ -22,8 +22,8 @@ void copy_into( std::bitset<N> dst, std::bitset<M> src, size_t dst_offset_from_r
 BytesContainer join( BytesContainer first, BytesContainer second ) {
 	BytesContainer joined;
 	joined.reserve(first.size() + second.size());
-	joined.insert( joined.end(), first.start(), first.end() );
-	joined.insert( joined.end(), second.start(), second.end() );
+	joined.insert( joined.end(), first.begin(), first.end() );
+	joined.insert( joined.end(), second.begin(), second.end() );
 	return joined;
 }
 
