@@ -10,6 +10,7 @@
 
 #include "consumer.h"
 #include "dnsmuncher/util/byte_print.h"
+#include "dnsmuncher/socket/helper.h"
 
 #include <stdio.h>
 #include <sys/types.h>
@@ -19,34 +20,8 @@ class EchoConsumer : public Consumer {
 	public:
 
 		virtual void run(int socket_fd) {
-			while(true) {
-#ifdef LOGGING
-				LOG(INFO) << "Reading from socket...";
-#endif
-				int read_status = read(socket_fd, buffer, BUFSIZE - 1);
-
-				if( read_status > 0 ) {
-#ifdef LOGGING
-					LOG(INFO) << "Read " << read_status << " bytes from connection" << "\nSTART REQUEST\n" << buffer << "\nPOSSIBLE END REQUEST (more content in next buffer?)";
-					LOG(INFO) << std::endl << demaria_util::to_string(buffer, read_status, 4, 12 );
-#endif
-				} else if(read_status == 0 ) {
-#ifdef LOGGING
-					LOG(INFO) << "No more bytes";
-#endif
-					break; // natural end of stream?
-				} else {
-#ifdef LOGGING
-					LOG(ERROR) << "read status: " << read_status;
-#endif
-					break;
-				}
-			}
+			BytesContainer b = all_data(socket_fd);
 		}
-
-	private:
-		static const int BUFSIZE = 1026;
-		char buffer[BUFSIZE];
 
 };
 

@@ -119,13 +119,14 @@ void accept_in_new_threads(unsigned short port, boost::function<void(int)> func,
 		perror("error passed through create_listening_port...");
 	}
 
-	// save the global handler
-	global_fd = listen_fd;
-
-	// create a sigint handler
-	handle_sigint(handle_c);
 
 	if ( socket_type == SOCK_STREAM ) {
+		// save the global handler
+		global_fd = listen_fd;
+
+		// create a sigint handler
+		handle_sigint(handle_c);
+
 		while(true) {
 #ifdef LOGGING
 			LOG(INFO) << "Waiting for incoming requests on port " << port;
@@ -145,6 +146,6 @@ void accept_in_new_threads(unsigned short port, boost::function<void(int)> func,
 			boost::thread t(boost::bind(func, connection_fd));
 		}
 	} else {
-		boost::thread t(boost::bind(func, listen_fd));
+		func(listen_fd);
 	}
 }

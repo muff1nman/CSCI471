@@ -20,12 +20,12 @@
 
 namespace demaria_util {
 
-std::string to_string( const char* data, size_t length, size_t group_space, size_t group_newline ) {
+std::string to_string( const unsigned char* data, size_t length, size_t group_space, size_t group_newline ) {
 	std::stringstream ss;
 	ss << '|';
 	for( size_t i = 0; i < length; ++i ) {
 		if( i % group_newline == 0 && i != 0 ) { 
-			ss << '|' << '\n' << '|';
+			ss << "|\n" << i  << " |";
 		}
 		ss << std::hex << std::setfill('0') << std::setw(2) << (unsigned int) (unsigned char) data[i];
 		ss << " ";
