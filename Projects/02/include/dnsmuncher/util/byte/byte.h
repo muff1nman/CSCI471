@@ -8,43 +8,50 @@
 #ifndef __byte_h__
 #define __byte_h__
 
-#include <boost/shared_ptr.hpp>
 #include <bitset>
 #include <string>
+#include <vector>
 
 #include "dnsmuncher/util/logging.h"
 
 #define BITS_PER_BYTE 8
 
 typedef unsigned char Byte;
-typedef boost::shared_ptr<Byte> Bytes;
+typedef std::vector<Byte> Bytes;
 
 class BytesContainer {
 	public:
 		BytesContainer() {
-			this->_size = 0;
 		}
 
 		BytesContainer(Bytes data) {
-			this->_size = 0;
 			this->_data = data;
 		}
 
 		BytesContainer(Bytes data, size_t size) {
-			this->_size = size;
+#ifdef LOGGING
+			LOG(WARNING) << "Deprecated";
+#endif
 			this->_data = data;
 		}
 
-		Byte* data() const {
-			return _data.get();
+		Byte* data() {
+			return &(this->_data[0]);
+		}
+
+		const Byte* data() const {
+			return &(this->_data[0]);
+		}
+
+		void resize(size_t size) {
+			return _data.resize(size);
 		}
 
 		size_t size() const {
-			return _size;
+			return this->_data.size();
 		}
 
 	private:
-		size_t _size;
 		Bytes _data;
 };
 

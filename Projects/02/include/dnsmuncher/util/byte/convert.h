@@ -83,7 +83,8 @@ Byte convert_to_char_big_endian( const std::bitset<n>& bits, size_t index = 0 ) 
  */
 template <size_t n>
 BytesContainer convert_big_endian( const std::bitset<BITS_PER_BYTE * n>& bits ) {
-	BytesContainer toReturn( Bytes( new Byte[n]), n);
+	BytesContainer toReturn;
+	toReturn.resize(n);
 
 	for( size_t i = 0; i < n; ++i ) {
 		toReturn.data()[i] = convert_to_char_big_endian<BITS_PER_BYTE>( bits, i );
@@ -100,7 +101,8 @@ BytesContainer convert_big_endian( const std::bitset<BITS_PER_BYTE * n>& bits ) 
  */
 template <size_t n>
 BytesContainer convert_little_endian( const std::bitset<BITS_PER_BYTE * n>& bits ) {
-	BytesContainer toReturn( Bytes( new Byte[n]), n);
+	BytesContainer toReturn;
+	toReturn.resize(n);
 
 	for( size_t i = 0; i < n; ++i ) {
 		toReturn.data()[i] = convert_to_char_little_endian<BITS_PER_BYTE>( bits, i );

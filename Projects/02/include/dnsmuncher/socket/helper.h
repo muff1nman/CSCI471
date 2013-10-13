@@ -103,8 +103,8 @@ inline BytesContainer all_data( int socket_fd, size_t buf_size ) {
 
 	// TODO really we should try to keep this close to the malloc and realloc
 	// calls
-	Bytes bytes( data, free);
-	BytesContainer valid( bytes, buf_size);
+	Bytes bytes( data, data + bytes_read);
+	BytesContainer valid( bytes);
 
 	return valid;
 }
