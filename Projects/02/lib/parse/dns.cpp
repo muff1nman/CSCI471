@@ -20,7 +20,7 @@ namespace qi = boost::spirit::qi;
 DNS from_data( const BytesContainer raw ) {
 	DNSBuilder b;
 	b.set_id(4);
-	bool parsed_correctly = qi::parse( raw.data.get(), raw.data.get() + raw.size, 
+	bool parsed_correctly = qi::parse( raw.data(), raw.data() + raw.size(), 
 			qi::big_word[boost::bind(&DNSBuilder::set_id, &b, _1)]
 			);
 #ifdef LOGGING

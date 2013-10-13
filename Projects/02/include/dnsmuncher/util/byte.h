@@ -21,8 +21,38 @@ typedef boost::shared_ptr<Byte> Bytes;
 
 class BytesContainer {
 	public:
-		size_t size;
-		Bytes data;
+		BytesContainer() {
+			this->_size = 0;
+		}
+
+		BytesContainer(Bytes data) {
+			set_data( data );
+		}
+
+		BytesContainer(Bytes data, size_t size) {
+			set_data( data, size );
+		}
+
+		void set_data( Bytes data ) {
+			this->_data = data;
+		}
+
+		void set_data( Bytes data, size_t size ) {
+			this->_data = data;
+			this->_size = size;
+		}
+
+		Byte* data() const {
+			return _data.get();
+		}
+
+		size_t size() const {
+			return _size;
+		}
+
+	private:
+		size_t _size;
+		Bytes _data;
 };
 
 //http://stackoverflow.com/questions/3061721/concatenate-boostdynamic-bitset-or-stdbitset
@@ -98,12 +128,10 @@ Byte convert_to_char_big_endian( const std::bitset<n>& bits, size_t index = 0 ) 
  */
 template <size_t n>
 BytesContainer convert_big_endian( const std::bitset<BITS_PER_BYTE * n>& bits ) {
-	BytesContainer toReturn;
-	toReturn.data = Bytes( new Byte[n] );
-	toReturn.size = n;
+	BytesContainer toReturn( Bytes( new Byte[n]), n);
 
 	for( size_t i = 0; i < n; ++i ) {
-		toReturn.data.get()[i] = convert_to_char_big_endian<BITS_PER_BYTE>( bits, i );
+		toReturn.data()[i] = convert_to_char_big_endian<BITS_PER_BYTE>( bits, i );
 	}
 
 	return toReturn;
@@ -117,12 +145,10 @@ BytesContainer convert_big_endian( const std::bitset<BITS_PER_BYTE * n>& bits ) 
  */
 template <size_t n>
 BytesContainer convert_little_endian( const std::bitset<BITS_PER_BYTE * n>& bits ) {
-	BytesContainer toReturn;
-	toReturn.data = Bytes( new Byte[n] );
-	toReturn.size = n;
+	BytesContainer toReturn( Bytes( new Byte[n]), n);
 
 	for( size_t i = 0; i < n; ++i ) {
-		toReturn.data.get()[i] = convert_to_char_little_endian<BITS_PER_BYTE>( bits, i );
+		toReturn.data()[i] = convert_to_char_little_endian<BITS_PER_BYTE>( bits, i );
 	}
 
 	return toReturn;

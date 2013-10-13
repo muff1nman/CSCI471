@@ -22,11 +22,11 @@ TEST(ByteListTest, MultipleWidthBitset) {
 	// in decimal: 165,81; in hex: a5,51
 	std::bitset<16> t1(std::string("1010010101010001"));
 	BytesContainer a = convert_big_endian<2>(t1);
-	EXPECT_EQ(2, a.size);
-	EXPECT_TRUE( 0 == memcmp( same_order, a.data.get(), a.size)) << "Convert big endian out of order";
+	EXPECT_EQ(2, a.size());
+	EXPECT_TRUE( 0 == memcmp( same_order, a.data(), a.size())) << "Convert big endian out of order";
 	a = convert_little_endian<2>(t1);
-	EXPECT_EQ(2, a.size);
-	EXPECT_TRUE( 0 == memcmp( flip_order, a.data.get(), a.size)) << "Convert little endian out of order";
+	EXPECT_EQ(2, a.size());
+	EXPECT_TRUE( 0 == memcmp( flip_order, a.data(), a.size())) << "Convert little endian out of order";
 }
 
 TEST(ByteTest, SingleWidthBitset) {

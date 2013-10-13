@@ -52,7 +52,6 @@ inline BytesContainer all_data( int socket_fd, size_t buf_size ) {
 	LOG(INFO) << "Buffer size set to [" << buf_size << "]";
 #endif
 	BytesContainer empty;
-	empty.size = 0;
 
 	Byte* data = (Byte*) malloc(buf_size); 
 	if( !check_allocated(data) ) {
@@ -102,11 +101,10 @@ inline BytesContainer all_data( int socket_fd, size_t buf_size ) {
 		}
 	}
 
-	BytesContainer valid;
-	valid.size = buf_size;
 	// TODO really we should try to keep this close to the malloc and realloc
 	// calls
-	valid.data = Bytes( data, free );
+	Bytes bytes( data, free);
+	BytesContainer valid( bytes, buf_size);
 
 	return valid;
 }
