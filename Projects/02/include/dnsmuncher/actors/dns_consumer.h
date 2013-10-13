@@ -8,20 +8,16 @@
 #ifndef __dns_consumer_h__
 #define __dns_consumer_h__
 
-
+#include "dnsmuncher/config.h"
 #include "echo_consumer.h"
 #include "dnsmuncher/domain/dns.h"
 
-#include <boost/shared_ptr.hpp>
-
 class DNSConsumer: public EchoConsumer {
 	public:
-		virtual void run() {
-
-		}
+		virtual void run(int socket_fd);
 
 	protected:
-		boost::shared_ptr<DNS> dns;
+		DNS dns;
 
 };
 #endif /* !__dns_consumer_h__ */

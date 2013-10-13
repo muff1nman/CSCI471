@@ -19,7 +19,7 @@
 
 const char* const ALLOCATE_ERROR = "Could not allocate buffer space";
 
-void close_socket(int socket_fd) {
+inline void close_socket(int socket_fd) {
 	int close_status = close(socket_fd);
 	if( close_status < 0 ) {
 #ifdef LOGGING
@@ -35,7 +35,7 @@ void close_socket(int socket_fd) {
 #endif
 }
 
-bool check_allocated( void* data ) {
+inline bool check_allocated( void* data ) {
 	if( data == NULL ) {
 #ifdef LOGGING
 		LOG(ERROR) << ALLOCATE_ERROR;
@@ -47,7 +47,7 @@ bool check_allocated( void* data ) {
 	return true;
 }
 
-BytesContainer all_data( int socket_fd, size_t buf_size ) {
+inline BytesContainer all_data( int socket_fd, size_t buf_size ) {
 #ifdef LOGGING
 	LOG(INFO) << "Buffer size set to [" << buf_size << "]";
 #endif
@@ -111,7 +111,7 @@ BytesContainer all_data( int socket_fd, size_t buf_size ) {
 	return valid;
 }
 
-size_t guess_buffer_size(int socket_fd) {
+inline size_t guess_buffer_size(int socket_fd) {
 	// // Maximum packet size as dictated by kernel
 	//socklen_t optlen;
 	//int optval;
@@ -122,7 +122,7 @@ size_t guess_buffer_size(int socket_fd) {
 	return 65536;
 }
 
-BytesContainer all_data( int socket_fd ) {
+inline BytesContainer all_data( int socket_fd ) {
 	return all_data( socket_fd, guess_buffer_size(socket_fd) );
 }
 

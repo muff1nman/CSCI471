@@ -126,8 +126,6 @@ int main( int argc, char** argv ) {
 	LOG(INFO) << "Done with connection";
 #endif
 
-	sleep(12312);
-
 	return 0;
 }
 

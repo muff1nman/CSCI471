@@ -1,6 +1,7 @@
 add_subdirectory(socket)
 add_subdirectory(actors)
 add_subdirectory(data)
+add_subdirectory(parse)
 
 set(LINK_LIBRARIES muncher_socket muncher_actors muncher_data)
 if(${LOGGING} STREQUAL "ON")

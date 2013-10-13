@@ -8,20 +8,26 @@
 #ifndef __dns_h__
 #define __dns_h__
 
+#include "dnsmuncher/util/logging.h"
+#include "dnsmuncher/util/byte.h"
+
 #include <bitset>
 #include <vector>
 #include <string>
 #include <cstdlib>
 #include "resource_record.h"
 #include "question.h"
-#include "dnsmuncher/util/byte.h"
 
-class DNS {
+class DNS : public Logging {
 	// TODO
 	public:
 		DNS() {
 			this->generate_id();
 			this->set_is_query();
+		}
+
+		virtual std::string stringify_object() const {
+			return "DNS OBJECT";
 		}
 
 		friend class DNSConvert;

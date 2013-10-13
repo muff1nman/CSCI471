@@ -13,6 +13,7 @@
 #include "dnsmuncher/actors/echo_consumer.h"
 #include "dnsmuncher/actors/data_producer.h"
 #include "dnsmuncher/data/dns_convert.h"
+#include "dnsmuncher/actors/dns_consumer.h"
 
 #include <iostream>
 #include <string>
@@ -27,7 +28,7 @@ using namespace std;
 // Runs a consumer and deletes it after completion.
 void thread_runner(int fd) {
 	//boost::shared_ptr<Convert> convert( new DNSConvert() );
-	boost::shared_ptr<Consumer> c(new EchoConsumer());
+	boost::shared_ptr<Consumer> c(new DNSConsumer());
 	c->run(fd);
 #ifdef LOGGING
 	LOG(INFO) << "Thread finalizing";
@@ -113,8 +114,6 @@ int main( int argc, char** argv ) {
 	//connect_in_new_thread( "8.8.8.8", 53, &thread_runner );
 	//connect_in_new_thread( "127.0.0.1", 16318, &thread_runner );
 	accept_in_new_threads( 16318, &thread_runner, SOCK_DGRAM );
-
-	sleep(12312);
 
 	return 0;
 }
