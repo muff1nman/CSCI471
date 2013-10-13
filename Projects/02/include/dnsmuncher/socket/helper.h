@@ -101,12 +101,7 @@ inline BytesContainer all_data( int socket_fd, size_t buf_size ) {
 		}
 	}
 
-	// TODO really we should try to keep this close to the malloc and realloc
-	// calls
-	Bytes bytes( data, data + bytes_read);
-	BytesContainer valid( bytes);
-
-	return valid;
+	return BytesContainer( data, data + bytes_read);
 }
 
 inline size_t guess_buffer_size(int socket_fd) {

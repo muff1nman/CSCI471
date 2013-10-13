@@ -17,44 +17,7 @@
 #define BITS_PER_BYTE 8
 
 typedef unsigned char Byte;
-typedef std::vector<Byte> Bytes;
-
-class BytesContainer {
-	public:
-		BytesContainer() {
-		}
-
-		BytesContainer(Bytes data) {
-			this->_data = data;
-		}
-
-		BytesContainer(Bytes data, size_t size) {
-#ifdef LOGGING
-			LOG(WARNING) << "Deprecated";
-#endif
-			this->_data = data;
-		}
-
-		Byte* data() {
-			return &(this->_data[0]);
-		}
-
-		const Byte* data() const {
-			return &(this->_data[0]);
-		}
-
-		void resize(size_t size) {
-			return _data.resize(size);
-		}
-
-		size_t size() const {
-			return this->_data.size();
-		}
-
-	private:
-		Bytes _data;
-};
-
+typedef std::vector<Byte> BytesContainer;
 
 #endif /* !__byte_h__ */
 
