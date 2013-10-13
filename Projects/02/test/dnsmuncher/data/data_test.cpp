@@ -6,8 +6,17 @@
  */
 
 #include "test_helper.h"
+#include "file_ops.h"
+#include "file_names.h"
+#include "dns_common.h"
+
+#include "dnsmuncher/data/dns_convert.h"
 
 #include <string>
+
+TEST(DNSConvert, SimpleQuery) {
+	EXPECT_EQ(bytes_from_file( QUERY_A_GOOGLE ), DNSConvert(query_a_google_obj()).to_data());
+}
 
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);

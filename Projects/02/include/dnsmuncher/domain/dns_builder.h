@@ -9,19 +9,27 @@
 #define __dns_builder_h__
 
 #include "dnsmuncher/util/logging.h"
+#include <boost/shared_ptr.hpp>
 
 class DNSBuilder {
 	public:
 
-		void set_id( unsigned long num) {
+		DNSBuilder& set_id( unsigned long num) {
 			this->id = std::bitset<16>(num);
 #ifdef LOGGING
 			LOG(INFO) << "Set id to: " << this->id.to_string();
 #endif
+			return *this;
 		}
 
 		DNS build() {
-			return DNS(id);
+			return DNS(id, qd_count, an_count, ns_count, ar_count, qr, aa, tc, rd, ra,
+					opcode, z, rcode, questions, records);
+		}
+
+		boost::shared_ptr<DNS> build_ptr() {
+			return boost::shared_ptr<DNS>(new DNS(id, qd_count, an_count, ns_count, ar_count, qr, aa, tc, rd, ra,
+					opcode, z, rcode, questions, records));
 		}
 
 	protected:

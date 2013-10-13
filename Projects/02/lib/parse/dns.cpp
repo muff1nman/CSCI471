@@ -8,12 +8,12 @@
 #include "dnsmuncher/parse/dns.h"
 
 #include "dnsmuncher/util/logging.h"
+#include "dnsmuncher/domain/dns_builder.h"
 
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/qi_binary.hpp>
 #include <boost/bind.hpp>
 
-#include "dns_builder.h"
 
 namespace qi = boost::spirit::qi;
 
