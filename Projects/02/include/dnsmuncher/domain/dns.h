@@ -27,12 +27,13 @@ class DNS : public Logging {
 		}
 
 		virtual std::string stringify_object() const {
-			return "DNS OBJECT";
+			std::string info("");
+			info += std::string("id: ") + this->id.to_string() + list_sep;
+			return info;
 		}
 
 		friend class DNSConvert;
 
-	public:
 		void add_question( const Question q ) {
 			// make sure to increment length
 			// TODO
@@ -74,6 +75,7 @@ class DNS : public Logging {
 			this->ra = ra;
 		}
 
+		DNS( std::bitset<16> id ) : id(id) { }
 
 	private:
 		// TODO maybe hide the implementation of bitset?
