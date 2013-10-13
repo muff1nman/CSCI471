@@ -26,20 +26,13 @@ class BytesContainer {
 		}
 
 		BytesContainer(Bytes data) {
-			set_data( data );
+			this->_size = 0;
+			this->_data = data;
 		}
 
 		BytesContainer(Bytes data, size_t size) {
-			set_data( data, size );
-		}
-
-		void set_data( Bytes data ) {
-			this->_data = data;
-		}
-
-		void set_data( Bytes data, size_t size ) {
-			this->_data = data;
 			this->_size = size;
+			this->_data = data;
 		}
 
 		Byte* data() const {
