@@ -28,11 +28,6 @@ class DNS : public Logging {
 		static const size_t Z_FIELD_LENGTH = 3;
 		static const size_t RCODE_FIELD_LENGTH = 4;
 
-		DNS() {
-			this->generate_id();
-			this->set_is_query();
-		}
-
 		virtual std::string stringify_object() const {
 			std::string info("");
 			info += std::string("id: ") + this->id.to_string() + list_sep;
@@ -41,46 +36,6 @@ class DNS : public Logging {
 
 		friend class DNSConvert;
 
-		void add_question( const Question q ) {
-			// make sure to increment length
-			// TODO
-		}
-
-		void add_additional( const ResourceRecord r ) {
-			// TODO
-		}
-
-		void add_answer( const ResourceRecord r ) {
-			// TODO	
-		}
-
-		void add_nameserver( const ResourceRecord r ) {
-			// TODO
-		}
-
-		void set_recursion_desired( bool rd ) {
-			this->rd = rd;
-		}
-
-		void set_authoritative_bit( bool aa ) {
-			this->aa = aa;
-		}
-
-		void set_is_response() {
-			this->qr = false;
-		}
-		
-		void set_is_query() {
-			this->qr = true;
-		}
-
-		void set_truncated() {
-			this->tc = true;
-		}
-
-		void set_recursion_available( bool ra ) {
-			this->ra = ra;
-		}
 
 		/**
 		 * For testing purposes
@@ -165,6 +120,8 @@ class DNS : public Logging {
 			{ }
 
 	private:
+		// dont use
+		DNS() { };
 		// TODO maybe hide the implementation of bitset?
 		std::bitset<GENERIC_HEADER_FIELD_LENGTH> id, qd_count, an_count, ns_count, ar_count;
 		bool qr, aa, tc, rd, ra;

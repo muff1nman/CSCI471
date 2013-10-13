@@ -16,9 +16,6 @@ class DNSConsumer: public EchoConsumer {
 	public:
 		virtual void run(int socket_fd);
 
-	protected:
-		DNS dns;
-
 };
 #endif /* !__dns_consumer_h__ */
 

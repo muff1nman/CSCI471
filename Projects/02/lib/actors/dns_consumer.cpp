@@ -11,9 +11,9 @@
 
 void DNSConsumer::run(int socket_fd) {
 	BytesContainer raw_data = all_data(socket_fd);
-	this->dns = from_data( raw_data );
+	DNS dns = from_data( raw_data );
 #ifdef LOGGING
-	LOG(INFO) << this->dns.to_string();
+	LOG(INFO) << dns.to_string();
 #endif
 }
 

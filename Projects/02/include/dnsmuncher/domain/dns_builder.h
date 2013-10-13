@@ -22,6 +22,47 @@ class DNSBuilder {
 			return *this;
 		}
 
+		void add_question( const Question q ) {
+			// make sure to increment length
+			// TODO
+		}
+
+		void add_additional( const ResourceRecord r ) {
+			// TODO
+		}
+
+		void add_answer( const ResourceRecord r ) {
+			// TODO	
+		}
+
+		void add_nameserver( const ResourceRecord r ) {
+			// TODO
+		}
+
+		void recursion_desired( bool rd ) {
+			this->rd = rd;
+		}
+
+		void authoritative_bit( bool aa ) {
+			this->aa = aa;
+		}
+
+		void is_response() {
+			this->qr = false;
+		}
+		
+		void is_query() {
+			this->qr = true;
+		}
+
+		void truncated() {
+			this->tc = true;
+		}
+
+		void recursion_available( bool ra ) {
+			this->ra = ra;
+		}
+
 		DNS build() {
 			return DNS(id, qd_count, an_count, ns_count, ar_count, qr, aa, tc, rd, ra,
 					opcode, z, rcode, questions, records);
