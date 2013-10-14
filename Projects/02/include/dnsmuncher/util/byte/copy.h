@@ -11,23 +11,39 @@
 #include "dnsmuncher/util/byte/byte.h"
 
 #include <bitset>
+#include <vector>
 
-// TODO test
 template <size_t M, size_t N>
-void copy_into( std::bitset<M> dst, std::bitset<N> src, size_t dst_offset_from_right = 0, size_t src_offset_from_right = 0 ) {
+std::bitset<M> copy_into( std::bitset<M>& dst, const std::bitset<N>& src, size_t dst_offset_from_right = 0 ) {
+	size_t i = dst_offset_from_right;
+	size_t j = 0;
+	while( i < M && j < N ) {
+		dst[i] = src[j];
+		++i;
+		++j;
+	}
 
+	return dst;
 }
 
-// TODO test
 template <size_t M, size_t N>
 std::bitset<N> dissect( std::bitset<M> src, size_t src_offset_from_right = 0 ) {
-	return std::bitset<N>(0);
+	std::bitset<N> to_return;
+	size_t i = 0;
+	size_t j = src_offset_from_right;
+	while( i < N && j < M ) {
+		to_return[i] = src[j];
+		++i;
+		++j;
+	}
+
+	return to_return;
 }
 
-// TODO test
-BytesContainer join( BytesContainer first, BytesContainer second ) {
-	BytesContainer joined;
-	joined.reserve(first.size() + second.size());
+template <class T>
+std::vector<T> join( const std::vector<T> first, const std::vector<T> second ) {
+	std::vector<T> joined;
+	joined.reserve( first.size() + second.size() );
 	joined.insert( joined.end(), first.begin(), first.end() );
 	joined.insert( joined.end(), second.begin(), second.end() );
 	return joined;

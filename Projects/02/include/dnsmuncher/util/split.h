@@ -10,10 +10,38 @@
 
 #include <vector>
 #include <string>
+#include <boost/algorithm/string.hpp>
+#include "dnsmuncher/util/logging.h"
+#include <algorithm>
 
-inline std::vector<std::string> split_name( const std::string& name ) {
-	// TODO
-	return std::vector<std::string>();
+
+inline std::vector<std::string> split_name( std::string name, std::string delimiter = "." ) {
+	if( name.empty() ) {
+		Logging::do_error("You gave me an empty domain name");
+		return std::vector<std::string>();
+	}
+	
+	if( name.substr( name.size() - delimiter.size() ) == delimiter) {
+		name.erase( name.end() - delimiter.size(), name.end() );
+	}
+
+	if( name.empty() ) { // search for implicit root domain
+		return std::vector<std::string>();
+	}
+
+	std::vector<std::string> cut_up;
+	boost::split(cut_up, name, boost::is_any_of(delimiter));
+
+	if( std::find(cut_up.begin(), cut_up.end(), std::string("")) != cut_up.end() ) {
+		Logging::do_error("I will not accept duplicate periods");
+		return std::vector<std::string>();
+	}
+
+	return cut_up;
+}
+
+inline std::vector<std::string> split_name( const char* c_str ) {
+	return split_name( std::string(c_str) );
 }
 
 #endif /* !__split_h__ */

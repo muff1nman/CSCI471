@@ -34,7 +34,6 @@ std::bitset<DNS::GENERIC_HEADER_FIELD_LENGTH> DNSConvert::flags() const {
 	return flags;
 }
 
-// TODO test
 BytesContainer DNSConvert::to_data() const {
 	BytesContainer c;
 	c = convert_big_endian<2>(this->dns->id);
