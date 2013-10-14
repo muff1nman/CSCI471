@@ -20,25 +20,16 @@ DNSConvert::DNSConvert(boost::shared_ptr<DNS> dns) : dns(dns) {
 }
 
 std::bitset<DNS::GENERIC_HEADER_FIELD_LENGTH> DNSConvert::flags() const {
-	const size_t QR_OFFSET = 0;
-	const size_t OPCODE_OFFSET = 1;
-	const size_t AA_OFFSET = 5;
-	const size_t TC_OFFSET = 6;
-	const size_t RD_OFFSET = 7;
-	const size_t RA_OFFSET = 8;
-	const size_t Z_OFFSET = 9;
-	const size_t RCODE_OFFSET = 12;
-
 	std::bitset<DNS::GENERIC_HEADER_FIELD_LENGTH> flags;
 
-	flags[QR_OFFSET] = this->dns->qr;
-	flags[AA_OFFSET] = this->dns->aa;
-	flags[TC_OFFSET] = this->dns->tc;
-	flags[RD_OFFSET] = this->dns->rd;
-	flags[RA_OFFSET] = this->dns->ra;
+	flags[DNS::QR_OFFSET] = this->dns->qr;
+	flags[DNS::AA_OFFSET] = this->dns->aa;
+	flags[DNS::TC_OFFSET] = this->dns->tc;
+	flags[DNS::RD_OFFSET] = this->dns->rd;
+	flags[DNS::RA_OFFSET] = this->dns->ra;
 
-	copy_into( flags, this->dns->opcode, OPCODE_OFFSET );
-	copy_into( flags, this->dns->rcode, RCODE_OFFSET );
+	copy_into( flags, this->dns->opcode, DNS::OPCODE_OFFSET );
+	copy_into( flags, this->dns->rcode, DNS::RCODE_OFFSET );
 
 	return flags;
 }

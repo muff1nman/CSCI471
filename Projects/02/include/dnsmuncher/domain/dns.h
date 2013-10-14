@@ -10,15 +10,16 @@
 
 #include "dnsmuncher/util/logging.h"
 #include "dnsmuncher/util/byte/byte.h"
+#include "resource_record.h"
+#include "question.h"
 
 #include <bitset>
 #include <vector>
 #include <string>
 #include <cstdlib>
-#include "resource_record.h"
-#include "question.h"
-
+#include <algorithm>
 #include <ostream>
+#include <sstream>
 
 class DNS : public Logging {
 	public:
@@ -27,11 +28,37 @@ class DNS : public Logging {
 		static const size_t OPCODE_FIELD_LENGTH = 4;
 		static const size_t Z_FIELD_LENGTH = 3;
 		static const size_t RCODE_FIELD_LENGTH = 4;
+		static const size_t QR_OFFSET = 15;
+		static const size_t OPCODE_OFFSET = 11;
+		static const size_t AA_OFFSET = 10;
+		static const size_t TC_OFFSET = 9;
+		static const size_t RD_OFFSET = 8;
+		static const size_t RA_OFFSET = 7;
+		static const size_t Z_OFFSET = 4;
+		static const size_t RCODE_OFFSET = 0;
 
-		virtual std::string stringify_object() const {
-			std::string info("");
-			info += std::string("id: ") + this->id.to_string() + list_sep;
-			return info;
+		std::string stringify_object() const {
+			std::stringstream info;
+			info << std::string("id: ") << this->id.to_string() << list_sep;
+			info << std::string("qd_count: ") << this->qd_count.to_string() << list_sep;
+			info << std::string( "an_count : ") << this->an_count.to_string() << list_sep;
+			info << std::string( "ns_count : ") << this->ns_count.to_string() << list_sep;
+			info << std::string( "ar_count : ") << this->ar_count.to_string() << list_sep;
+			info << std::string( "qr : ") << this->qr << list_sep;
+			info << std::string( "aa : ") << this->aa << list_sep;
+			info << std::string( "tc : ") << this->tc << list_sep;
+			info << std::string( "rd : ") << this->rd << list_sep;
+			info << std::string( "ra : ") << this->ra << list_sep;
+			info << std::string( "opcode : ") << this->opcode.to_string() << list_sep;
+			info << std::string( "z : ") << this->z.to_string() << list_sep;
+			info << std::string( "rcode : ") << this->rcode.to_string() << list_sep;
+			info << std::string("questions: ") + nested_start;
+			for( size_t i = 0; i < questions.size(); ++i ) {
+				info << questions.at(i).to_string() + list_sep;
+			}
+			info << nested_finish;
+			//stringify_list_helper( "records : ", info, records );
+			return info.str();
 		}
 
 		friend class DNSConvert;
@@ -41,7 +68,7 @@ class DNS : public Logging {
 		 * For testing purposes
 		 */
 		bool header_equal( const DNS& other ) const {
-			return this->id == other.id &&
+			bool ret_val = this->id == other.id &&
 				this->qd_count == other.qd_count &&
 				this->an_count == other.an_count &&
 				this->ns_count == other.ns_count &&
@@ -54,14 +81,26 @@ class DNS : public Logging {
 				this->opcode == other.opcode &&
 				this->z == other.z &&
 				this->rcode == other.rcode;
+			return ret_val;
+
+		}
+
+		/** 
+		 * For testing purposes
+		 */
+		bool content_equal( const DNS& other ) const {
+			return
+				this->questions.size() == other.questions.size() &&
+				this->records.size() == other.records.size();
+				std::equal(this->questions.begin(), this->questions.end(), other.questions.begin()) &&
+				std::equal(this->records.begin(), this->records.end(), other.records.begin());
 		}
 
 		/**
 		 * For testing purposes
 		 */
 		bool operator==( const DNS& other ) const {
-			return header_equal(other);
-			// TODO recuse into Question and Resource
+			return header_equal(other) && content_equal(other);
 		}
 
 		/**
@@ -69,19 +108,7 @@ class DNS : public Logging {
 		 */
 		friend std::ostream& operator<<(std::ostream& os, const DNS& dns) {
 			os << std::endl;
-			os<< "id: " << dns.id << std::endl;
-			os<< "qt_count: " << dns.qd_count << std::endl;
-			os<< "an_count : " << dns.an_count << std::endl;
-			os<< "ns_count : " << dns.ns_count << std::endl;
-			os<< "ar_count : " << dns.ar_count << std::endl;
-			os<< "qr : " << dns.qr << std::endl;
-			os<< "aa : " << dns.aa << std::endl;
-			os<< "tc : " << dns.tc << std::endl;
-			os<< "rd : " << dns.rd << std::endl;
-			os<< "ra : " << dns.ra << std::endl;
-			os<< "opcode : " << dns.opcode << std::endl;
-			os<< "z : " << dns.z << std::endl;
-			os<< "rcode : " << dns.rcode << std::endl;
+			os<< dns.to_string();
 			return os;
 		}
 

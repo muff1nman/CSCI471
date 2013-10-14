@@ -13,7 +13,11 @@
 #include <boost/shared_ptr.hpp>
 
 boost::shared_ptr<DNS> query_a_google_obj() {	
-	return DNSBuilder().set_id(29644).build_ptr();
+	return DNSBuilder().
+		set_id(29644).
+		recursion_desired(true).
+		add_question( Question("www.google.com") ).
+		build_ptr();
 }
 
 #endif /* !__dns_common_h__ */

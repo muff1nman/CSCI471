@@ -14,10 +14,21 @@
 #include "dnsmuncher/util/byte/byte.h"
 
 #include <vector>
+#include <algorithm>
 
 class ResourceRecord {
+	public:
+		ResourceRecord( Name aname = "", QType type = QType(), NetClass aclass = NetClass() ) : aname(aname), type(type), aclass(aclass) {}
 
-	// TODO clean up rdata (it was possibly allocated with new?)
+		bool operator==( const ResourceRecord& other ) const {
+			return this->aname == other.aname &&
+				this->type == other.type &&
+				this->aclass == other.aclass &&
+				this->ttl == other.ttl &&
+				this->rdlength == other.rdlength;
+				this->rdata.size() == other.rdata.size() &&
+				std::equal( this->rdata.begin(), this->rdata.end(), other.rdata.begin() );
+		}
 
 	private:
 		Name aname;

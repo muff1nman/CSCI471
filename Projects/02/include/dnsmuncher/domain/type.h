@@ -8,11 +8,25 @@
 #ifndef __type_h__
 #define __type_h__
 
-class Type {
+#include "dnsmuncher/util/logging.h"
+
+class Type : public Logging {
 	public:
 		static const size_t A = 1;
-		// TODO...etc
-	private:
+
+		Type( size_t type ) : type(type) { }
+		
+		bool operator==( const Type& other ) const {
+			return this->type == other.type;
+		}
+
+		std::string stringify_object() const {
+			std::stringstream info;
+			info << type;
+			return info.str();
+		}
+
+	protected:
 		size_t type;
 };
 

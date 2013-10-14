@@ -11,7 +11,8 @@
 #include "type.h"
 
 class QType : public Type {
-	// TODO
+	public:
+		QType( size_t type = Type::A ) : Type(type) { }
 };
 
 #endif /* !__qtype_h__ */
