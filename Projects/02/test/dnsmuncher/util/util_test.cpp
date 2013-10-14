@@ -134,7 +134,7 @@ TEST(SplitName, Multiple) {
 }
 
 TEST(SplitName, DoublePeriods) {
-	EXPECT_DEATH({ split_name("www.hell..o.com"); }, "Will not accept duplicate periods");
+	EXPECT_DEATH({ split_name("www.hell..o.com"); }, "duplicate periods");
 }
 
 int main(int argc, char **argv) {
