@@ -18,7 +18,7 @@
 
 class ResourceRecord {
 	public:
-		ResourceRecord( Name aname = "", QType type = QType(), NetClass aclass = NetClass() ) : aname(aname), type(type), aclass(aclass) {}
+		ResourceRecord( Name aname = ".", QType type = QType(), NetClass aclass = NetClass() ) : aname(aname), type(type), aclass(aclass) {}
 
 		bool operator==( const ResourceRecord& other ) const {
 			return this->aname == other.aname &&
