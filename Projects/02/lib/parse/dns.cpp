@@ -51,6 +51,10 @@ void print_s( const std::string& data ) {
 #endif
 }
 
+void multiple( const std::vector<std::string>& data, unsigned long type, unsigned long other_type ) {
+
+}
+
 DNS from_data( const BytesContainer raw ) {
 
 	using boost::phoenix::ref;
@@ -83,9 +87,12 @@ DNS from_data( const BytesContainer raw ) {
 			qi::big_word[ref(answer_count) = qi::_1] >>
 			qi::big_word[ref(ns_count) = qi::_1] >>
 			qi::big_word[ref(ar_count) = qi::_1] >>
-			//qi::repeat(ref(question_count))[
-				name_parse[boost::bind(&print, _1)]
-			//]
+			qi::repeat(ref(question_count))[
+			(
+				name_parse[boost::bind(&print, _1)] >>
+				qi::big_word >>
+				qi::big_word)[&multiple]
+			]
 			);
 #ifdef LOGGING
 	if ( start == finish ) {
