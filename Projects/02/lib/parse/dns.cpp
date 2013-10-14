@@ -74,7 +74,7 @@ DNS from_data( const BytesContainer raw ) {
 		;
 
 	BytesContainer::const_iterator start = raw.begin();
-	BytesContainer::const_iterator finish = raw.end() - 4;
+	BytesContainer::const_iterator finish = raw.end();
 
 	bool parsed_header_correctly = qi::parse( start, finish, 
 			qi::big_word[bind(&DNSBuilder::set_id, &b, _1)] >> 
@@ -91,7 +91,7 @@ DNS from_data( const BytesContainer raw ) {
 	if ( start == finish ) {
 		LOG(INFO) << "Used all bytes";
 	} else {
-		LOG(WARNING) << "Bytes remaining";
+		LOG(WARNING) << finish - start << " bytes remaining";
 	}
 	if (parsed_header_correctly) {
 		LOG(INFO) << "Parsed correctly";
