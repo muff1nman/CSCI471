@@ -25,6 +25,8 @@ class Name : public Logging {
 			this->labels = split_name( domain_name );
 		}
 
+		Name( const std::vector<std::string> name ) : labels(name) { }
+
 		bool operator==( const Name& other ) const {
 			return this->labels.size() == other.labels.size() &&
 				std::equal( this->labels.begin(), this->labels.end(), other.labels.begin() );

@@ -19,5 +19,8 @@
 typedef unsigned char Byte;
 typedef std::vector<Byte> BytesContainer;
 
+typedef unsigned int generic_number;
+typedef unsigned short opcode_number;
+
 #endif /* !__byte_h__ */
 
