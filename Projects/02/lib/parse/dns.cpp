@@ -38,6 +38,77 @@ void set_fields( DNSBuilder* builder, unsigned long num ) {
 	builder->return_code( dissect<DNS::GENERIC_HEADER_FIELD_LENGTH,DNS::RCODE_FIELD_LENGTH>(fields, DNS::RCODE_OFFSET) );
 }
 
+void create_name( /*Name* const name,*/ std::vector<std::string > labels ) {
+#ifdef LOGGING
+	LOG(INFO) << "Creating name!";
+#endif
+	//*name = Name(labels);
+}
+
+void dummy ( ) {
+#ifdef LOGGING
+	LOG(INFO) << "dummy!";
+#endif
+
+}
+
+qi::rule< BytesContainer::const_iterator, std::string() > string_parse(const size_t& label_length) {
+	return qi::repeat(ref(label_length))[qi::char_];
+}
+
+qi::rule< BytesContainer::const_iterator > create_name_parser( Name& name, size_t& label_length ) {
+		qi::rule< BytesContainer::const_iterator > r = 
+			(qi::repeat[
+			(qi::omit[qi::byte_[ref(label_length) = qi::_1] - qi::byte_(0)] >> 
+			string_parse( label_length ))[bind(&dummy)]
+		] >>
+		qi::omit[qi::byte_(0)])// [bind(&dummy/*, &name*/)]
+		;
+
+		return r;
+}
+
+void loop_over_and_print( BytesContainer::const_iterator start, BytesContainer::const_iterator end ) {
+#ifdef LOGGING
+	LOG(INFO) << "Starting print process";
+#endif
+	for(;start != end; ++start ) {
+#ifdef LOGGING
+		LOG(INFO) << "Byte: " << *start;
+#endif
+	}
+#ifdef LOGGING
+	LOG(INFO) << "Ending print process";
+#endif
+}
+
+boost::optional<Name> parse_name( ParseContext& context ) {
+	boost::optional<Name> n;
+	Name name;
+	size_t length;
+
+	loop_over_and_print( context.raw_data.begin() + 12, context.raw_data.begin()  + 28 );
+
+	qi::rule< BytesContainer::const_iterator > name_parser = create_name_parser(name, length );
+
+	bool sucessful = qi::parse( context.raw_data.begin() + 12, context.raw_data.begin()  + 28, 
+			name_parser);
+	if( sucessful ) {
+#ifdef LOGGING
+			LOG(INFO) << "Parsed name: " << name.to_string();
+#endif
+		n = name;
+	}
+#ifdef LOGGING
+	else {
+		LOG(WARNING) << "Name not parsed correctly";
+	}
+#endif
+
+	return n;
+
+}
+
 boost::optional<ResourceRecord> parse_other_record( ParseContext& context ) {
 	boost::optional<ResourceRecord> r;
 	// TODO
@@ -46,7 +117,8 @@ boost::optional<ResourceRecord> parse_other_record( ParseContext& context ) {
 
 boost::optional<Question> parse_question( ParseContext& context ) {
 	boost::optional<Question> q;
-	// TODO	
+	boost::optional<Name> name = parse_name( context );
+
 	return q;
 }
 
@@ -90,15 +162,6 @@ bool parse_header( ParseContext& context, size_t& question_count, size_t& answer
 
 }
 
-qi::rule< BytesContainer::const_iterator, std::vector<std::string>() > create_name_parser( size_t& label_length ) {
-		return qi::repeat[
-			qi::omit[qi::byte_[ref(label_length) = qi::_1] - qi::byte_(0)] >> 
-			qi::repeat(ref(label_length))[qi::char_]
-		] >>
-		qi::omit[qi::byte_(0)]
-		;
-}
-
 DNS from_data( const BytesContainer raw ) {
 
 	const size_t HEADER_SIZE_IN_BYTES = 16;
@@ -123,9 +186,9 @@ DNS from_data( const BytesContainer raw ) {
 	b->additional_count( ar_count );
 
 	for( size_t i = 0; i < question_count; ++i ) {
-		boost::optional<Question> q; // = parse_question();
+		boost::optional<Question> q = parse_question(context);
 		if ( !q ) {
-			//Logging::do_error( "Could not parse questions correctly" );
+			Logging::do_error( "Could not parse questions correctly" );
 		} 
 
 		// TODO do something with q

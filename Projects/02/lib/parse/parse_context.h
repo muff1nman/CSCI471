@@ -16,7 +16,7 @@ class ParseContext {
 	public:
 		ParseContext( const BytesContainer& raw_data, const
 				BytesContainer::const_iterator& start, const
-				BytesContainer::const_iterator& finish, BytesContainer::const_iterator
+				BytesContainer::const_iterator& finish, const BytesContainer::const_iterator
 				current, boost::shared_ptr<DNSBuilder> b) : 
 			raw_data(raw_data), start(start), finish(finish), current(current), b(b) { }
 
@@ -25,6 +25,9 @@ class ParseContext {
 		const BytesContainer::const_iterator& finish;
 		BytesContainer::const_iterator current;
 		boost::shared_ptr<DNSBuilder> b;
+
+	private:
+		ParseContext( const ParseContext& other );
 
 };
 
