@@ -17,6 +17,7 @@
 #include <boost/bind.hpp>
 #include <boost/optional.hpp>
 #include "parse_context.h"
+#include <iterator>
 
 using boost::phoenix::ref;
 using boost::bind;
@@ -82,28 +83,60 @@ void loop_over_and_print( BytesContainer::const_iterator start, BytesContainer::
 #endif
 }
 
-boost::optional<Name> parse_name( ParseContext& context ) {
-	boost::optional<Name> n;
-	Name name;
-	size_t length;
+bool context_has_bytes_left( const ParseContext& context, size_t bytes ) {
+	return context.finish - context.start >= bytes;
+}
 
-	loop_over_and_print( context.raw_data.begin() + 12, context.raw_data.begin()  + 28 );
-
-	qi::rule< BytesContainer::const_iterator > name_parser = create_name_parser(name, length );
-
-	bool sucessful = qi::parse( context.raw_data.begin() + 12, context.raw_data.begin()  + 28, 
-			name_parser);
-	if( sucessful ) {
+boost::optional<std::string> parse_string_part( ParseContext& context ) {
+	boost::optional<std::string> to_return;
+	if( context_has_bytes_left( context, 1 )) {
+		size_t length = (size_t) *(context.current++);
 #ifdef LOGGING
-			LOG(INFO) << "Parsed name: " << name.to_string();
+		LOG(INFO) << "length of next string: " << length;
 #endif
-		n = name;
+		if( context_has_bytes_left( context, length )) {
+			BytesContainer::const_iterator end_of_string = context.current;
+			std::advance( end_of_string, length);
+			to_return = std::string(context.current, end_of_string);
+#ifdef LOGGING
+			LOG(INFO) << "Created string: " << *to_return;
+#endif
+			context.current = end_of_string;
+		}
+#ifdef LOGGING
+		else {
+			LOG(WARNING) << "Not enough bytes to parse next piece of label";
+		}
+#endif
 	}
 #ifdef LOGGING
 	else {
-		LOG(WARNING) << "Name not parsed correctly";
+		LOG(WARNING) << "Not enough bytes left to parse next label length";
 	}
 #endif
+
+	return to_return;
+}
+
+bool is_zero_byte( ParseContext& context ) {
+	return context_has_bytes_left( context, 1 )  && *(context.current) == (Byte) 0;
+}
+
+boost::optional<Name> parse_name( ParseContext& context ) {
+	boost::optional<Name> n;
+
+	std::vector<std::string> labels;
+
+	while(!is_zero_byte(context)) {
+		boost::optional<std::string> label = parse_string_part( context );
+		if( label ) {
+			labels.push_back(*label);
+		} else {
+			break;
+		}
+	}
+
+	n = Name(labels);
 
 	return n;
 
@@ -118,6 +151,10 @@ boost::optional<ResourceRecord> parse_other_record( ParseContext& context ) {
 boost::optional<Question> parse_question( ParseContext& context ) {
 	boost::optional<Question> q;
 	boost::optional<Name> name = parse_name( context );
+#ifdef LOGGING
+	if(name)
+		LOG(INFO) << "Name: " << (*name).to_string();
+#endif
 
 	return q;
 }

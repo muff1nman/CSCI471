@@ -37,9 +37,6 @@ class Name : public Logging {
 		std::string stringify_object() const {
 			std::stringstream info;
 			info << "labels: ";
-#ifdef LOGGING
-			LOG(INFO) << "HERE";
-#endif
 			for( size_t i = 0; i < labels.size(); ++i ) {
 				info << labels.at(i) << ".";
 			}
