@@ -15,4 +15,24 @@ include_directories(
 
 add_subdirectory( dnsmuncher )
 
-file(COPY ${RESOURCES_DIR} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+# New cmake copy command
+#file(COPY ${RESOURCES_DIR} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
+# Old cmake copy command
+set(destDir ${RESOURCES_OUTPUT_DIR})
+set(srcDir ${CMAKE_CURRENT_SOURCE_DIR}/${RESOURCES_DIR})
+
+make_directory(${destDir})
+
+file(GLOB templateFiles RELATIVE ${srcDir} ${RESOURCES_DIR}/*)
+message(STATUS "Files to be copied: ${templateFiles}")
+foreach(templateFile ${templateFiles})
+	set(srcTemplatePath ${srcDir}/${templateFile})
+	if(NOT IS_DIRECTORY ${srcTemplatePath})
+		message(STATUS "Copying ${templateFile}")
+		configure_file(
+			${srcTemplatePath}
+			${destDir}/${templateFile}
+			COPYONLY)
+	endif(NOT IS_DIRECTORY ${srcTemplatePath})
+endforeach(templateFile)

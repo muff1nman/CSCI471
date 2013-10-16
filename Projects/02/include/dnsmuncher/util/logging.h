@@ -11,10 +11,10 @@
 #include "dnsmuncher/config.h"
 
 #ifdef LOGGING
-#include <string>
 #include <boost/lexical_cast.hpp>
 #include <glog/logging.h>
 #endif
+#include <string>
 #include <cstdio>
 #include <cstdlib>
 #include <sstream>
@@ -35,12 +35,10 @@ class Logging {
 			exit(1);
 		}
 
-#ifdef LOGGING
 		virtual std::string to_string() const { return std::string(nested_start) + stringify_object() + std::string(nested_finish); }
 		virtual std::string stringify_object() const { return std::string("UNKNOWN"); }
 	protected:
 		virtual ~Logging() { }
-#endif
 
 };
 
