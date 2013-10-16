@@ -12,5 +12,7 @@
 
 DNS from_data( const BytesContainer raw );
 
+boost::shared_ptr<DNS> from_data_as_ptr( const BytesContainer raw );
+
 #endif /* !__dns_h__ */
 

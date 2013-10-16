@@ -27,8 +27,8 @@ using namespace std;
 
 // Runs a consumer and deletes it after completion.
 void thread_runner(int fd) {
-	//boost::shared_ptr<Convert> convert( new DNSConvert() );
-	boost::shared_ptr<Consumer> c(new DNSConsumer());
+	boost::shared_ptr<DNS> result;
+	boost::shared_ptr<Consumer> c(new DNSConsumer(result));
 	c->run(fd);
 #ifdef LOGGING
 	LOG(INFO) << "Thread finalizing";

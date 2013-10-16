@@ -14,7 +14,11 @@
 
 class DNSConsumer: public EchoConsumer {
 	public:
+		DNSConsumer( boost::shared_ptr<DNS>& result ) : result(result) { }
 		virtual void run(int socket_fd);
+
+	protected:
+		boost::shared_ptr<DNS>& result;
 
 };
 #endif /* !__dns_consumer_h__ */

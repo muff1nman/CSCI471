@@ -346,11 +346,8 @@ bool parse_header( ParseContext& context, size_t& question_count, size_t& answer
 
 }
 
-DNS from_data( const BytesContainer raw ) {
-
+void from_data_interntal( const BytesContainer raw, boost::shared_ptr<DNSBuilder> b ) {
 	const size_t HEADER_SIZE_IN_BYTES = 16;
-
-	boost::shared_ptr<DNSBuilder> b( new DNSBuilder() );
 
 	// data holders
 	size_t question_count;
@@ -393,7 +390,24 @@ DNS from_data( const BytesContainer raw ) {
 		}
 	}
 
+}
+
+DNS from_data( const BytesContainer raw ) {
+
+	boost::shared_ptr<DNSBuilder> b( new DNSBuilder() );
+
+	from_data_interntal( raw, b );
+
 	return b->build();
+}
+
+boost::shared_ptr<DNS> from_data_as_ptr( const BytesContainer raw ) {
+	boost::shared_ptr<DNSBuilder> b( new DNSBuilder() );
+
+	from_data_interntal( raw, b );
+
+	return b->build_ptr();
+
 }
 
 

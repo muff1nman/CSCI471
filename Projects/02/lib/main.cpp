@@ -7,11 +7,13 @@
 
 #include "dnsmuncher/config.h"
 #include "dnsmuncher/socket/connect.h"
+#include "dnsmuncher/socket/listen.h"
 #include "dnsmuncher/socket/helper.h"
 #include "dnsmuncher/actors/consumer.h"
 #include "dnsmuncher/actors/data_producer.h"
 #include "dnsmuncher/data/dns_convert.h"
 #include "dnsmuncher/domain/dns_builder.h"
+#include "dnsmuncher/actors/dns_consumer.h"
 
 #include <iostream>
 #include <string>
@@ -44,6 +46,19 @@ void socket_thread_runner(int fd, boost::shared_ptr<Consumer> c) {
 #ifdef LOGGING
 	LOG(INFO) << "Thread released";
 #endif
+}
+
+DNS send_and_receive( boost::shared_ptr<DNS> query ) {
+	boost::shared_ptr<Convert> dns_data( new DNSConvert(query) );
+	boost::shared_ptr<Consumer> gen(new DataProducer(dns_data));
+	boost::function<void(int)> sfunc = boost::bind(&socket_thread_runner, _1, gen);
+	connect_in_new_thread( "127.0.0.1", 16318, sfunc );
+
+	//boost::shared_ptr<DNS> result;
+	//boost::shared_ptr<Consumer> parse( new DNSConsumer(result) );
+	//boost::function<void(int)> rfunc = boost::bind(&socket_thread_runner, _1, parse);
+	//accept_in_new_threads( 16318, rfunc, SOCK_DGRAM );
+
 }
 
 
@@ -117,11 +132,12 @@ int main( int argc, char** argv ) {
 #endif
 
 	DNSBuilder b;
-	boost::shared_ptr<Convert> convert( new DNSConvert(b.build_ptr()) );
-	boost::shared_ptr<Consumer> c(new DataProducer(convert));
-	boost::function<void(int)> func = boost::bind(&socket_thread_runner, _1, c);
-	//connect_in_new_thread( "8.8.8.8", 53, func );
-	connect_in_new_thread( "127.0.0.1", 16318, func );
+	b.set_id( 234)
+	 .is_query()
+	 .add_question( Question("www.google.com") )
+	 .question_count(1)
+	 .recursion_desired(true);
+	send_and_receive(b.build_ptr());
 
 #ifdef LOGGING
 	LOG(INFO) << "Done with connection";

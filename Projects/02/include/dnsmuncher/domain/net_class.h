@@ -21,6 +21,8 @@ class NetClass : public Logging {
 		bool operator==( const NetClass& other ) const {
 			return this->net_class == other.net_class;
 		}
+		
+		virtual ~NetClass() { }
 
 		std::string stringify_object() const {
 			std::stringstream info;
