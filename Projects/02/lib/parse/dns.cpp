@@ -11,6 +11,10 @@
 #include "dnsmuncher/domain/dns_builder.h"
 #include "dnsmuncher/util/byte/copy.h"
 
+#ifdef LOGGING
+#include "dnsmuncher/util/byte/print.h"
+#endif
+
 #include <boost/spirit/include/qi.hpp>
 #include <boost/spirit/include/qi_binary.hpp>
 #include <boost/spirit/include/phoenix.hpp>
@@ -149,7 +153,7 @@ boost::optional<Name> parse_name( ParseContext& context ) {
 template <class ForwardIterator, class Distance>
 ForwardIterator next(ForwardIterator it, Distance d) {
 	ForwardIterator i = it;
-	std::advance(it, d);
+	std::advance(i, d);
 	return i;
 }
 
@@ -217,7 +221,15 @@ boost::optional<ResourceRecord> parse_other_record( ParseContext& context ) {
 	boost::optional<BytesContainer> rdata;
 	if( rdlength ) {
 		rdata	= parse_data( context, *rdlength );
+#ifdef LOGGING
+		LOG(INFO) << "Resource record has data: " << demaria_util::to_string( *rdata );
+#endif
 	}
+#ifdef LOGGING
+	else {
+		LOG(WARNING) << "Could not parse data";
+	}
+#endif
 
 	if( 
 			name &&

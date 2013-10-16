@@ -9,10 +9,10 @@
 #define __test_helper_h__
 
 #include "dnsmuncher/config.h"
-#include "gtest/gtest.h"
 #ifdef LOGGING
 #include <glog/logging.h>
 #endif
+#include "gtest/gtest.h"
 
 #endif /* !__test_helper_h__ */
 

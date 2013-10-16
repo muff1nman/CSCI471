@@ -32,7 +32,7 @@ class ResourceRecord {
 				this->type == other.type &&
 				this->aclass == other.aclass &&
 				this->ttl == other.ttl &&
-				this->rdlength == other.rdlength;
+				this->rdlength == other.rdlength &&
 				this->rdata.size() == other.rdata.size() &&
 				std::equal( this->rdata.begin(), this->rdata.end(), other.rdata.begin() );
 		}
@@ -44,9 +44,9 @@ class ResourceRecord {
 			info << "class: " << aclass.to_string() << list_sep;
 			info << "ttl: " << ttl << list_sep;
 			info << "rd length: " << rdlength << list_sep;
-			info << "rdata: " << std::endl;
+			info << "rdata: " << nested_start << std::endl;
 			info << demaria_util::to_string( rdata ) << std::endl;
-			
+			info <<  nested_finish;
 			return info.str();
 		}
 

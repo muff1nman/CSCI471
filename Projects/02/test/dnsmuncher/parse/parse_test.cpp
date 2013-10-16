@@ -27,9 +27,14 @@ TEST(Parse, SimpleQuery) {
 	EXPECT_EQ( *query_a_google_obj(), from_data(bytes_from_file( QUERY_A_GOOGLE )));
 }
 
+TEST(Parse, SimpleResponse) {
+	EXPECT_EQ( *response_a_intel_without_link(), from_data(bytes_from_file( RESPONSE_A_INTEL_WITHOUT_LINK )));
+}
+
 TEST(Parse, ComplexResponse) {
 	EXPECT_EQ( *response_complex_google(), from_data(bytes_from_file( RESPONSE_COMPLEX_GOOGLE )));
 }
+
 
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);

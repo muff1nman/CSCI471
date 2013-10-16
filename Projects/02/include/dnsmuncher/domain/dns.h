@@ -95,9 +95,12 @@ class DNS : public Logging {
 		 * For testing purposes
 		 */
 		bool content_equal( const DNS& other ) const {
+#ifdef LOGGING
+			LOG(INFO) << "Checking contents are equal";
+#endif
 			return
 				this->questions.size() == other.questions.size() &&
-				this->records.size() == other.records.size();
+				this->records.size() == other.records.size() &&
 				std::equal(this->questions.begin(), this->questions.end(), other.questions.begin()) &&
 				std::equal(this->records.begin(), this->records.end(), other.records.begin());
 		}
