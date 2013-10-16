@@ -36,6 +36,7 @@ class DNS : public Logging {
 		static const size_t RA_OFFSET = 7;
 		static const size_t Z_OFFSET = 4;
 		static const size_t RCODE_OFFSET = 0;
+		static const size_t TYPE_LENGTH = 16;
 
 		std::string stringify_object() const {
 			std::stringstream info;

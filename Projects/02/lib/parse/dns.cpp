@@ -136,10 +136,36 @@ boost::optional<Name> parse_name( ParseContext& context ) {
 		}
 	}
 
-	n = Name(labels);
+	// consume zero length root 
+	if( context_has_bytes_left( context, 1 ) ) {
+		std::advance( context.current, 1 );
+		n = Name(labels);
+	}
 
 	return n;
 
+}
+
+boost::optional<size_t> parse_word( ParseContext& context ) {
+	boost::optional<size_t> data;
+	size_t buffer;
+
+	if( context_has_bytes_left( context, 2 ) ) {
+#ifdef LOGGING
+		LOG(INFO) << "Parsing type at: " << std::distance(context.start, context.current);
+		LOG(INFO) << "Byte 0: " << *(context.current);
+		BytesContainer::const_iterator copy = context.current;
+		std::advance(copy, 1);
+		LOG(INFO) << "Byte 1: " << *copy;
+#endif
+		bool parsed_correctly = qi::parse( context.current, context.finish, 
+				qi::big_word[ref(buffer) = qi::_1]);
+		if( parsed_correctly ) {
+			data = buffer;
+		}
+	}
+
+	return data;
 }
 
 boost::optional<ResourceRecord> parse_other_record( ParseContext& context ) {
@@ -154,6 +180,20 @@ boost::optional<Question> parse_question( ParseContext& context ) {
 #ifdef LOGGING
 	if(name)
 		LOG(INFO) << "Name: " << (*name).to_string();
+#endif
+	boost::optional<size_t> type = parse_word( context );
+	boost::optional<size_t> qclass = parse_word( context );
+
+	if( name && type && qclass ) {
+		q = Question(*name, *type, *qclass);
+#ifdef LOGGING
+		LOG(INFO) << "Parsed question " << q->to_string();
+#endif
+	} 
+#ifdef LOGGING
+	else {
+		LOG(WARNING) << "Could not parse question";
+	}
 #endif
 
 	return q;
@@ -170,19 +210,9 @@ bool parse_header( ParseContext& context, size_t& question_count, size_t& answer
 			qi::big_word[ref(answer_count) = qi::_1] >>
 			qi::big_word[ref(ns_count) = qi::_1] >>
 			qi::big_word[ref(ar_count) = qi::_1]
-			//qi::repeat(ref(question_count))[
-			//(
-				//name_parse[boost::bind(&print, _1)] >>
-				//qi::big_word >>
-				//qi::big_word)[&multiple]
-			//]
 			);
 #ifdef LOGGING
-	if ( context.current == context.finish ) {
-		LOG(INFO) << "Used all header bytes";
-	} else {
-		LOG(WARNING) << context.finish - context.current << " bytes in header remaining";
-	}
+	LOG(INFO) << context.finish - context.current << " bytes remaining after header";
 #endif
 
 	if (parsed_header_correctly) {
@@ -224,11 +254,11 @@ DNS from_data( const BytesContainer raw ) {
 
 	for( size_t i = 0; i < question_count; ++i ) {
 		boost::optional<Question> q = parse_question(context);
-		if ( !q ) {
+		if ( q ) {
+			b->add_question( *q );
+		} else {	
 			Logging::do_error( "Could not parse questions correctly" );
 		} 
-
-		// TODO do something with q
 	}
 
 	for( size_t i = 0; i < answer_count + ns_count + ar_count; ++i ) {
