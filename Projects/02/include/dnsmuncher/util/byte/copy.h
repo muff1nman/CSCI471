@@ -40,14 +40,5 @@ std::bitset<N> dissect( std::bitset<M> src, size_t src_offset_from_right = 0 ) {
 	return to_return;
 }
 
-template <class T>
-std::vector<T> join( const std::vector<T> first, const std::vector<T> second ) {
-	std::vector<T> joined;
-	joined.reserve( first.size() + second.size() );
-	joined.insert( joined.end(), first.begin(), first.end() );
-	joined.insert( joined.end(), second.begin(), second.end() );
-	return joined;
-}
-
 #endif /* !__copy_h__ */
 

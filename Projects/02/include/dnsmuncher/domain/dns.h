@@ -24,10 +24,10 @@
 class DNS : public Logging {
 	public:
 
-		static const size_t GENERIC_HEADER_FIELD_LENGTH = 16;
-		static const size_t OPCODE_FIELD_LENGTH = 4;
-		static const size_t Z_FIELD_LENGTH = 3;
-		static const size_t RCODE_FIELD_LENGTH = 4;
+		static const size_t GENERIC_HEADER_FIELD_LENGTH = 16; //bits
+		static const size_t OPCODE_FIELD_LENGTH = 4; //bits
+		static const size_t Z_FIELD_LENGTH = 3; //bits
+		static const size_t RCODE_FIELD_LENGTH = 4; //bits
 		static const size_t QR_OFFSET = 15;
 		static const size_t OPCODE_OFFSET = 11;
 		static const size_t AA_OFFSET = 10;
@@ -36,7 +36,11 @@ class DNS : public Logging {
 		static const size_t RA_OFFSET = 7;
 		static const size_t Z_OFFSET = 4;
 		static const size_t RCODE_OFFSET = 0;
-		static const size_t TYPE_LENGTH = 2;
+		// TODO change from bytes to bits
+		static const size_t TYPE_LENGTH = 2; // bytes
+		static const size_t POINTER_LENGTH = 16; // bits
+
+		static const size_t MAX_LABEL_SIZE = 63;
 
 		std::string stringify_object() const {
 			std::stringstream info;

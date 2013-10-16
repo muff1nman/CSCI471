@@ -9,6 +9,7 @@
 #include "dnsmuncher/data/dns_convert.h"
 #include "dnsmuncher/util/byte/convert.h"
 #include "dnsmuncher/util/byte/copy.h"
+#include "dnsmuncher/util/join.h"
 
 #include <cstring>
 #ifdef LOGGING

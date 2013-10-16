@@ -26,6 +26,10 @@ class ParseContext {
 		BytesContainer::const_iterator current;
 		boost::shared_ptr<DNSBuilder> b;
 
+		ParseContext( const ParseContext& other, size_t offset_from_start ) : raw_data(other.raw_data), start(other.start), finish(other.finish), b(other.b) {
+			current = other.raw_data.begin() + offset_from_start;
+		}
+
 	private:
 		ParseContext( const ParseContext& other );
 

@@ -10,6 +10,7 @@
 #include "dnsmuncher/util/logging.h"
 #include "dnsmuncher/domain/dns_builder.h"
 #include "dnsmuncher/util/byte/copy.h"
+#include "dnsmuncher/util/join.h"
 
 #ifdef LOGGING
 #include "dnsmuncher/util/byte/print.h"
@@ -43,34 +44,50 @@ void set_fields( DNSBuilder* builder, unsigned long num ) {
 	builder->return_code( dissect<DNS::GENERIC_HEADER_FIELD_LENGTH,DNS::RCODE_FIELD_LENGTH>(fields, DNS::RCODE_OFFSET) );
 }
 
-void create_name( /*Name* const name,*/ std::vector<std::string > labels ) {
 #ifdef LOGGING
-	LOG(INFO) << "Creating name!";
-#endif
-	//*name = Name(labels);
+size_t current_index( ParseContext& context ) {
+	return std::distance( context.start, context.current );
 }
-
-void dummy ( ) {
-#ifdef LOGGING
-	LOG(INFO) << "dummy!";
 #endif
 
+bool context_has_bytes_left( const ParseContext& context, size_t bytes ) {
+	return context.finish - context.start >= bytes;
 }
 
-qi::rule< BytesContainer::const_iterator, std::string() > string_parse(const size_t& label_length) {
-	return qi::repeat(ref(label_length))[qi::char_];
+template <class ForwardIterator, class Distance>
+ForwardIterator next(ForwardIterator it, Distance d) {
+	ForwardIterator i = it;
+	std::advance(i, d);
+	return i;
 }
 
-qi::rule< BytesContainer::const_iterator > create_name_parser( Name& name, size_t& label_length ) {
-		qi::rule< BytesContainer::const_iterator > r = 
-			(qi::repeat[
-			(qi::omit[qi::byte_[ref(label_length) = qi::_1] - qi::byte_(0)] >> 
-			string_parse( label_length ))[bind(&dummy)]
-		] >>
-		qi::omit[qi::byte_(0)])// [bind(&dummy/*, &name*/)]
-		;
+template <class T, size_t N>
+qi::rule< BytesContainer::const_iterator, T> number_parser( T& buffer ) {
+	switch(N) {
+		case 4:
+			return qi::big_dword[ref(buffer) = qi::_1];
+		case 2:
+			return qi::big_word[ref(buffer) = qi::_1];
+		case 1:
+		default:
+			return qi::byte_[ref(buffer) = qi::_1];
+	}
+}
 
-		return r;
+template <class T, size_t N>
+boost::optional<T> parse_number( ParseContext& context ) {
+	boost::optional<T> data;
+	T buffer;
+
+	if( context_has_bytes_left( context, 2*N ) ) {
+		bool parsed_correctly = qi::parse( context.current, context.finish, 
+				number_parser<T,N>(buffer));
+		if( parsed_correctly ) {
+			data = buffer;
+		}
+	}
+
+	return data;
 }
 
 void loop_over_and_print( BytesContainer::const_iterator start, BytesContainer::const_iterator end ) {
@@ -87,9 +104,6 @@ void loop_over_and_print( BytesContainer::const_iterator start, BytesContainer::
 #endif
 }
 
-bool context_has_bytes_left( const ParseContext& context, size_t bytes ) {
-	return context.finish - context.start >= bytes;
-}
 
 boost::optional<std::string> parse_string_part( ParseContext& context ) {
 	boost::optional<std::string> to_return;
@@ -98,6 +112,9 @@ boost::optional<std::string> parse_string_part( ParseContext& context ) {
 #ifdef LOGGING
 		LOG(INFO) << "length of next string: " << length;
 #endif
+		if( length > DNS::MAX_LABEL_SIZE ) {
+			Logging::do_error( "Label size too large");
+		}
 		if( context_has_bytes_left( context, length )) {
 			BytesContainer::const_iterator end_of_string = context.current;
 			std::advance( end_of_string, length);
@@ -126,12 +143,34 @@ bool is_zero_byte( ParseContext& context ) {
 	return context_has_bytes_left( context, 1 )  && *(context.current) == (Byte) 0;
 }
 
-boost::optional<Name> parse_name( ParseContext& context ) {
-	boost::optional<Name> n;
+bool is_pointer( ParseContext& context ) {
+	if( !context_has_bytes_left( context, 2 ) ) {
+		return false;
+	}
 
+	Byte first_byte = *(context.current);
+	std::bitset<BITS_PER_BYTE> pointer = std::bitset<BITS_PER_BYTE>( first_byte );
+	return pointer.test(BITS_PER_BYTE - 1) && pointer.test(BITS_PER_BYTE - 2);
+}
+
+
+bool parse_zero_byte( ParseContext& context ) {
+	if( is_zero_byte( context ) ) {
+		std::advance( context.current, 1 );
+		return true;
+	}
+	return false;
+}
+
+boost::optional<std::vector<std::string> > parse_labels( ParseContext& context ) {
+	boost::optional<std::vector<std::string> > n;
 	std::vector<std::string> labels;
 
-	while(!is_zero_byte(context)) {
+#ifdef LOGGING
+	LOG(INFO) << "Starting to look for labels at: " << current_index(context);
+#endif
+
+	while(!is_zero_byte(context) && !is_pointer(context)) {
 		boost::optional<std::string> label = parse_string_part( context );
 		if( label ) {
 			labels.push_back(*label);
@@ -140,61 +179,76 @@ boost::optional<Name> parse_name( ParseContext& context ) {
 		}
 	}
 
-	// consume zero length root 
-	if( context_has_bytes_left( context, 1 ) ) {
-		std::advance( context.current, 1 );
-		n = Name(labels);
+	if( !parse_zero_byte(context) && !is_pointer(context) ) {
+#ifdef LOGGING
+		LOG(ERROR) << "Could not parse zero byte or a pointer";
+#endif
+	} else {
+		n = labels;
 	}
 
 	return n;
 
 }
 
-template <class ForwardIterator, class Distance>
-ForwardIterator next(ForwardIterator it, Distance d) {
-	ForwardIterator i = it;
-	std::advance(i, d);
-	return i;
-}
-
-template <class T, size_t N>
-qi::rule< BytesContainer::const_iterator, T> number_parser( T& buffer ) {
-	switch(N) {
-		case 4:
-			return qi::big_dword[ref(buffer) = qi::_1];
-		case 2:
-			return qi::big_word[ref(buffer) = qi::_1];
-		case 1:
-		default:
-			return qi::byte_[ref(buffer) = qi::_1];
-	}
-}
-
-
-template <class T, size_t N>
-boost::optional<T> parse_number( ParseContext& context ) {
-	boost::optional<T> data;
-	T buffer;
-
-	if( context_has_bytes_left( context, 2*N ) ) {
+boost::optional<std::vector<std::string> > parse_label_pointer( ParseContext& context ) {
 #ifdef LOGGING
-		LOG(INFO) << "Parsing type at: " << std::distance(context.start, context.current);
-		LOG(INFO) << "Byte 0: " << *(context.current);
-		BytesContainer::const_iterator copy = context.current;
-		std::advance(copy, 1);
-		LOG(INFO) << "Byte 1: " << *copy;
+	LOG(INFO) << "Starting pare of label pointer at: " << current_index( context);
 #endif
-		bool parsed_correctly = qi::parse( context.current, context.finish, 
-				number_parser<T,N>(buffer));
-		if( parsed_correctly ) {
-			data = buffer;
+	if( is_pointer(context) ) {
+		boost::optional<size_t> bytes = parse_number<size_t,DNS::POINTER_LENGTH / BITS_PER_BYTE>( context );
+		if( bytes ) {
+#ifdef LOGGING
+			LOG(INFO) << "Consumed ptr, now at: " << current_index(context);
+#endif
+			std::bitset<DNS::POINTER_LENGTH> pointer = std::bitset<DNS::POINTER_LENGTH>(*bytes);
+			pointer.set(DNS::POINTER_LENGTH - 1, 0);
+			pointer.set(DNS::POINTER_LENGTH - 2, 0);
+			size_t index = pointer.to_ulong();
+			ParseContext temporary(context, index);
+			return parse_labels( temporary );
 		}
 	}
+	return boost::optional<std::vector<std::string> >();
+}
 
-	return data;
+boost::optional<Name> parse_name( ParseContext& context ) {
+	boost::optional<Name> n;
+
+	// first attempt to parse a list of labels that may end with a zero byte or a
+	// pointer
+	boost::optional<std::vector<std::string> > maybe_labels = parse_labels( context );
+#ifdef LOGGING
+	if( maybe_labels ) {
+		LOG(INFO) << "Labels found";
+	} else { 
+		LOG(INFO) << "Labels not found";
+	}
+	LOG(INFO) << "Index at: " << current_index( context );
+#endif
+
+	boost::optional<std::vector<std::string> > maybe_pointer_labels = parse_label_pointer( context );
+#ifdef LOGGING
+	if( maybe_pointer_labels ) {
+		LOG(INFO) << "Pointer Labels found";
+	} else { 
+		LOG(INFO) << "Pointer Labels not found";
+	}
+#endif
+
+	boost::optional<std::vector<std::string> > combined = maybe_join( maybe_labels, maybe_pointer_labels );
+	if( combined ) {
+		n = Name(*combined);
+	}
+
+	return n;
+
 }
 
 boost::optional<BytesContainer> parse_data( ParseContext& context, size_t length ) {
+#ifdef LOGGING
+	LOG(INFO) << "#parse_data called with length " << length;
+#endif
 	boost::optional<BytesContainer> c;
 	if( context_has_bytes_left( context, length ) ) {
 		BytesContainer::const_iterator end_of_rdata = next(context.current,length);
@@ -212,12 +266,30 @@ boost::optional<BytesContainer> parse_data( ParseContext& context, size_t length
 }
 
 boost::optional<ResourceRecord> parse_other_record( ParseContext& context ) {
+#ifdef LOGGING
+	LOG(INFO) << "Starting to parse resource record at: " << current_index( context );
+#endif
 	boost::optional<ResourceRecord> r;
 	boost::optional<Name> name = parse_name( context );
+#ifdef LOGGING
+	LOG(INFO) << "Finished parsing name and now we are at: " << current_index( context );
+#endif
 	boost::optional<size_t> type = parse_number<size_t, 2>( context );
+#ifdef LOGGING
+	LOG(INFO) << "Finished parsing type and now we are at: " << current_index( context );
+#endif
 	boost::optional<size_t> qclass = parse_number<size_t, 2>( context );
+#ifdef LOGGING
+	LOG(INFO) << "Finished parsing qclass and now we are at: " << current_index( context );
+#endif
 	boost::optional<ttl_number> ttl = parse_number<ttl_number, 4>( context );
+#ifdef LOGGING
+	LOG(INFO) << "Finished parsing ttl and now we are at: " << current_index( context );
+#endif
 	boost::optional<rdata_length_number> rdlength = parse_number<rdata_length_number, 2>( context );
+#ifdef LOGGING
+	LOG(INFO) << "Finished parsing rdlength and now we are at: " << current_index( context );
+#endif
 	boost::optional<BytesContainer> rdata;
 	if( rdlength ) {
 		rdata	= parse_data( context, *rdlength );
@@ -266,7 +338,7 @@ boost::optional<Question> parse_question( ParseContext& context ) {
 	} 
 #ifdef LOGGING
 	else {
-		LOG(WARNING) << "Could not parse question";
+		LOG(WARNING) << "Could not parse question because name: " << (bool) name << " type: " << (bool) type << " or qclass: " << (bool) qclass;
 	}
 #endif
 

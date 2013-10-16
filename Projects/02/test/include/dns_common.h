@@ -24,7 +24,11 @@ boost::shared_ptr<DNS> query_a_google_obj() {
 }
 
 boost::shared_ptr<DNS> response_complex_google() {
-	BytesContainer a1 =  boost::assign::list_of('\x4a')('\x7d')('\xe1')('\xe3');
+	BytesContainer a1 =  boost::assign::list_of('\x4a')('\x7d')('\xe1')('\xd3');
+	BytesContainer a2 =  boost::assign::list_of('\x4a')('\x7d')('\xe1')('\xd2');
+	BytesContainer a3 =  boost::assign::list_of('\x4a')('\x7d')('\xe1')('\xd4');
+	BytesContainer a4 =  boost::assign::list_of('\x4a')('\x7d')('\xe1')('\xd0');
+	BytesContainer a5 =  boost::assign::list_of('\x4a')('\x7d')('\xe1')('\xd1');
 
 	return DNSBuilder().
 		set_id(45350).
@@ -35,6 +39,10 @@ boost::shared_ptr<DNS> response_complex_google() {
 		question_count(1).
 		add_question( Question("www.google.com")).
 		add_resource( ResourceRecord("www.google.com", a1, Type::A, NetClass::IN, 183, 4) ).
+		add_resource( ResourceRecord("www.google.com", a2, Type::A, NetClass::IN, 183, 4) ).
+		add_resource( ResourceRecord("www.google.com", a3, Type::A, NetClass::IN, 183, 4) ).
+		add_resource( ResourceRecord("www.google.com", a4, Type::A, NetClass::IN, 183, 4) ).
+		add_resource( ResourceRecord("www.google.com", a5, Type::A, NetClass::IN, 183, 4) ).
 		answer_count(5).
 		build_ptr();
 }

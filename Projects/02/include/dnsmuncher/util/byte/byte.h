@@ -14,7 +14,7 @@
 
 #include "dnsmuncher/util/logging.h"
 
-#define BITS_PER_BYTE 8
+const size_t BITS_PER_BYTE = 8;
 
 typedef unsigned char Byte;
 typedef std::vector<Byte> BytesContainer;

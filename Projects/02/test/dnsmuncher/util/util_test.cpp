@@ -11,6 +11,7 @@
 #include "dnsmuncher/util/byte/convert.h"
 #include "dnsmuncher/util/byte/copy.h"
 #include "dnsmuncher/util/split.h"
+#include "dnsmuncher/util/join.h"
 
 #include <boost/assign/list_of.hpp>
 #include <bitset>
@@ -112,6 +113,8 @@ TEST(Join, Simple) {
 
 	EXPECT_EQ( expected, join( first, second ));
 }
+
+// TODO test Join optional
 
 TEST(SplitName, Empty) {
 	EXPECT_DEATH({ split_name(""); }, "empty domain");

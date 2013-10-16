@@ -35,6 +35,8 @@ TEST(Parse, ComplexResponse) {
 	EXPECT_EQ( *response_complex_google(), from_data(bytes_from_file( RESPONSE_COMPLEX_GOOGLE )));
 }
 
+// TODO test for root query
+
 
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
