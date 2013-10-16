@@ -17,6 +17,7 @@
 #endif
 #include <cstdio>
 #include <cstdlib>
+#include <sstream>
 
 #define sep " "
 #define list_sep ", "

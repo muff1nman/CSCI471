@@ -8,9 +8,24 @@
 #ifndef __net_class_h__
 #define __net_class_h__
 
-class NetClass {
+#include "dnsmuncher/util/logging.h"
+
+class NetClass : public Logging {
 	public:
 		static const size_t IN = 1;
+
+		NetClass( size_t net_class = IN) : net_class(net_class) {} 
+
+		bool operator==( const NetClass& other ) const {
+			return this->net_class == other.net_class;
+		}
+
+		std::string stringify_object() const {
+			std::stringstream info;
+			info << net_class;
+			return info.str();
+		}
+
 	private:
 		size_t net_class;
 };

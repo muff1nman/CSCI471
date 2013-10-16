@@ -10,6 +10,7 @@
 
 #include "dnsmuncher/domain/dns.h"
 #include "convert.h"
+#include "dnsmuncher/util/byte/byte.h"
 
 #include <boost/shared_ptr.hpp>
 
@@ -21,6 +22,7 @@ class DNSConvert : public Convert {
 
 	private:
 		boost::shared_ptr<DNS> dns;
+		std::bitset<DNS::GENERIC_HEADER_FIELD_LENGTH> flags() const;
 };
 
 #endif /* !__dns_convert_h__ */

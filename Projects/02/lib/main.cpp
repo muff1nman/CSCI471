@@ -11,6 +11,7 @@
 #include "dnsmuncher/actors/consumer.h"
 #include "dnsmuncher/actors/data_producer.h"
 #include "dnsmuncher/data/dns_convert.h"
+#include "dnsmuncher/domain/dns_builder.h"
 
 #include <iostream>
 #include <string>
@@ -85,7 +86,7 @@ string print_info( int argc, char** argv ) {
 
 void init_log() {
 #ifdef LOGGING
-	google::InitGoogleLogging("DNSMuncher");
+	google::InitGoogleLogging(PROJECT_NAME);
 	FLAGS_minloglevel = LOG_LEVEL;
 	FLAGS_alsologtostderr = 1;
 	FLAGS_colorlogtostderr = 1;
@@ -115,8 +116,8 @@ int main( int argc, char** argv ) {
 	LOG(INFO) << "Connecting in new thread";
 #endif
 
-	boost::shared_ptr<DNS> query( new DNS());
-	boost::shared_ptr<Convert> convert( new DNSConvert(query) );
+	DNSBuilder b;
+	boost::shared_ptr<Convert> convert( new DNSConvert(b.build_ptr()) );
 	boost::shared_ptr<Consumer> c(new DataProducer(convert));
 	boost::function<void(int)> func = boost::bind(&socket_thread_runner, _1, c);
 	//connect_in_new_thread( "8.8.8.8", 53, func );
@@ -125,8 +126,6 @@ int main( int argc, char** argv ) {
 #ifdef LOGGING
 	LOG(INFO) << "Done with connection";
 #endif
-
-	sleep(12312);
 
 	return 0;
 }

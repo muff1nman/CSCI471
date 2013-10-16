@@ -10,7 +10,7 @@
 
 #include "consumer.h"
 #include "dnsmuncher/data/convert.h"
-#include "dnsmuncher/util/byte.h"
+#include "dnsmuncher/util/byte/byte.h"
 #include <unistd.h>
 #ifdef LOGGING
 #include <glog/logging.h>
@@ -30,7 +30,7 @@ class DataProducer : public Consumer {
 			LOG(INFO) << "Writing to socket [" << socket_fd << "]";
 #endif
 			//int result = write(socket_fd, bytes.data.get(), bytes.size);
-			int result = send(socket_fd, bytes.data.get(), bytes.size, 0);
+			int result = send(socket_fd, bytes.data(), bytes.size(), 0);
 #ifdef LOGGING
 			if( result < 0 ) {
 				LOG(INFO) << "Could not write to socket: " << strerror(errno);

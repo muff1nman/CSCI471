@@ -10,15 +10,37 @@
 
 #include <vector>
 #include <string>
+#include <algorithm>
 
-class Name {
+#include "dnsmuncher/util/split.h"
+#include "dnsmuncher/util/logging.h"
+
+class Name : public Logging {
 	public:
-		Name( const std::string& domain_name ) {
-			// TODO
+		Name() { }
+
+		Name( const char* string ) {
+			this->labels = split_name(std::string(string));
 		}
 
-		Name() {
-			// TODO
+		Name( const std::string& domain_name ) {
+			this->labels = split_name( domain_name );
+		}
+
+		Name( const std::vector<std::string> name ) : labels(name) { }
+
+		bool operator==( const Name& other ) const {
+			return this->labels.size() == other.labels.size() &&
+				std::equal( this->labels.begin(), this->labels.end(), other.labels.begin() );
+		}
+
+		std::string stringify_object() const {
+			std::stringstream info;
+			info << "labels: ";
+			for( size_t i = 0; i < labels.size(); ++i ) {
+				info << labels.at(i) << ".";
+			}
+			return info.str();
 		}
 
 	private:

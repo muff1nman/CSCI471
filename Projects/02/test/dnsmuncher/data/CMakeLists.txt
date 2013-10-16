@@ -1,6 +1,6 @@
-set( TESTNAME Util )
+set( TESTNAME Data )
 set( SRCS
-	util_test.cpp
+	data_test.cpp
 )
 
 #set(LINK_LIBRARIES gtest gtest_main)
@@ -10,7 +10,7 @@ if(${LOGGING} STREQUAL "ON")
 endif()
 
 add_executable( "Test${TESTNAME}" ${SRCS})
-target_link_libraries( "Test${TESTNAME}" ${LINK_LIBRARIES})
+target_link_libraries( "Test${TESTNAME}" ${LINK_LIBRARIES} muncher_data)
 
 add_test( ${TESTNAME} "Test${TESTNAME}" )
 

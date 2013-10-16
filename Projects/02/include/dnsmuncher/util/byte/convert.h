@@ -1,29 +1,14 @@
 /*
- * byte.h
+ * convert.h
  * Copyright (C) 2013 Andrew DeMaria (muff1nman) <ademaria@mines.edu>
  *
  * All Rights Reserved.
  */
 
-#ifndef __byte_h__
-#define __byte_h__
+#ifndef __byte_convert_h__
+#define __byte_convert_h__
 
-#include <boost/shared_ptr.hpp>
-#include <bitset>
-#include <string>
-
-#include "dnsmuncher/util/logging.h"
-
-#define BITS_PER_BYTE 8
-
-typedef unsigned char Byte;
-typedef boost::shared_ptr<Byte> Bytes;
-
-class BytesContainer {
-	public:
-		size_t size;
-		Bytes data;
-};
+#include "byte.h"
 
 //http://stackoverflow.com/questions/3061721/concatenate-boostdynamic-bitset-or-stdbitset
 template <size_t N1, size_t N2 >
@@ -99,11 +84,10 @@ Byte convert_to_char_big_endian( const std::bitset<n>& bits, size_t index = 0 ) 
 template <size_t n>
 BytesContainer convert_big_endian( const std::bitset<BITS_PER_BYTE * n>& bits ) {
 	BytesContainer toReturn;
-	toReturn.data = Bytes( new Byte[n] );
-	toReturn.size = n;
+	toReturn.resize(n);
 
 	for( size_t i = 0; i < n; ++i ) {
-		toReturn.data.get()[i] = convert_to_char_big_endian<BITS_PER_BYTE>( bits, i );
+		toReturn.data()[i] = convert_to_char_big_endian<BITS_PER_BYTE>( bits, i );
 	}
 
 	return toReturn;
@@ -118,15 +102,14 @@ BytesContainer convert_big_endian( const std::bitset<BITS_PER_BYTE * n>& bits ) 
 template <size_t n>
 BytesContainer convert_little_endian( const std::bitset<BITS_PER_BYTE * n>& bits ) {
 	BytesContainer toReturn;
-	toReturn.data = Bytes( new Byte[n] );
-	toReturn.size = n;
+	toReturn.resize(n);
 
 	for( size_t i = 0; i < n; ++i ) {
-		toReturn.data.get()[i] = convert_to_char_little_endian<BITS_PER_BYTE>( bits, i );
+		toReturn.data()[i] = convert_to_char_little_endian<BITS_PER_BYTE>( bits, i );
 	}
 
 	return toReturn;
 }
 
-#endif /* !__byte_h__ */
+#endif /* !__byte_convert_h__ */
 

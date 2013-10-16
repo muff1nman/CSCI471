@@ -8,74 +8,166 @@
 #ifndef __dns_h__
 #define __dns_h__
 
+#include "dnsmuncher/util/logging.h"
+#include "dnsmuncher/util/byte/byte.h"
+#include "resource_record.h"
+#include "question.h"
+
 #include <bitset>
 #include <vector>
 #include <string>
 #include <cstdlib>
-#include "resource_record.h"
-#include "question.h"
-#include "dnsmuncher/util/byte.h"
+#include <algorithm>
+#include <ostream>
+#include <sstream>
 
-class DNS {
-	// TODO
+class DNS : public Logging {
 	public:
-		DNS() {
-			this->generate_id();
-			this->set_is_query();
+
+		static const size_t GENERIC_HEADER_FIELD_LENGTH = 16; //bits
+		static const size_t OPCODE_FIELD_LENGTH = 4; //bits
+		static const size_t Z_FIELD_LENGTH = 3; //bits
+		static const size_t RCODE_FIELD_LENGTH = 4; //bits
+		static const size_t QR_OFFSET = 15;
+		static const size_t OPCODE_OFFSET = 11;
+		static const size_t AA_OFFSET = 10;
+		static const size_t TC_OFFSET = 9;
+		static const size_t RD_OFFSET = 8;
+		static const size_t RA_OFFSET = 7;
+		static const size_t Z_OFFSET = 4;
+		static const size_t RCODE_OFFSET = 0;
+		// TODO change from bytes to bits
+		static const size_t TYPE_LENGTH = 2; // bytes
+		static const size_t POINTER_LENGTH = 16; // bits
+
+		static const size_t MAX_LABEL_SIZE = 63;
+
+		std::string stringify_object() const {
+			std::stringstream info;
+			info << std::string("id: ") << this->id.to_string() << list_sep;
+			info << std::string("qd_count: ") << this->qd_count.to_string() << list_sep;
+			info << std::string( "an_count : ") << this->an_count.to_string() << list_sep;
+			info << std::string( "ns_count : ") << this->ns_count.to_string() << list_sep;
+			info << std::string( "ar_count : ") << this->ar_count.to_string() << list_sep;
+			info << std::string( "qr : ") << this->qr << list_sep;
+			info << std::string( "aa : ") << this->aa << list_sep;
+			info << std::string( "tc : ") << this->tc << list_sep;
+			info << std::string( "rd : ") << this->rd << list_sep;
+			info << std::string( "ra : ") << this->ra << list_sep;
+			info << std::string( "opcode : ") << this->opcode.to_string() << list_sep;
+			info << std::string( "z : ") << this->z.to_string() << list_sep;
+			info << std::string( "rcode : ") << this->rcode.to_string() << list_sep;
+			info << std::string("questions: ") + nested_start;
+			for( size_t i = 0; i < questions.size(); ++i ) {
+				info << questions.at(i).to_string() + list_sep;
+			}
+			info << nested_finish;
+			info << list_sep;
+			info <<  std::string("records: ") + nested_start;
+			for( size_t i = 0; i < records.size(); ++i ) {
+				info << records.at(i).to_string() + list_sep;
+			}
+			info << nested_finish;
+			return info.str();
 		}
 
 		friend class DNSConvert;
 
-	public:
-		void add_question( const Question q ) {
-			// make sure to increment length
-			// TODO
+
+		/**
+		 * For testing purposes
+		 */
+		bool header_equal( const DNS& other ) const {
+			bool ret_val = this->id == other.id &&
+				this->qd_count == other.qd_count &&
+				this->an_count == other.an_count &&
+				this->ns_count == other.ns_count &&
+				this->ar_count == other.ar_count &&
+				this->qr == other.qr &&
+				this->aa == other.aa &&
+				this->tc == other.tc &&
+				this->rd == other.rd &&
+				this->ra == other.ra && 
+				this->opcode == other.opcode &&
+				this->z == other.z &&
+				this->rcode == other.rcode;
+			return ret_val;
+
 		}
 
-		void add_additional( const ResourceRecord r ) {
-			// TODO
+		/** 
+		 * For testing purposes
+		 */
+		bool content_equal( const DNS& other ) const {
+#ifdef LOGGING
+			LOG(INFO) << "Checking contents are equal";
+#endif
+			return
+				this->questions.size() == other.questions.size() &&
+				this->records.size() == other.records.size() &&
+				std::equal(this->questions.begin(), this->questions.end(), other.questions.begin()) &&
+				std::equal(this->records.begin(), this->records.end(), other.records.begin());
 		}
 
-		void add_answer( const ResourceRecord r ) {
-			// TODO	
+		/**
+		 * For testing purposes
+		 */
+		bool operator==( const DNS& other ) const {
+			return header_equal(other) && content_equal(other);
 		}
 
-		void add_nameserver( const ResourceRecord r ) {
-			// TODO
+		/**
+		 * For testing purposes
+		 */
+		friend std::ostream& operator<<(std::ostream& os, const DNS& dns) {
+			os << std::endl;
+			os<< dns.to_string();
+			return os;
 		}
 
-		void set_recursion_desired( bool rd ) {
-			this->rd = rd;
-		}
-
-		void set_authoritative_bit( bool aa ) {
-			this->aa = aa;
-		}
-
-		void set_is_response() {
-			this->qr = false;
-		}
-		
-		void set_is_query() {
-			this->qr = true;
-		}
-
-		void set_truncated() {
-			this->tc = true;
-		}
-
-		void set_recursion_available( bool ra ) {
-			this->ra = ra;
-		}
-
+		DNS( 
+				std::bitset<GENERIC_HEADER_FIELD_LENGTH> id, 
+				std::bitset<GENERIC_HEADER_FIELD_LENGTH> qd_count,
+				std::bitset<GENERIC_HEADER_FIELD_LENGTH> an_count,
+				std::bitset<GENERIC_HEADER_FIELD_LENGTH> ns_count,
+				std::bitset<GENERIC_HEADER_FIELD_LENGTH> ar_count,
+				bool qr,
+				bool aa,
+				bool tc,
+				bool rd,
+				bool ra,
+				std::bitset<OPCODE_FIELD_LENGTH> opcode,
+				std::bitset<Z_FIELD_LENGTH> z,
+				std::bitset<RCODE_FIELD_LENGTH> rcode,
+				std::vector<Question> questions,
+				std::vector<ResourceRecord> records
+			 ) : 
+			id(id),
+			qd_count(qd_count),
+			an_count(an_count),
+			ns_count(ns_count),
+			ar_count(ar_count),
+			qr(qr),
+			aa(aa),
+			tc(tc),
+			rd(rd),
+			ra(ra),
+			opcode(opcode),
+			z(z),
+			rcode(rcode),
+			questions(questions),
+			records(records)
+			{ }
 
 	private:
+		// dont use
+		DNS() { };
 		// TODO maybe hide the implementation of bitset?
-		std::bitset<16> id, qd_count, an_count, ns_count, ar_count;
+		std::bitset<GENERIC_HEADER_FIELD_LENGTH> id, qd_count, an_count, ns_count, ar_count;
 		bool qr, aa, tc, rd, ra;
-		std::bitset<4> opcode;
-		std::bitset<3> z;
-		std::bitset<4> rcode;
+		std::bitset<OPCODE_FIELD_LENGTH> opcode;
+		std::bitset<Z_FIELD_LENGTH> z;
+		std::bitset<RCODE_FIELD_LENGTH> rcode;
 		std::vector<Question> questions;
 		std::vector<ResourceRecord> records;
 
@@ -92,7 +184,7 @@ class DNS {
 		}
 
 		void generate_id() {
-			id = std::bitset<16>(rand());
+			id = std::bitset<GENERIC_HEADER_FIELD_LENGTH>(rand());
 		}
 		
 };
