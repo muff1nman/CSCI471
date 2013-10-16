@@ -16,6 +16,8 @@ class NetClass : public Logging {
 
 		NetClass( size_t net_class = IN) : net_class(net_class) {} 
 
+		friend class NetClassConvert;
+
 		bool operator==( const NetClass& other ) const {
 			return this->net_class == other.net_class;
 		}

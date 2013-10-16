@@ -51,22 +51,22 @@ class DNSBuilder {
 
 		// TODO refactor internal query bit into response bit
 		DNSBuilder& is_response() {
-			this->qr = false;
+			this->response = true;
 			return do_common();
 		}
 
 		DNSBuilder& is_response( bool response ) {
-			this->qr = !response;
+			this->response = response;
 			return do_common();
 		}
 		
 		DNSBuilder& is_query( bool query ) {
-			this->qr = query;
+			this->response = !query;
 			return do_common();
 		}
 
 		DNSBuilder& is_query() {
-			this->qr = true;
+			this->response = false;
 			return do_common();
 		}
 
@@ -140,18 +140,18 @@ class DNSBuilder {
 		}
 
 		DNS build() {
-			return DNS(id, qd_count, an_count, ns_count, ar_count, qr, aa, tc, rd, ra,
+			return DNS(id, qd_count, an_count, ns_count, ar_count, response, aa, tc, rd, ra,
 					opcode, z, rcode, questions, other_records);
 		}
 
 		boost::shared_ptr<DNS> build_ptr() {
-			return boost::shared_ptr<DNS>(new DNS(id, qd_count, an_count, ns_count, ar_count, qr, aa, tc, rd, ra,
+			return boost::shared_ptr<DNS>(new DNS(id, qd_count, an_count, ns_count, ar_count, response, aa, tc, rd, ra,
 					opcode, z, rcode, questions, other_records));
 		}
 
 	protected:
 		std::bitset<DNS::GENERIC_HEADER_FIELD_LENGTH> id, qd_count, an_count, ns_count, ar_count;
-		bool qr, aa, tc, rd, ra;
+		bool response, aa, tc, rd, ra;
 		std::bitset<DNS::OPCODE_FIELD_LENGTH> opcode;
 		std::bitset<DNS::Z_FIELD_LENGTH> z;
 		std::bitset<DNS::RCODE_FIELD_LENGTH> rcode;
@@ -175,7 +175,7 @@ class DNSBuilder {
 			rcode.reset();
 			questions.clear();
 			other_records.clear();
-			qr = false;
+			response = false;
 			aa = false;
 			tc = false;
 			rd = false;

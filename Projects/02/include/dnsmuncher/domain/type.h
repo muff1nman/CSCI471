@@ -15,6 +15,8 @@ class Type : public Logging {
 		static const size_t A = 1;
 
 		Type( size_t type ) : type(type) { }
+
+		friend class TypeConvert;
 		
 		bool operator==( const Type& other ) const {
 			return this->type == other.type;

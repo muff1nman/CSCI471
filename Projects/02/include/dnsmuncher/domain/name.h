@@ -29,6 +29,8 @@ class Name : public Logging {
 
 		Name( const std::vector<std::string> name ) : labels(name) { }
 
+		friend class NameConvert;
+
 		bool operator==( const Name& other ) const {
 			return this->labels.size() == other.labels.size() &&
 				std::equal( this->labels.begin(), this->labels.end(), other.labels.begin() );

@@ -19,6 +19,8 @@ class Question : public Logging {
 		Question( Name domain_name, QType type = QType(), NetClass qclass =
 				NetClass() ) : qname(domain_name), type(type), qclass(qclass) {}
 
+		friend class QuestionConvert;
+
 		/** 
 		 * For testing purposes
 		 */

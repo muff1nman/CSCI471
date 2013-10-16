@@ -27,6 +27,8 @@ class ResourceRecord {
 		ResourceRecord( Name aname, BytesContainer data, QType type, NetClass aclass, ttl_number ttl, rdata_length_number rdlength) : aname(aname), rdata(data), type(type), aclass(aclass), ttl(ttl), rdlength(rdlength) {
 		}
 
+		friend class ResourceRecordConvert;
+
 		bool operator==( const ResourceRecord& other ) const {
 			return this->aname == other.aname &&
 				this->type == other.type &&

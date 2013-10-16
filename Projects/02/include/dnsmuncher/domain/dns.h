@@ -24,10 +24,12 @@
 class DNS : public Logging {
 	public:
 
-		static const size_t GENERIC_HEADER_FIELD_LENGTH = 16; //bits
-		static const size_t OPCODE_FIELD_LENGTH = 4; //bits
-		static const size_t Z_FIELD_LENGTH = 3; //bits
-		static const size_t RCODE_FIELD_LENGTH = 4; //bits
+		static const size_t GENERIC_HEADER_FIELD_LENGTH = 16; 
+		static const size_t OPCODE_FIELD_LENGTH = 4; 
+		static const size_t Z_FIELD_LENGTH = 3; 
+		static const size_t RCODE_FIELD_LENGTH = 4; 
+		static const size_t POINTER_LENGTH = 16; 
+
 		static const size_t QR_OFFSET = 15;
 		static const size_t OPCODE_OFFSET = 11;
 		static const size_t AA_OFFSET = 10;
@@ -36,9 +38,7 @@ class DNS : public Logging {
 		static const size_t RA_OFFSET = 7;
 		static const size_t Z_OFFSET = 4;
 		static const size_t RCODE_OFFSET = 0;
-		// TODO change from bytes to bits
-		static const size_t TYPE_LENGTH = 2; // bytes
-		static const size_t POINTER_LENGTH = 16; // bits
+
 
 		static const size_t MAX_LABEL_SIZE = 63;
 
@@ -49,7 +49,7 @@ class DNS : public Logging {
 			info << std::string( "an_count : ") << this->an_count.to_string() << list_sep;
 			info << std::string( "ns_count : ") << this->ns_count.to_string() << list_sep;
 			info << std::string( "ar_count : ") << this->ar_count.to_string() << list_sep;
-			info << std::string( "qr : ") << this->qr << list_sep;
+			info << std::string( "response : ") << this->response << list_sep;
 			info << std::string( "aa : ") << this->aa << list_sep;
 			info << std::string( "tc : ") << this->tc << list_sep;
 			info << std::string( "rd : ") << this->rd << list_sep;
@@ -73,7 +73,6 @@ class DNS : public Logging {
 
 		friend class DNSConvert;
 
-
 		/**
 		 * For testing purposes
 		 */
@@ -83,7 +82,7 @@ class DNS : public Logging {
 				this->an_count == other.an_count &&
 				this->ns_count == other.ns_count &&
 				this->ar_count == other.ar_count &&
-				this->qr == other.qr &&
+				this->response == other.response &&
 				this->aa == other.aa &&
 				this->tc == other.tc &&
 				this->rd == other.rd &&
@@ -131,7 +130,7 @@ class DNS : public Logging {
 				std::bitset<GENERIC_HEADER_FIELD_LENGTH> an_count,
 				std::bitset<GENERIC_HEADER_FIELD_LENGTH> ns_count,
 				std::bitset<GENERIC_HEADER_FIELD_LENGTH> ar_count,
-				bool qr,
+				bool response,
 				bool aa,
 				bool tc,
 				bool rd,
@@ -147,7 +146,7 @@ class DNS : public Logging {
 			an_count(an_count),
 			ns_count(ns_count),
 			ar_count(ar_count),
-			qr(qr),
+			response(response),
 			aa(aa),
 			tc(tc),
 			rd(rd),
@@ -164,28 +163,12 @@ class DNS : public Logging {
 		DNS() { };
 		// TODO maybe hide the implementation of bitset?
 		std::bitset<GENERIC_HEADER_FIELD_LENGTH> id, qd_count, an_count, ns_count, ar_count;
-		bool qr, aa, tc, rd, ra;
+		bool response, aa, tc, rd, ra;
 		std::bitset<OPCODE_FIELD_LENGTH> opcode;
 		std::bitset<Z_FIELD_LENGTH> z;
 		std::bitset<RCODE_FIELD_LENGTH> rcode;
 		std::vector<Question> questions;
 		std::vector<ResourceRecord> records;
-
-		void set_z_as_zeros() {
-			// TODO 
-		}
-
-		void set_rcode_for_question() {
-			// TODO
-		}
-
-		void set_opcode_as_standard_query() {
-			// TODO
-		}
-
-		void generate_id() {
-			id = std::bitset<GENERIC_HEADER_FIELD_LENGTH>(rand());
-		}
 		
 };
 

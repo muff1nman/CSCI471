@@ -10,7 +10,6 @@
 
 #include "dnsmuncher/domain/dns.h"
 #include "convert.h"
-#include "dnsmuncher/util/byte/byte.h"
 
 #include <boost/shared_ptr.hpp>
 
