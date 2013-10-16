@@ -21,6 +21,8 @@ typedef std::vector<Byte> BytesContainer;
 
 typedef unsigned int generic_number;
 typedef unsigned short opcode_number;
+typedef unsigned int ttl_number;
+typedef unsigned int rdata_length_number;
 
 #endif /* !__byte_h__ */
 

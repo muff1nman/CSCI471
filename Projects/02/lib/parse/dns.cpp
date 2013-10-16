@@ -29,7 +29,7 @@ void set_fields( DNSBuilder* builder, unsigned long num ) {
 #ifdef LOGGING
 	LOG(INFO) << "fields: " << fields;
 #endif
-	builder->is_query(fields[DNS::QR_OFFSET]);
+	builder->is_response(fields[DNS::QR_OFFSET]);
 	builder->authoritative_bit(fields[DNS::AA_OFFSET]);
 	builder->truncated(fields[DNS::TC_OFFSET]);
 	builder->recursion_desired(fields[DNS::RD_OFFSET]);
@@ -146,11 +146,33 @@ boost::optional<Name> parse_name( ParseContext& context ) {
 
 }
 
-boost::optional<size_t> parse_word( ParseContext& context ) {
-	boost::optional<size_t> data;
-	size_t buffer;
+template <class ForwardIterator, class Distance>
+ForwardIterator next(ForwardIterator it, Distance d) {
+	ForwardIterator i = it;
+	std::advance(it, d);
+	return i;
+}
 
-	if( context_has_bytes_left( context, 2 ) ) {
+template <class T, size_t N>
+qi::rule< BytesContainer::const_iterator, T> number_parser( T& buffer ) {
+	switch(N) {
+		case 4:
+			return qi::big_dword[ref(buffer) = qi::_1];
+		case 2:
+			return qi::big_word[ref(buffer) = qi::_1];
+		case 1:
+		default:
+			return qi::byte_[ref(buffer) = qi::_1];
+	}
+}
+
+
+template <class T, size_t N>
+boost::optional<T> parse_number( ParseContext& context ) {
+	boost::optional<T> data;
+	T buffer;
+
+	if( context_has_bytes_left( context, 2*N ) ) {
 #ifdef LOGGING
 		LOG(INFO) << "Parsing type at: " << std::distance(context.start, context.current);
 		LOG(INFO) << "Byte 0: " << *(context.current);
@@ -159,7 +181,7 @@ boost::optional<size_t> parse_word( ParseContext& context ) {
 		LOG(INFO) << "Byte 1: " << *copy;
 #endif
 		bool parsed_correctly = qi::parse( context.current, context.finish, 
-				qi::big_word[ref(buffer) = qi::_1]);
+				number_parser<T,N>(buffer));
 		if( parsed_correctly ) {
 			data = buffer;
 		}
@@ -168,21 +190,61 @@ boost::optional<size_t> parse_word( ParseContext& context ) {
 	return data;
 }
 
+boost::optional<BytesContainer> parse_data( ParseContext& context, size_t length ) {
+	boost::optional<BytesContainer> c;
+	if( context_has_bytes_left( context, length ) ) {
+		BytesContainer::const_iterator end_of_rdata = next(context.current,length);
+		c = BytesContainer(context.current, end_of_rdata);
+		context.current = end_of_rdata;
+	} 
+#ifdef LOGGING
+	else {
+		LOG(WARNING) << "Not enough bytes left";
+	}
+#endif
+
+	return c;
+
+}
+
 boost::optional<ResourceRecord> parse_other_record( ParseContext& context ) {
 	boost::optional<ResourceRecord> r;
-	// TODO
+	boost::optional<Name> name = parse_name( context );
+	boost::optional<size_t> type = parse_number<size_t, 2>( context );
+	boost::optional<size_t> qclass = parse_number<size_t, 2>( context );
+	boost::optional<ttl_number> ttl = parse_number<ttl_number, 4>( context );
+	boost::optional<rdata_length_number> rdlength = parse_number<rdata_length_number, 2>( context );
+	boost::optional<BytesContainer> rdata;
+	if( rdlength ) {
+		rdata	= parse_data( context, *rdlength );
+	}
+
+	if( 
+			name &&
+			type &&
+			qclass &&
+			ttl &&
+			rdlength &&
+			rdata ) {
+		r = ResourceRecord( *name, *rdata, *type, *qclass, *ttl, *rdlength );
+#ifdef LOGGING
+		LOG(INFO) << "Parse record: " << r->to_string();
+#endif
+	}
+#ifdef LOGGING
+	else {
+		LOG(WARNING) << "Could not parse record";
+	}
+#endif
+
 	return r;
 }
 
 boost::optional<Question> parse_question( ParseContext& context ) {
 	boost::optional<Question> q;
 	boost::optional<Name> name = parse_name( context );
-#ifdef LOGGING
-	if(name)
-		LOG(INFO) << "Name: " << (*name).to_string();
-#endif
-	boost::optional<size_t> type = parse_word( context );
-	boost::optional<size_t> qclass = parse_word( context );
+	boost::optional<size_t> type = parse_number<size_t, 2>( context );
+	boost::optional<size_t> qclass = parse_number<size_t, 2>( context );
 
 	if( name && type && qclass ) {
 		q = Question(*name, *type, *qclass);
@@ -253,6 +315,12 @@ DNS from_data( const BytesContainer raw ) {
 	b->additional_count( ar_count );
 
 	for( size_t i = 0; i < question_count; ++i ) {
+#ifdef LOGGING
+		if( i > 0 ) {
+			LOG(WARNING) << "Multiple questions have very little support in the real world and are not guaranteed to work";
+		}
+#endif
+
 		boost::optional<Question> q = parse_question(context);
 		if ( q ) {
 			b->add_question( *q );
@@ -262,12 +330,12 @@ DNS from_data( const BytesContainer raw ) {
 	}
 
 	for( size_t i = 0; i < answer_count + ns_count + ar_count; ++i ) {
-		boost::optional<ResourceRecord> r;// = parse_other_record();
-		if ( !r ) {
-			//Logging::do_error( "Could not parse other records correctly" );
+		boost::optional<ResourceRecord> r = parse_other_record(context);
+		if ( r ) {
+			b->add_resource( *r );
+		} else {
+			Logging::do_error( "Could not parse other records correctly" );
 		}
-
-		// TODO do something with r
 	}
 
 	return b->build();

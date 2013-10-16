@@ -36,7 +36,7 @@ class DNS : public Logging {
 		static const size_t RA_OFFSET = 7;
 		static const size_t Z_OFFSET = 4;
 		static const size_t RCODE_OFFSET = 0;
-		static const size_t TYPE_LENGTH = 16;
+		static const size_t TYPE_LENGTH = 2;
 
 		std::string stringify_object() const {
 			std::stringstream info;
@@ -58,7 +58,12 @@ class DNS : public Logging {
 				info << questions.at(i).to_string() + list_sep;
 			}
 			info << nested_finish;
-			//stringify_list_helper( "records : ", info, records );
+			info << list_sep;
+			info <<  std::string("records: ") + nested_start;
+			for( size_t i = 0; i < records.size(); ++i ) {
+				info << records.at(i).to_string() + list_sep;
+			}
+			info << nested_finish;
 			return info.str();
 		}
 

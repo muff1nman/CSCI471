@@ -16,6 +16,9 @@
 
 
 inline std::vector<std::string> split_name( std::string name, std::string delimiter = "." ) {
+#ifdef LOGGING
+	LOG(INFO) << "Spliting: " << name;
+#endif
 	if( name.empty() ) {
 		Logging::do_error("You gave me an empty domain name");
 		return std::vector<std::string>();
@@ -26,6 +29,9 @@ inline std::vector<std::string> split_name( std::string name, std::string delimi
 	}
 
 	if( name.empty() ) { // search for implicit root domain
+#ifdef LOGGING
+		LOG(WARNING) << "Are you sure you want labels to be empty?";
+#endif
 		return std::vector<std::string>();
 	}
 

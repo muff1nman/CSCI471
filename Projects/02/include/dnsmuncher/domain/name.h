@@ -20,7 +20,7 @@ class Name : public Logging {
 		Name() { }
 
 		Name( const char* string ) {
-			Name( std::string(string));
+			this->labels = split_name(std::string(string));
 		}
 
 		Name( const std::string& domain_name ) {

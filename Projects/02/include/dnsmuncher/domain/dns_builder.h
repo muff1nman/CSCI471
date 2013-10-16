@@ -49,6 +49,7 @@ class DNSBuilder {
 			return do_common();
 		}
 
+		// TODO refactor internal query bit into response bit
 		DNSBuilder& is_response() {
 			this->qr = false;
 			return do_common();
@@ -72,6 +73,10 @@ class DNSBuilder {
 		DNSBuilder& truncated( bool tc ) {
 			this->tc = tc;
 			return do_common();
+		}
+
+		DNSBuilder& recursion_available() {
+			return recursion_available( true );
 		}
 
 		DNSBuilder& recursion_available( bool ra ) {

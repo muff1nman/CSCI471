@@ -15,4 +15,6 @@ include_directories(
 
 add_subdirectory( dnsmuncher )
 
+# TODO automatically copy all files in the resources dir
 file(COPY ${RESOURCES_DIR}/query_a_google DESTINATION ${RESOURCES_OUTPUT_DIR})
+file(COPY ${RESOURCES_DIR}/response_complex_google DESTINATION ${RESOURCES_OUTPUT_DIR})
