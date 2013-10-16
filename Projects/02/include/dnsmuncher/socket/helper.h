@@ -64,7 +64,7 @@ inline BytesContainer all_data( int socket_fd, size_t buf_size ) {
 #ifdef LOGGING
 		LOG(INFO) << "Reading from socket...";
 #endif
-		int read_status = read(socket_fd, data+bytes_read, buf_size );
+		int read_status = read(socket_fd, data+bytes_read, buf_size - 1 );
 
 		if( read_status > 0 ) {
 			bytes_read += read_status;
@@ -83,7 +83,7 @@ inline BytesContainer all_data( int socket_fd, size_t buf_size ) {
 #ifdef LOGGING
 				LOG(INFO) << "Allocating more space";
 #endif
-				data = (Byte*) realloc(data, bytes_read + buf_size);
+				data = (Byte*) realloc(data, bytes_read + 1 + buf_size);
 				if( !check_allocated(data) ) {
 					return empty;
 				}
@@ -100,8 +100,10 @@ inline BytesContainer all_data( int socket_fd, size_t buf_size ) {
 			break;
 		}
 	}
-
-	return BytesContainer( data, data + bytes_read);
+	
+	BytesContainer packaged_data( data, data + bytes_read);
+	free(data);
+	return packaged_data;
 }
 
 inline size_t guess_buffer_size(int socket_fd) {

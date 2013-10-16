@@ -20,11 +20,11 @@
 
 class ResourceRecord {
 	public:
-		ResourceRecord( Name aname, BytesContainer data, QType type = QType(), NetClass aclass = NetClass(), ttl_number ttl = 0) : aname(aname), rdata(data), type(type), aclass(aclass), ttl(ttl) {
+		ResourceRecord( const Name& aname, const BytesContainer& data, QType type = QType(), NetClass aclass = NetClass(), ttl_number ttl = 0) : aname(aname), rdata(data), type(type), aclass(aclass), ttl(ttl) {
 			rdlength = data.size();
 		}
 
-		ResourceRecord( Name aname, BytesContainer data, QType type, NetClass aclass, ttl_number ttl, rdata_length_number rdlength) : aname(aname), rdata(data), type(type), aclass(aclass), ttl(ttl), rdlength(rdlength) {
+		ResourceRecord( const Name& aname, const BytesContainer& data, QType type, NetClass aclass, ttl_number ttl, rdata_length_number rdlength) : aname(aname), rdata(data), type(type), aclass(aclass), ttl(ttl), rdlength(rdlength) {
 		}
 
 		friend class ResourceRecordConvert;
@@ -52,7 +52,13 @@ class ResourceRecord {
 			return info.str();
 		}
 
+
+	~ResourceRecord() {
+
+	}	
+
 	private:
+		//ResourceRecord( const ResourceRecord& other ) {}
 		Name aname;
 		QType type;
 		NetClass aclass;

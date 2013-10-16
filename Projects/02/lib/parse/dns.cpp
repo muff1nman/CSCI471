@@ -24,7 +24,7 @@
 void set_fields( DNSBuilder* builder, unsigned long num ) {
 	std::bitset<DNS::GENERIC_HEADER_FIELD_LENGTH> fields(num);
 #ifdef LOGGING
-	LOG(INFO) << "fields: " << fields;
+	LOG(INFO) << "fields: " << fields.to_string();
 #endif
 	builder->is_response(fields[DNS::QR_OFFSET]);
 	builder->authoritative_bit(fields[DNS::AA_OFFSET]);
@@ -276,7 +276,9 @@ boost::optional<ResourceRecord> parse_other_record( ParseContext& context ) {
 	if( rdlength ) {
 		rdata	= parse_data( context, *rdlength );
 #ifdef LOGGING
-		LOG(INFO) << "Resource record has data: " << demaria_util::to_string( *rdata );
+		if(rdata) {
+			LOG(INFO) << "Resource record has data: " << demaria_util::to_string( *rdata );
+		}
 #endif
 	}
 #ifdef LOGGING
@@ -291,7 +293,8 @@ boost::optional<ResourceRecord> parse_other_record( ParseContext& context ) {
 			qclass &&
 			ttl &&
 			rdlength &&
-			rdata ) {
+		 	rdata 
+			) {
 		r = ResourceRecord( *name, *rdata, *type, *qclass, *ttl, *rdlength );
 #ifdef LOGGING
 		LOG(INFO) << "Parse record: " << r->to_string();
@@ -330,19 +333,42 @@ boost::optional<Question> parse_question( ParseContext& context ) {
 bool parse_header( ParseContext& context, size_t& question_count, size_t& answer_count, size_t& ns_count, size_t& ar_count) {
 
 	// TODO check dereferences on optionals
-	context.b->set_id( *parse_number<size_t,2>( context ));
-	set_fields( context.b.get(), *parse_number<size_t,2>( context ));
-	question_count = *parse_number<size_t,2>( context );
-	answer_count = *parse_number<size_t,2>( context );
-	ns_count = *parse_number<size_t,2>( context );
-	ar_count = *parse_number<size_t,2>( context );
+	typedef boost::optional<size_t>	maybe_num;
+
+	maybe_num id = parse_number<size_t,2>( context );
+	maybe_num fields = parse_number<size_t,2>( context );
+	maybe_num q_count = parse_number<size_t,2>( context );
+	maybe_num an_count = parse_number<size_t,2>( context );
+	maybe_num nss_count = parse_number<size_t,2>( context );
+	maybe_num arr_count = parse_number<size_t,2>( context );
+
+	if(
+			id &&
+			fields &&
+			q_count &&
+			an_count &&
+			nss_count &&
+			arr_count ) {
+
+		context.b->set_id( *id);
+		set_fields( context.b.get(), *fields);
+		question_count = *q_count;
+		answer_count = *an_count;
+		// TODO change rhs names
+		ns_count = *nss_count;
+		ar_count = *arr_count;
+#ifdef LOGGING
+		LOG(INFO) << context.finish - context.current << " bytes remaining after header";
+#endif
+		return true;
+
+	}  else {
 
 #ifdef LOGGING
-	LOG(INFO) << context.finish - context.current << " bytes remaining after header";
+		LOG(ERROR) << "Could not parse header";
 #endif
-
-	// see TODO above
-	return true;
+		return false;
+	}
 
 }
 

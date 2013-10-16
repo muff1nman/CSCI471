@@ -13,6 +13,8 @@
 class Convert {
 	public:
 		virtual BytesContainer to_data() const = 0;
+
+		virtual ~Convert() { }
 };
 
 #endif /* !__convert_h__ */

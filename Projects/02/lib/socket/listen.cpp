@@ -76,7 +76,7 @@ int create_listening_port( unsigned short port_number, int socket_type ) {
 	int bind_status = bind_listening_socket_to_port( listening_fd, port_number );
 	if( bind_status < SUCCESS ) {
 #ifdef LOGGING
-		LOG(FATAL) << ERROR_BIND_SOCKET;
+		LOG(FATAL) << ERROR_BIND_SOCKET << ": " << strerror(errno);
 #else
 		perror(ERROR_BIND_SOCKET);
 #endif

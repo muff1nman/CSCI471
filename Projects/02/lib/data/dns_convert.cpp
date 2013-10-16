@@ -16,10 +16,6 @@
 #include <glog/logging.h>
 #endif
 
-DNSConvert::DNSConvert(boost::shared_ptr<DNS> dns) : dns(dns) {
-	// TODO
-}
-
 std::bitset<DNS::GENERIC_HEADER_FIELD_LENGTH> DNSConvert::flags() const {
 	std::bitset<DNS::GENERIC_HEADER_FIELD_LENGTH> flags;
 

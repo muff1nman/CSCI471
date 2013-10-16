@@ -33,7 +33,9 @@ int connect_to_socket(const char* server, unsigned short port) {
 	int fd = open_connect_socket();
 
 	if( fd <  SUCCESS ) {
-		do_error(ERROR_CREATE_SOCKET);
+#ifdef LOGGING
+		LOG(ERROR) << ERROR_CREATE_SOCKET << ": " << strerror(errno);
+#endif
 		return fd;
 	}
 

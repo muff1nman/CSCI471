@@ -48,16 +48,20 @@ void socket_thread_runner(int fd, boost::shared_ptr<Consumer> c) {
 #endif
 }
 
-DNS send_and_receive( boost::shared_ptr<DNS> query ) {
+void send_and_receive( boost::shared_ptr<DNS> query ) {
 	boost::shared_ptr<Convert> dns_data( new DNSConvert(query) );
 	boost::shared_ptr<Consumer> gen(new DataProducer(dns_data));
 	boost::function<void(int)> sfunc = boost::bind(&socket_thread_runner, _1, gen);
-	connect_in_new_thread( "127.0.0.1", 16318, sfunc );
+	connect_in_new_thread( "8.8.8.8", 53, sfunc );
 
-	//boost::shared_ptr<DNS> result;
-	//boost::shared_ptr<Consumer> parse( new DNSConsumer(result) );
-	//boost::function<void(int)> rfunc = boost::bind(&socket_thread_runner, _1, parse);
-	//accept_in_new_threads( 16318, rfunc, SOCK_DGRAM );
+	boost::shared_ptr<DNS> result;
+	boost::shared_ptr<Consumer> parse( new DNSConsumer(result) );
+	boost::function<void(int)> rfunc = boost::bind(&socket_thread_runner, _1, parse);
+	accept_in_new_threads( 16318, rfunc, SOCK_DGRAM );
+
+#ifdef LOGGING
+	LOG(INFO) << "Received dns result: " << result->to_string();
+#endif
 
 }
 
@@ -134,10 +138,11 @@ int main( int argc, char** argv ) {
 	DNSBuilder b;
 	b.set_id( 234)
 	 .is_query()
-	 .add_question( Question("www.google.com") )
+	 .add_question( Question("www.google.com", Type::A, NetClass::IN) )
 	 .question_count(1)
 	 .recursion_desired(true);
-	send_and_receive(b.build_ptr());
+	boost::shared_ptr<DNS> to_send = b.build_ptr();
+	send_and_receive( to_send );
 
 #ifdef LOGGING
 	LOG(INFO) << "Done with connection";

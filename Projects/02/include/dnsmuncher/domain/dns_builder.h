@@ -23,9 +23,6 @@ class DNSBuilder {
 
 		DNSBuilder& set_id( generic_number num) {
 			this->id = std::bitset<16>(num);
-#ifdef LOGGING
-			LOG(INFO) << "Set id to: " << this->id.to_string();
-#endif
 			return do_common();
 		}
 

@@ -16,7 +16,7 @@
 class DNSConvert : public Convert {
 
 	public:
-		DNSConvert(boost::shared_ptr<DNS> dns);
+		DNSConvert(boost::shared_ptr<DNS> dns) : dns(dns) { }
 		virtual BytesContainer to_data() const;
 
 	private:

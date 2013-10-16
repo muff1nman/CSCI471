@@ -13,7 +13,7 @@ void DNSConsumer::run(int socket_fd) {
 	BytesContainer raw_data = all_data(socket_fd);
 	result = from_data_as_ptr( raw_data );
 #ifdef LOGGING
-	LOG(INFO) << result.to_string();
+	LOG(INFO) << result->to_string();
 #endif
 }
 
