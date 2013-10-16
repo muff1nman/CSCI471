@@ -16,18 +16,10 @@
 #include "dnsmuncher/util/byte/print.h"
 #endif
 
-#include <boost/spirit/include/qi.hpp>
-#include <boost/spirit/include/qi_binary.hpp>
-#include <boost/spirit/include/phoenix.hpp>
 #include <boost/bind.hpp>
 #include <boost/optional.hpp>
 #include "parse_context.h"
 #include <iterator>
-
-using boost::phoenix::ref;
-using boost::bind;
-
-namespace qi = boost::spirit::qi;
 
 void set_fields( DNSBuilder* builder, unsigned long num ) {
 	std::bitset<DNS::GENERIC_HEADER_FIELD_LENGTH> fields(num);
@@ -62,29 +54,19 @@ ForwardIterator next(ForwardIterator it, Distance d) {
 }
 
 template <class T, size_t N>
-qi::rule< BytesContainer::const_iterator, T> number_parser( T& buffer ) {
-	switch(N) {
-		case 4:
-			return qi::big_dword[ref(buffer) = qi::_1];
-		case 2:
-			return qi::big_word[ref(buffer) = qi::_1];
-		case 1:
-		default:
-			return qi::byte_[ref(buffer) = qi::_1];
-	}
-}
-
-template <class T, size_t N>
 boost::optional<T> parse_number( ParseContext& context ) {
 	boost::optional<T> data;
-	T buffer;
 
-	if( context_has_bytes_left( context, 2*N ) ) {
-		bool parsed_correctly = qi::parse( context.current, context.finish, 
-				number_parser<T,N>(buffer));
-		if( parsed_correctly ) {
-			data = buffer;
+	if( context_has_bytes_left( context, N ) ) {
+		std::bitset<N * BITS_PER_BYTE> bytes;
+		std::bitset<BITS_PER_BYTE> cache;
+		for( size_t i = 0; i < N; ++i ) {
+			cache = std::bitset<BITS_PER_BYTE>( *context.current );
+			bytes = bytes << BITS_PER_BYTE;
+			copy_into(bytes, cache);
+			std::advance( context.current, 1);
 		}
+		data = bytes.to_ulong();
 	}
 
 	return data;
@@ -347,31 +329,20 @@ boost::optional<Question> parse_question( ParseContext& context ) {
 
 bool parse_header( ParseContext& context, size_t& question_count, size_t& answer_count, size_t& ns_count, size_t& ar_count) {
 
-	DNSBuilder g;
+	// TODO check dereferences on optionals
+	context.b->set_id( *parse_number<size_t,2>( context ));
+	set_fields( context.b.get(), *parse_number<size_t,2>( context ));
+	question_count = *parse_number<size_t,2>( context );
+	answer_count = *parse_number<size_t,2>( context );
+	ns_count = *parse_number<size_t,2>( context );
+	ar_count = *parse_number<size_t,2>( context );
 
-	bool parsed_header_correctly = qi::parse( context.current, context.finish, 
-			qi::big_word[bind(&DNSBuilder::set_id, context.b.get(), _1)] >> 
-			qi::big_word[bind(&set_fields, context.b.get(), _1)] >>
-			qi::big_word[ref(question_count) = qi::_1] >>
-			qi::big_word[ref(answer_count) = qi::_1] >>
-			qi::big_word[ref(ns_count) = qi::_1] >>
-			qi::big_word[ref(ar_count) = qi::_1]
-			);
 #ifdef LOGGING
 	LOG(INFO) << context.finish - context.current << " bytes remaining after header";
 #endif
 
-	if (parsed_header_correctly) {
-#ifdef LOGGING
-		LOG(INFO) << "Parsed correctly";
-#endif
-		return true;
-	} else {
-#ifdef LOGGING
-		LOG(WARNING) << "Parsed incorrectly";
-#endif
-		return false;
-	}
+	// see TODO above
+	return true;
 
 }
 
