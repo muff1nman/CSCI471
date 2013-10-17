@@ -47,7 +47,6 @@ int open_socket(int type) {
  */
 int connect_to_socket(int fd, const char* server, unsigned short port) {
 
-
 #ifdef LOGGING
 	LOG(INFO) << "Opened socket: [" << fd << "]";
 #endif
@@ -91,7 +90,7 @@ void Socket::accept( SocketFunction f) {
 }
 
 void Socket::connect(const char* server, Port dest_port, SocketFunction f) {
-	int connect_status = connect_to_socket( this->socket_fd, server, this->port);
+	int connect_status = connect_to_socket( this->socket_fd, server, dest_port);
 	if( connect_status < SUCCESS ) {
 #ifdef LOGGING
 		LOG(ERROR) << ERROR_CONNECT << ": " << strerror(errno);
@@ -99,9 +98,15 @@ void Socket::connect(const char* server, Port dest_port, SocketFunction f) {
 		perror(ERROR_CONNECT);
 #endif
 	}
+#ifdef LOGGING
+	else {
+		LOG(INFO) << "Connected to socket";
+	}
+#endif
 
 	boost::function<void()> bound_func = boost::bind(f, this->socket_fd);
-	boost::thread t(bound_func);
+	//boost::thread t(bound_func);
+	bound_func();
 }
 
 Socket::Socket( int socket_type, Port port) : socket_type(socket_type), port(port) {
@@ -113,11 +118,21 @@ Socket::Socket( int socket_type, Port port) : socket_type(socket_type), port(por
 		perror(ERROR_CREATE_SOCKET);
 #endif
 	}
-	int bind_result = bind_listening_socket_to_port( this->socket_fd, port );
 #ifdef LOGGING
-	LOG(ERROR) << ERROR_BIND_SOCKET << ": " << strerror(errno);
+	LOG(INFO) << "Opened socket";
+#endif
+	int bind_result = bind_listening_socket_to_port( this->socket_fd, port );
+	if(bind_result < SUCCESS) {
+#ifdef LOGGING
+		LOG(ERROR) << ERROR_BIND_SOCKET << ": " << strerror(errno);
 #else
-	perror(ERROR_BIND_SOCKET);
+		perror(ERROR_BIND_SOCKET);
+#endif
+	}
+#ifdef LOGGING
+	else {
+		LOG(INFO) << "Bound socket";
+	}
 #endif
 	
 }

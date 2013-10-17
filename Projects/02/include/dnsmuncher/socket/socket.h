@@ -17,7 +17,8 @@
 class Socket {
 	public:
 		typedef unsigned short Port;
-		typedef void (*SocketFunction)(int);
+		//typedef void (*SocketFunction)(int);
+		typedef boost::function<void(int)> SocketFunction;
 		Socket( int socket_type, Port port);
 
 		// TODO only for TCP socket

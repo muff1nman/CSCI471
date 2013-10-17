@@ -14,6 +14,7 @@
 #include "dnsmuncher/data/dns_convert.h"
 #include "dnsmuncher/domain/dns_builder.h"
 #include "dnsmuncher/actors/dns_consumer.h"
+#include "dnsmuncher/socket/socket.h"
 
 #include <iostream>
 #include <string>
@@ -48,20 +49,22 @@ void socket_thread_runner(int fd, boost::shared_ptr<Consumer> c) {
 #endif
 }
 
-void send_and_receive( boost::shared_ptr<DNS> query ) {
+void send_and_receive( boost::shared_ptr<DNS> query ) {	
+	Socket socket(SOCK_DGRAM, 16318);
 	boost::shared_ptr<Convert> dns_data( new DNSConvert(query) );
 	boost::shared_ptr<Consumer> gen(new DataProducer(dns_data));
 	boost::function<void(int)> sfunc = boost::bind(&socket_thread_runner, _1, gen);
-	connect_in_new_thread( "8.8.8.8", 53, sfunc );
+	socket.connect("8.8.8.8", 53, sfunc);
+	//connect_in_new_thread( "8.8.8.8", 53, sfunc );
 
-	boost::shared_ptr<DNS> result;
-	boost::shared_ptr<Consumer> parse( new DNSConsumer(result) );
-	boost::function<void(int)> rfunc = boost::bind(&socket_thread_runner, _1, parse);
-	accept_in_new_threads( 16318, rfunc, SOCK_DGRAM );
+	//boost::shared_ptr<DNS> result;
+	//boost::shared_ptr<Consumer> parse( new DNSConsumer(result) );
+	//boost::function<void(int)> rfunc = boost::bind(&socket_thread_runner, _1, parse);
+	//accept_in_new_threads( 16318, rfunc, SOCK_DGRAM );
 
-#ifdef LOGGING
-	LOG(INFO) << "Received dns result: " << result->to_string();
-#endif
+//#ifdef LOGGING
+	//LOG(INFO) << "Received dns result: " << result->to_string();
+//#endif
 
 }
 
