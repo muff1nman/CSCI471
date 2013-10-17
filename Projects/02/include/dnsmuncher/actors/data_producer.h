@@ -19,6 +19,7 @@
 
 #include <sys/socket.h>
 #include <sys/types.h>
+#include <boost/shared_ptr.hpp>
 
 class DataProducer : public Consumer {
 	public:

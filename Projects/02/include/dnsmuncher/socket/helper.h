@@ -68,7 +68,7 @@ inline BytesContainer all_data( int socket_fd, size_t buf_size ) {
 
 		if( read_status > 0 ) {
 			bytes_read += read_status;
-			if( read_status < buf_size ) {
+			if( (unsigned) read_status < buf_size ) {
 #ifdef LOGGING
 				LOG(INFO) << "No more bytes";
 				LOG(INFO) << std::endl << demaria_util::to_string(data, read_status, 4, 10 );

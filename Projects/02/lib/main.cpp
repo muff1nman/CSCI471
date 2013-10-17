@@ -6,9 +6,6 @@
  */
 
 #include "dnsmuncher/config.h"
-#include "dnsmuncher/socket/connect.h"
-#include "dnsmuncher/socket/listen.h"
-#include "dnsmuncher/socket/helper.h"
 #include "dnsmuncher/actors/consumer.h"
 #include "dnsmuncher/actors/data_producer.h"
 #include "dnsmuncher/data/dns_convert.h"
@@ -79,7 +76,7 @@ string print_usage( int argc, char** argv ) {
 
 boost::optional<string> parse_internal( int argc, char** argv, size_t position ) {
 	boost::optional<string> ret_val;
-	if( argc > position ) {
+	if( (unsigned) argc > position ) {
 		ret_val = string(argv[position]);
 	}
 	return ret_val;

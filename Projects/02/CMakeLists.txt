@@ -11,8 +11,8 @@ set( PROJECT_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include )
 set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 
 # Configuration Stuff
-option(DEBUG "Turn debuggin on or off" ON)
-option(LOGGING "Turn loggin on or off" ON)
+option(DEBUG "Turn debuggin on or off" OFF)
+option(LOGGING "Turn loggin on or off" OFF)
 option(TEST "Turn testing on or off" ON)
 
 set( LOG_LEVEL 1 )

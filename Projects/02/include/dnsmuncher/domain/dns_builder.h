@@ -130,6 +130,7 @@ class DNSBuilder {
 
 		DNSBuilder& additional_count( std::bitset<DNS::GENERIC_HEADER_FIELD_LENGTH> ad_count ) {
 			this->ar_count = ad_count;
+			return do_common();
 		}
 
 		DNSBuilder& additional_count( generic_number num ) {
@@ -177,6 +178,7 @@ class DNSBuilder {
 			tc = false;
 			rd = false;
 			ra = false;
+			return do_common();
 		}
 };
 

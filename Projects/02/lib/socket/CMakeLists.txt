@@ -1,6 +1,4 @@
 set(SRCS
-	listen.cpp
-	connect.cpp
 	socket.cpp
 )
 

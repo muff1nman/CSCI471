@@ -6,9 +6,8 @@
  */
 
 #include "dnsmuncher/config.h"
-#include "dnsmuncher/socket/connect.h"
-#include "dnsmuncher/socket/listen.h"
 #include "dnsmuncher/socket/helper.h"
+#include "dnsmuncher/socket/socket.h"
 #include "dnsmuncher/actors/consumer.h"
 #include "dnsmuncher/actors/echo_consumer.h"
 #include "dnsmuncher/actors/data_producer.h"
@@ -31,14 +30,7 @@ void thread_runner(int fd) {
 	boost::shared_ptr<Consumer> c(new DNSConsumer(result));
 	c->run(fd);
 #ifdef LOGGING
-	LOG(INFO) << "Thread finalizing";
-#endif
-#ifdef LOGGING
-	LOG(INFO) << "Closing spawned socket(not the listening one)";
-#endif
-	close_socket(fd);
-#ifdef LOGGING
-	LOG(INFO) << "Thread released";
+	LOG(INFO) << "Runner finalizing";
 #endif
 }
 
@@ -54,7 +46,7 @@ string print_usage( int argc, char** argv ) {
 
 boost::optional<string> parse_internal( int argc, char** argv, size_t position ) {
 	boost::optional<string> ret_val;
-	if( argc > position ) {
+	if( (unsigned) argc > position ) {
 		ret_val = string(argv[position]);
 	}
 	return ret_val;
@@ -111,9 +103,8 @@ int main( int argc, char** argv ) {
 #ifdef LOGGING
 	LOG(INFO) << "Connecting in new thread";
 #endif
-	//connect_in_new_thread( "8.8.8.8", 53, &thread_runner );
-	//connect_in_new_thread( "127.0.0.1", 16318, &thread_runner );
-	accept_in_new_threads( 16318, &thread_runner, SOCK_DGRAM );
+	Socket s(SOCK_DGRAM, 16318);
+	s.accept(&thread_runner);
 
 	return 0;
 }

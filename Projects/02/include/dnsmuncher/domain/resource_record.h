@@ -60,11 +60,11 @@ class ResourceRecord {
 	private:
 		//ResourceRecord( const ResourceRecord& other ) {}
 		Name aname;
+		BytesContainer rdata;
 		QType type;
 		NetClass aclass;
 		ttl_number ttl;
 		rdata_length_number rdlength;
-		BytesContainer rdata;
 };
 
 #endif /* !__resource_record_h__ */

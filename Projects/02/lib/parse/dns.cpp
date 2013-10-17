@@ -43,7 +43,7 @@ size_t current_index( ParseContext& context ) {
 #endif
 
 bool context_has_bytes_left( const ParseContext& context, size_t bytes ) {
-	return context.finish - context.start >= bytes;
+	return context.finish - context.start >= (int) bytes;
 }
 
 template <class ForwardIterator, class Distance>
@@ -373,8 +373,6 @@ bool parse_header( ParseContext& context, size_t& question_count, size_t& answer
 }
 
 void from_data_interntal( const BytesContainer raw, boost::shared_ptr<DNSBuilder> b ) {
-	const size_t HEADER_SIZE_IN_BYTES = 16;
-
 	// data holders
 	size_t question_count;
 	size_t answer_count;
