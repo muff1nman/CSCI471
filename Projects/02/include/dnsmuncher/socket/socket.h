@@ -22,21 +22,19 @@ class Socket {
 
 		// TODO only for TCP socket
 		//void listen(Port port);
-		
+	
+		// TODO accept in thread?
 		void accept( SocketFunction f);
 
 		void connect(const char* server, Port dest_port, SocketFunction f);
 
+		void handle_c( int sig );
 
 	private:
 		int socket_fd;
 		int socket_type;
+		int port;
 
-		int open_connect_socket() {
-			return socket(AF_INET, socket_type, 0);
-		}
-
-		void bind_to_port( Port port );
 
 };
 
