@@ -12,7 +12,7 @@ set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 
 # Configuration Stuff
 option(DEBUG "Turn debuggin on or off" ON)
-option(LOGGING "Turn loggin on or off" OFF)
+option(LOGGING "Turn loggin on or off" ON)
 option(TEST "Turn testing on or off" ON)
 
 set( LOG_LEVEL 1 )
@@ -31,6 +31,19 @@ endif()
 if( Boost_MINOR_VERSION LESS "54" )
 	message(STATUS "Setting to old boost")
 	set( OLDBOOST 1 )
+endif()
+
+# profiling stuff
+if(CMAKE_COMPILER_IS_GNUCXX)
+	#message(STATUS "enabling c++ 11")
+	#add_definitions(-std=gnu++0x)
+	if(DEBUG)
+		message(STATUS "warnings on")
+		add_definitions(-Wall)
+		message(STATUS "enabling gprof")
+		add_definitions(-pg)
+		set( CMAKE_EXE_LINKER_FLAGS -pg )
+	endif(DEBUG)
 endif()
 
 #ensure this is after we find the boost version
