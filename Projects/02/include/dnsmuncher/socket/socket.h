@@ -29,7 +29,8 @@ class Socket {
 
 		void connect(const char* server, Port dest_port, SocketFunction f);
 
-		void handle_c( int sig );
+		// TODO not implemented yet
+		//void handle_c( int sig );
 
 	private:
 		int socket_fd;

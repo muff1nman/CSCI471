@@ -72,18 +72,18 @@ int connect_to_socket(int fd, const char* server, unsigned short port) {
 	return fd;
 }
 
-void Socket::handle_c( int sig ) {
-	int close_status = close(this->socket_fd);
-	if(close_status < 0 ) {
-#ifdef LOGGING
-		LOG(ERROR) << "Could not close listening socket";
-#endif
-	} else {
-#ifdef LOGGING
-		LOG(INFO) << "Closed listening socket";
-#endif
-	}
-}
+//void Socket::handle_c( int sig ) {
+	//int close_status = close(this->socket_fd);
+	//if(close_status < 0 ) {
+//#ifdef LOGGING
+		//LOG(ERROR) << "Could not close listening socket";
+//#endif
+	//} else {
+//#ifdef LOGGING
+		//LOG(INFO) << "Closed listening socket";
+//#endif
+	//}
+//}
 
 void Socket::accept( SocketFunction f) {
 	f(this->socket_fd);
