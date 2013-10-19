@@ -11,11 +11,14 @@ set( PROJECT_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include )
 set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 
 # Configuration Stuff
-option(DEBUG "Turn debuggin on or off" ON)
+option(DEBUG "Turn debuggin on or off" OFF)
 option(LOGGING "Turn loggin on or off" OFF)
-set( LOG_LEVEL 1 )
+option(TEST "Turn testing on or off" ON)
+
 if(DEBUG)
-	set( LOG_LEVEL 0 )
+	set( CMAKE_BUILD_TYPE debug)
+else()
+	set( CMAKE_BUILD_TYPE release)
 endif(DEBUG)
 
 # for boost lexical cast 
@@ -27,7 +30,19 @@ if( Boost_MINOR_VERSION LESS "54" )
 	message(STATUS "Setting to old boost")
 	set( OLDBOOST 1 )
 endif()
-include_directories(${Boost_INCLUDE_DIR})
+
+# profiling stuff
+if(CMAKE_COMPILER_IS_GNUCXX)
+	#message(STATUS "enabling c++ 11")
+	#add_definitions(-std=gnu++0x)
+	if(DEBUG)
+		message(STATUS "warnings on")
+		add_definitions(-Wall)
+		message(STATUS "enabling gprof")
+		add_definitions(-pg)
+		set( CMAKE_EXE_LINKER_FLAGS -pg )
+	endif(DEBUG)
+endif()
 
 #ensure this is after we find the boost version
 configure_file( 
@@ -40,3 +55,9 @@ include_directories( ${PROJECT_INCLUDE_DIR}
 
 # Go do work CMake!
 add_subdirectory( lib )
+
+# if testing do some tests!
+if( ${TEST} STREQUAL "ON" )
+	enable_testing()
+	add_subdirectory( test )
+endif()
