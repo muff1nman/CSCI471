@@ -22,7 +22,7 @@ int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);
 #ifdef LOGGING
 	google::InitGoogleLogging( PROJECT_NAME "-" "TestData" );
-	FLAGS_minloglevel = LOG_LEVEL;
+	FLAGS_minloglevel = TEST_LOG_LEVEL;
 	FLAGS_alsologtostderr = 1;
 	FLAGS_colorlogtostderr = 1;
 #endif

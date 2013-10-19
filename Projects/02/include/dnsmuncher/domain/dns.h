@@ -158,6 +158,14 @@ class DNS : public Logging {
 			records(records)
 			{ }
 
+		const std::vector<Question> get_questions() const {
+			return this->questions;
+		}
+
+		const std::vector<ResourceRecord> get_resource_records() const {
+			return this->records;
+		}
+
 	private:
 		// dont use
 		DNS() { };

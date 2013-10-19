@@ -52,13 +52,11 @@ class ResourceRecord {
 			return info.str();
 		}
 
-
-	~ResourceRecord() {
-
-	}	
+		BytesContainer get_data() const {
+			return this->rdata;
+		}
 
 	private:
-		//ResourceRecord( const ResourceRecord& other ) {}
 		Name aname;
 		BytesContainer rdata;
 		QType type;

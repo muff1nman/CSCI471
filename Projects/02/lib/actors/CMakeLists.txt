@@ -1,6 +1,7 @@
 set(SRCS
 	consumer.cpp
 	dns_consumer.cpp
+	dns_response_consumer.cpp
 )
 
 add_library(muncher_actors ${SRCS})
