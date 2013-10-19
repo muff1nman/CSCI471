@@ -9,11 +9,11 @@
 #define __ip_h__
 
 #include <string>
+#include "dnsmuncher/util/byte/byte.h"
 
-std::string ip_from_data( const BytesContainer& data ) {
-	// TODO
-	return std::string("IP ADDRESS");
-}
+const size_t BYTE_LENGTH = 4;
+
+std::string ip_from_data( const BytesContainer& data );
 
 #endif /* !__ip_h__ */
 

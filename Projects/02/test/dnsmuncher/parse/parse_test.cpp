@@ -53,7 +53,7 @@ TEST(ParseIP, Extrabytes) {
 TEST(ParseIP, NumbersSmallerThan64) {
 	const BytesContainer test = boost::assign::list_of
 		('\x63')('\x00')('\x25')('\x01');
-	EXPECT_EQ( std::string("99.0.19.1"), ip_from_data( test ));
+	EXPECT_EQ( std::string("99.0.37.1"), ip_from_data( test ));
 }
 
 int main(int argc, char **argv) {
