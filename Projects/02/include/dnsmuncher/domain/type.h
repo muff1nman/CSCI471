@@ -13,6 +13,9 @@
 class Type : public Logging {
 	public:
 		static const size_t A = 1;
+		static const size_t NS = 2;
+		static const size_t CNAME = 5;
+		static const size_t SOA = 6;
 
 		Type( size_t type ) : type(type) { }
 
@@ -20,6 +23,14 @@ class Type : public Logging {
 		
 		bool operator==( const Type& other ) const {
 			return this->type == other.type;
+		}
+
+		bool operator==( const size_t other ) const {
+			return this->type == other;
+		}
+
+		operator size_t() {
+			return type;
 		}
 
 		std::string stringify_object() const {

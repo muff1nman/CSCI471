@@ -7,7 +7,9 @@ set(SRCS
 	dns.cpp
 )
 
-add_library(muncher_dns ${SRCS})
+FILE(GLOB_RECURSE INC_ALL ${CMAKE_SOURCE_DIR}/include/*.h)
+
+add_library(muncher_dns ${SRCS} ${INC_ALL})
 
 set(LINK_LIBRARIES_DNS
 	${CMAKE_THREAD_LIBS_INIT} ${Boost_LIBRARIES} muncher_socket muncher_actors

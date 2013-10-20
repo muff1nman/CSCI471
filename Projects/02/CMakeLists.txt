@@ -37,7 +37,8 @@ if(CMAKE_COMPILER_IS_GNUCXX)
 	#add_definitions(-std=gnu++0x)
 	if(DEBUG)
 		message(STATUS "warnings on")
-		add_definitions(-Wall)
+		add_definitions(-Wall -Wextra -pedantic -ansi -Wno-unused-variable
+			-Wno-unused-parameter)
 		message(STATUS "enabling gprof")
 		add_definitions(-pg)
 		set( CMAKE_EXE_LINKER_FLAGS -pg )
@@ -52,6 +53,9 @@ configure_file(
 # Project includes 
 include_directories( ${PROJECT_INCLUDE_DIR} 
 	${CMAKE_CURRENT_BINARY_DIR}/include )
+
+FILE(GLOB_RECURSE INC_ALL ${CMAKE_SOURCE_DIR}/include/*.h)
+message(STATUS "include files: ${INC_ALL}")
 
 # Go do work CMake!
 add_subdirectory( lib )

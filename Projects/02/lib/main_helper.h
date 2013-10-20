@@ -9,6 +9,8 @@
 #define __main_helper_h__
 
 #include "dnsmuncher/config.h"
+#include "dnsmuncher/domain/type.h"
+#include "dnsmuncher/domain/qtype.h"
 
 #ifdef LOGGING
 #include <glog/logging.h>
@@ -56,6 +58,9 @@ po::variables_map parse_args( int argc, char** argv ) {
 		 "  some.name.com\n"
 		 "  . (For the root server)\n"
 		 "Empty strings are not allowed")
+
+		(TYPE_OPTION, po::value< size_t >()->default_value(1),
+		 "Query for the given type. Defaults to 1 (NS)")
 
 		/**
 		 * Debugging options

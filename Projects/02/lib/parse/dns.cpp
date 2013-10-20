@@ -9,6 +9,8 @@
 
 #include "dnsmuncher/util/logging.h"
 #include "dnsmuncher/domain/dns_builder.h"
+#include "dnsmuncher/domain/ns_resource_record.h"
+#include "dnsmuncher/domain/cname_resource_record.h"
 #include "dnsmuncher/util/byte/copy.h"
 #include "dnsmuncher/util/join.h"
 
@@ -36,14 +38,15 @@ void set_fields( DNSBuilder* builder, unsigned long num ) {
 	builder->return_code( dissect<DNS::GENERIC_HEADER_FIELD_LENGTH,DNS::RCODE_FIELD_LENGTH>(fields, DNS::RCODE_OFFSET) );
 }
 
-#ifdef LOGGING
 size_t current_index( ParseContext& context ) {
 	return std::distance( context.start, context.current );
 }
-#endif
 
 bool context_has_bytes_left( const ParseContext& context, size_t bytes ) {
-	return context.finish - context.start >= (int) bytes;
+#ifdef LOGGING
+	LOG(INFO) << std::distance( context.current, context.finish ) << " bytes left";
+#endif
+	return std::distance(context.current, context.finish) >= (int) bytes;
 }
 
 template <class ForwardIterator, class Distance>
@@ -56,6 +59,9 @@ ForwardIterator next(ForwardIterator it, Distance d) {
 template <class T, size_t N>
 boost::optional<T> parse_number( ParseContext& context ) {
 	boost::optional<T> data;
+#ifdef LOGGING
+	LOG(INFO) << "Parsing number of " << N << " bytes";
+#endif
 
 	if( context_has_bytes_left( context, N ) ) {
 		std::bitset<N * BITS_PER_BYTE> bytes;
@@ -144,7 +150,7 @@ bool parse_zero_byte( ParseContext& context ) {
 	return false;
 }
 
-boost::optional<std::vector<std::string> > parse_labels( ParseContext& context ) {
+boost::optional<std::vector<std::string> > parse_labels( ParseContext& context, bool& pointer_next ) {
 	boost::optional<std::vector<std::string> > n;
 	std::vector<std::string> labels;
 
@@ -152,7 +158,8 @@ boost::optional<std::vector<std::string> > parse_labels( ParseContext& context )
 	LOG(INFO) << "Starting to look for labels at: " << current_index(context);
 #endif
 
-	while(!is_zero_byte(context) && !is_pointer(context)) {
+	while( (!is_pointer(context)) && (!is_zero_byte(context))) {		
+
 		boost::optional<std::string> label = parse_string_part( context );
 		if( label ) {
 			labels.push_back(*label);
@@ -161,14 +168,19 @@ boost::optional<std::vector<std::string> > parse_labels( ParseContext& context )
 		}
 	}
 
-	if( !parse_zero_byte(context) && !is_pointer(context) ) {
-#ifdef LOGGING
-		LOG(ERROR) << "Could not parse zero byte or a pointer";
-#endif
-	} else {
+	bool parsed_zero = parse_zero_byte(context);
+	if( parsed_zero ) {
 		n = labels;
+	} else {
+		pointer_next = is_pointer(context);
+		if( pointer_next ) {
+			n = labels;
+		} else {
+#ifdef LOGGING
+			LOG(ERROR) << "Could not parse zero byte or a pointer";
+#endif
+		}
 	}
-
 	return n;
 
 }
@@ -188,7 +200,8 @@ boost::optional<std::vector<std::string> > parse_label_pointer( ParseContext& co
 			pointer.set(DNS::POINTER_LENGTH - 2, 0);
 			size_t index = pointer.to_ulong();
 			ParseContext temporary(context, index);
-			return parse_labels( temporary );
+			bool dontcare;
+			return parse_labels( temporary, dontcare );
 		}
 	}
 	return boost::optional<std::vector<std::string> >();
@@ -196,10 +209,13 @@ boost::optional<std::vector<std::string> > parse_label_pointer( ParseContext& co
 
 boost::optional<Name> parse_name( ParseContext& context ) {
 	boost::optional<Name> n;
+	bool should_parse_pointer = false;
+	boost::optional<std::vector<std::string> > maybe_pointer_labels;
+	boost::optional<std::vector<std::string> > maybe_labels;
 
 	// first attempt to parse a list of labels that may end with a zero byte or a
 	// pointer
-	boost::optional<std::vector<std::string> > maybe_labels = parse_labels( context );
+	maybe_labels = parse_labels( context, should_parse_pointer );
 #ifdef LOGGING
 	if( maybe_labels ) {
 		LOG(INFO) << "Labels found";
@@ -209,14 +225,16 @@ boost::optional<Name> parse_name( ParseContext& context ) {
 	LOG(INFO) << "Index at: " << current_index( context );
 #endif
 
-	boost::optional<std::vector<std::string> > maybe_pointer_labels = parse_label_pointer( context );
+	if( should_parse_pointer ) {
+		maybe_pointer_labels = parse_label_pointer( context );
 #ifdef LOGGING
-	if( maybe_pointer_labels ) {
-		LOG(INFO) << "Pointer Labels found";
-	} else { 
-		LOG(INFO) << "Pointer Labels not found";
-	}
+		if( maybe_pointer_labels ) {
+			LOG(INFO) << "Pointer Labels found";
+		} else { 
+			LOG(INFO) << "Pointer Labels not found";
+		}
 #endif
+	}
 
 	boost::optional<std::vector<std::string> > combined = maybe_join( maybe_labels, maybe_pointer_labels );
 	if( combined ) {
@@ -247,16 +265,63 @@ boost::optional<BytesContainer> parse_data( ParseContext& context, size_t length
 
 }
 
-boost::optional<ResourceRecord> parse_other_record( ParseContext& context ) {
+DNS::ResourcePtr create_specific_resource( const DNS::ResourcePtr& resource, ParseContext& context ) {
+	switch( resource->get_type()) {
+		case Type::NS: 
+		case Type::SOA: {
+#ifdef LOGGING
+											LOG(INFO) << "Parsing name for NS";
+#endif
+											boost::optional<Name> name = parse_name(context);
+											if( name ) {
+#ifdef LOGGING
+												LOG(INFO) << "Successfully parsed name for NS record: " << name->to_string();
+#endif
+												return DNS::ResourcePtr( new NsResourceRecord(*resource, *name));
+											} else {
+#ifdef LOGGING
+												LOG(WARNING) << "Could not parse name in rdata for Type: " << Type::NS;
+#endif
+												return resource;
+											}
+											break;
+										}
+		case Type::CNAME: {
+												boost::optional<Name> name = parse_name(context);
+												if( name ) {
+													return DNS::ResourcePtr( new CNameResourceRecord(*resource, *name));
+												} else {
+#ifdef LOGGING
+													LOG(WARNING) << "Could not parse name in rdata for Type: " << Type::CNAME;
+#endif
+													return resource;
+												}
+												break;
+
+											}
+		default:		{
+									return resource;
+								}
+	}
+	return resource;  // compiler gives warning without this
+}
+
+boost::optional<DNS::ResourcePtr> parse_other_record( ParseContext& context ) {
 #ifdef LOGGING
 	LOG(INFO) << "Starting to parse resource record at: " << current_index( context );
 #endif
-	boost::optional<ResourceRecord> r;
+	boost::optional<DNS::ResourcePtr> r;
 	boost::optional<Name> name = parse_name( context );
 #ifdef LOGGING
 	LOG(INFO) << "Finished parsing name and now we are at: " << current_index( context );
 #endif
 	boost::optional<size_t> type = parse_number<size_t, 2>( context );
+	// Check type
+	if( type && (*type != (size_t)Type::A && *type != (size_t)Type::NS && *type != (size_t)Type::CNAME)) {
+#ifdef LOGGING
+		LOG(WARNING) << "Parsing unsupported type [" << *type << "], the information in this record may not be printed accurately";
+#endif
+	}
 #ifdef LOGGING
 	LOG(INFO) << "Finished parsing type and now we are at: " << current_index( context );
 #endif
@@ -272,8 +337,9 @@ boost::optional<ResourceRecord> parse_other_record( ParseContext& context ) {
 #ifdef LOGGING
 	LOG(INFO) << "Finished parsing rdlength and now we are at: " << current_index( context );
 #endif
+	ParseContext duplicate_before_rdata_parse(context, current_index(context));
 	boost::optional<BytesContainer> rdata;
-	if( rdlength ) {
+if( rdlength ) {
 		rdata	= parse_data( context, *rdlength );
 #ifdef LOGGING
 		if(rdata) {
@@ -295,30 +361,38 @@ boost::optional<ResourceRecord> parse_other_record( ParseContext& context ) {
 			rdlength &&
 		 	rdata 
 			) {
-		r = ResourceRecord( *name, *rdata, *type, *qclass, *ttl, *rdlength );
+		r = DNS::ResourcePtr( new ResourceRecord( *name, *rdata, *type, *qclass, *ttl, *rdlength ));
 #ifdef LOGGING
-		LOG(INFO) << "Parse record: " << r->to_string();
+		LOG(INFO) << "Parse record: " << (*r)->to_string();
 #endif
+		r = create_specific_resource(*r, duplicate_before_rdata_parse);
 	}
 #ifdef LOGGING
 	else {
 		LOG(WARNING) << "Could not parse record";
+	}
+
+	if( duplicate_before_rdata_parse.current > context.current ) {
+		LOG(WARNING) << "Parsing contexts do not match after parsing specific type rdata";
+		LOG(INFO) << "Duplicate at: " << current_index(duplicate_before_rdata_parse) << " and context at: " << current_index( context );
+	} else if ( duplicate_before_rdata_parse.current != context.current ) {
+		LOG(INFO) << "Duplicate at: " << current_index(duplicate_before_rdata_parse) << " and context at: " << current_index( context );
 	}
 #endif
 
 	return r;
 }
 
-boost::optional<Question> parse_question( ParseContext& context ) {
-	boost::optional<Question> q;
+boost::optional<DNS::QuestionPtr> parse_question( ParseContext& context ) {
+	boost::optional<DNS::QuestionPtr> q;
 	boost::optional<Name> name = parse_name( context );
 	boost::optional<size_t> type = parse_number<size_t, 2>( context );
 	boost::optional<size_t> qclass = parse_number<size_t, 2>( context );
 
 	if( name && type && qclass ) {
-		q = Question(*name, *type, *qclass);
+		q = DNS::QuestionPtr( new Question(*name, *type, *qclass));
 #ifdef LOGGING
-		LOG(INFO) << "Parsed question " << q->to_string();
+		LOG(INFO) << "Parsed question " << (*q)->to_string();
 #endif
 	} 
 #ifdef LOGGING
@@ -388,8 +462,15 @@ void from_data_interntal( const BytesContainer raw, boost::shared_ptr<DNSBuilder
 	BytesContainer::const_iterator finish = raw.end();
 
 	ParseContext context(raw, raw.begin(), raw.end(), raw.begin(), b);
+#ifdef LOGGING
+	LOG(INFO) << "Context at: " << current_index(context);
+	LOG(INFO) << "Bytes remaining?" << context_has_bytes_left(context, 3);
+#endif
 
 	parse_header( context, question_count, answer_count, ns_count, ar_count );
+#ifdef LOGGING
+	LOG(INFO) << "Context at: " << current_index(context);
+#endif
 
 	b->question_count( question_count );
 	b->answer_count( answer_count );
@@ -401,9 +482,10 @@ void from_data_interntal( const BytesContainer raw, boost::shared_ptr<DNSBuilder
 		if( i > 0 ) {
 			LOG(WARNING) << "Multiple questions have very little support in the real world and are not guaranteed to work";
 		}
+		LOG(INFO) << "Attempt to parse question " << i << " out of " << question_count;
 #endif
 
-		boost::optional<Question> q = parse_question(context);
+		boost::optional<DNS::QuestionPtr> q = parse_question(context);
 		if ( q ) {
 			b->add_question( *q );
 		} else {	
@@ -412,7 +494,10 @@ void from_data_interntal( const BytesContainer raw, boost::shared_ptr<DNSBuilder
 	}
 
 	for( size_t i = 0; i < answer_count + ns_count + ar_count; ++i ) {
-		boost::optional<ResourceRecord> r = parse_other_record(context);
+#ifdef LOGGING
+		LOG(INFO) << "Attempt to parse record " << i << " out of " << answer_count;
+#endif
+		boost::optional<DNS::ResourcePtr> r = parse_other_record(context);
 		if ( r ) {
 			b->add_resource( *r );
 		} else {

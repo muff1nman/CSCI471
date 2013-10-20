@@ -41,10 +41,10 @@ BytesContainer DNSConvert::to_data() const {
 	c = join(c, convert_big_endian<gen_by_len>( this->dns->ns_count ));
 	c = join(c, convert_big_endian<gen_by_len>( this->dns->ar_count ));
 	for( size_t i = 0; i < this->dns->questions.size(); ++i ) {
-		c = join(c, QuestionConvert(this->dns->questions.at(i)).to_data());
+		c = join(c, QuestionConvert(*(this->dns->questions.at(i))).to_data());
 	}
 	for( size_t i = 0; i < this->dns->records.size(); ++i ) {
-		c = join(c, ResourceRecordConvert(this->dns->records.at(i)).to_data());
+		c = join(c, ResourceRecordConvert(*(this->dns->records.at(i))).to_data());
 	}
 	return c;
 }

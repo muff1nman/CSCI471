@@ -6,6 +6,7 @@
  */
 
 #include "dnsmuncher/config.h"
+#include "main_helper.h"
 #include "dnsmuncher/actors/consumer.h"
 #include "dnsmuncher/actors/data_producer.h"
 #include "dnsmuncher/data/dns_convert.h"
@@ -14,7 +15,6 @@
 #include "dnsmuncher/actors/dns_response_consumer.h"
 #include "dnsmuncher/socket/socket.h"
 #include "dnsmuncher/dns.h"
-#include "main_helper.h"
 
 #include <iostream>
 #include <boost/bind.hpp>
@@ -40,7 +40,7 @@ int main( int argc, char** argv ) {
 		DNSBuilder b;
 		b.set_id( 234 )
 			.is_query()
-			.add_question( Question(configs[NAME_OPTION].as< string >(), Type::A, NetClass::IN) )
+			.add_question( Question(configs[NAME_OPTION].as< string >(), configs[TYPE_OPTION].as< size_t>(), NetClass::IN) )
 			.question_count(1)
 			.recursion_desired(true);
 		boost::shared_ptr<DNS> to_send = b.build_ptr();
