@@ -25,6 +25,10 @@ class Type : public Logging {
 			return this->type == other.type;
 		}
 
+		bool operator==( const size_t other ) const {
+			return this->type == other;
+		}
+
 		operator size_t() {
 			return type;
 		}
