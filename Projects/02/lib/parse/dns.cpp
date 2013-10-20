@@ -38,11 +38,9 @@ void set_fields( DNSBuilder* builder, unsigned long num ) {
 	builder->return_code( dissect<DNS::GENERIC_HEADER_FIELD_LENGTH,DNS::RCODE_FIELD_LENGTH>(fields, DNS::RCODE_OFFSET) );
 }
 
-#ifdef LOGGING
 size_t current_index( ParseContext& context ) {
 	return std::distance( context.start, context.current );
 }
-#endif
 
 bool context_has_bytes_left( const ParseContext& context, size_t bytes ) {
 #ifdef LOGGING
@@ -268,7 +266,6 @@ boost::optional<BytesContainer> parse_data( ParseContext& context, size_t length
 }
 
 DNS::ResourcePtr create_specific_resource( const DNS::ResourcePtr& resource, ParseContext& context ) {
-	LOG(INFO) << "Create specific resource called with type: " << resource->get_type();
 	switch( resource->get_type()) {
 		case Type::NS: 
 		case Type::SOA: {
@@ -374,7 +371,6 @@ if( rdlength ) {
 	else {
 		LOG(WARNING) << "Could not parse record";
 	}
-#endif
 
 	if( duplicate_before_rdata_parse.current > context.current ) {
 		LOG(WARNING) << "Parsing contexts do not match after parsing specific type rdata";
@@ -382,6 +378,7 @@ if( rdlength ) {
 	} else if ( duplicate_before_rdata_parse.current != context.current ) {
 		LOG(INFO) << "Duplicate at: " << current_index(duplicate_before_rdata_parse) << " and context at: " << current_index( context );
 	}
+#endif
 
 	return r;
 }
@@ -490,7 +487,9 @@ void from_data_interntal( const BytesContainer raw, boost::shared_ptr<DNSBuilder
 	}
 
 	for( size_t i = 0; i < answer_count + ns_count + ar_count; ++i ) {
+#ifdef LOGGING
 		LOG(INFO) << "Attempt to parse record " << i << " out of " << answer_count;
+#endif
 		boost::optional<DNS::ResourcePtr> r = parse_other_record(context);
 		if ( r ) {
 			b->add_resource( *r );
