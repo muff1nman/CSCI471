@@ -12,12 +12,12 @@
 void DNSResponseConsumer::run(int socket_fd) {
 	DNSConsumer::run(socket_fd);
 	if( result->response_code() != DNS::NO_ERROR ) {
-		std::vector<ResourceRecord> answers = result->get_answers();
+		DNS::ResourceList answers = result->get_answers();
 		if( answers.empty()) {
 			std::cerr << "There were no answers" << std::endl;
 		}
 		for( size_t i = 0; i < answers.size(); ++i ) {
-			std::string ip_address = ip_from_data( answers.at(i).get_data() );
+			std::string ip_address = ip_from_data( answers.at(i)->get_data() );
 			std::cout << ip_address << std::endl;
 		}
 	} else {

@@ -20,9 +20,17 @@
 #include <algorithm>
 #include <ostream>
 #include <sstream>
+#include <boost/shared_ptr.hpp>
+#include <boost/iterator/indirect_iterator.hpp>
 
 class DNS : public Logging {
 	public:
+
+		typedef boost::shared_ptr<Question> QuestionPtr;
+		typedef boost::shared_ptr<ResourceRecord> ResourcePtr;
+
+		typedef std::vector< QuestionPtr > QuestionList;
+		typedef std::vector< ResourcePtr > ResourceList;
 
 		static const size_t GENERIC_HEADER_FIELD_LENGTH = 16; 
 		static const size_t OPCODE_FIELD_LENGTH = 4; 
@@ -66,13 +74,13 @@ class DNS : public Logging {
 			info << std::string( "rcode : ") << this->rcode.to_string() << list_sep;
 			info << std::string("questions: ") + nested_start;
 			for( size_t i = 0; i < questions.size(); ++i ) {
-				info << questions.at(i).to_string() + list_sep;
+				info << questions.at(i)->to_string() + list_sep;
 			}
 			info << nested_finish;
 			info << list_sep;
 			info <<  std::string("records: ") + nested_start;
 			for( size_t i = 0; i < records.size(); ++i ) {
-				info << records.at(i).to_string() + list_sep;
+				info << records.at(i)->to_string() + list_sep;
 			}
 			info << nested_finish;
 			return info.str();
@@ -108,12 +116,17 @@ class DNS : public Logging {
 #ifdef LOGGING
 			LOG(INFO) << "Checking contents are equal";
 #endif
-            bool value =
+			bool value =
 				this->questions.size() == other.questions.size() &&
 				this->records.size() == other.records.size() &&
-				std::equal(this->questions.begin(), this->questions.end(), other.questions.begin()) &&
-				std::equal(this->records.begin(), this->records.end(), other.records.begin());
-            return value;
+				std::equal(boost::make_indirect_iterator(this->questions.begin()),
+						boost::make_indirect_iterator(this->questions.end()),
+						boost::make_indirect_iterator(other.questions.begin())) &&
+				std::equal(boost::make_indirect_iterator(this->records.begin()),
+						boost::make_indirect_iterator(this->records.end()),
+						boost::make_indirect_iterator(other.records.begin()));
+
+			return value;
 		}
 
 		/**
@@ -146,8 +159,8 @@ class DNS : public Logging {
 				std::bitset<OPCODE_FIELD_LENGTH> opcode,
 				std::bitset<Z_FIELD_LENGTH> z,
 				std::bitset<RCODE_FIELD_LENGTH> rcode,
-				std::vector<Question> questions,
-				std::vector<ResourceRecord> records
+				QuestionList questions,
+				ResourceList records
 			 ) : 
 			id(id),
 			qd_count(qd_count),
@@ -166,18 +179,18 @@ class DNS : public Logging {
 			records(records)
 			{ }
 
-		const std::vector<Question> get_questions() const {
+		const QuestionList get_questions() const {
 			return this->questions;
 		}
 
-		const std::vector<ResourceRecord> get_answers() const {
-			std::vector<ResourceRecord> all = get_resource_records();
-			std::vector<ResourceRecord>::const_iterator start_of_answers = all.begin() + get_question_count();
-			return std::vector<ResourceRecord>(start_of_answers, start_of_answers + get_answer_count());
+		const ResourceList get_answers() const {
+			ResourceList all = get_resource_records();
+			ResourceList::const_iterator start_of_answers = all.begin() + get_question_count();
+			return ResourceList(start_of_answers, start_of_answers + get_answer_count());
 
 		}
 
-		const std::vector<ResourceRecord> get_resource_records() const {
+		const ResourceList get_resource_records() const {
 			return this->records;
 		}
 
@@ -215,8 +228,8 @@ class DNS : public Logging {
 		std::bitset<OPCODE_FIELD_LENGTH> opcode;
 		std::bitset<Z_FIELD_LENGTH> z;
 		std::bitset<RCODE_FIELD_LENGTH> rcode;
-		std::vector<Question> questions;
-		std::vector<ResourceRecord> records;
+		QuestionList questions;
+		ResourceList records;
 		
 };
 

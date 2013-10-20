@@ -253,11 +253,11 @@ boost::optional<BytesContainer> parse_data( ParseContext& context, size_t length
 
 }
 
-boost::optional<ResourceRecord> parse_other_record( ParseContext& context ) {
+boost::optional<DNS::ResourcePtr> parse_other_record( ParseContext& context ) {
 #ifdef LOGGING
 	LOG(INFO) << "Starting to parse resource record at: " << current_index( context );
 #endif
-	boost::optional<ResourceRecord> r;
+	boost::optional<DNS::ResourcePtr> r;
 	boost::optional<Name> name = parse_name( context );
 #ifdef LOGGING
 	LOG(INFO) << "Finished parsing name and now we are at: " << current_index( context );
@@ -307,9 +307,9 @@ boost::optional<ResourceRecord> parse_other_record( ParseContext& context ) {
 			rdlength &&
 		 	rdata 
 			) {
-		r = ResourceRecord( *name, *rdata, *type, *qclass, *ttl, *rdlength );
+		r = DNS::ResourcePtr( new ResourceRecord( *name, *rdata, *type, *qclass, *ttl, *rdlength ));
 #ifdef LOGGING
-		LOG(INFO) << "Parse record: " << r->to_string();
+		LOG(INFO) << "Parse record: " << (*r)->to_string();
 #endif
 	}
 #ifdef LOGGING
@@ -321,16 +321,16 @@ boost::optional<ResourceRecord> parse_other_record( ParseContext& context ) {
 	return r;
 }
 
-boost::optional<Question> parse_question( ParseContext& context ) {
-	boost::optional<Question> q;
+boost::optional<DNS::QuestionPtr> parse_question( ParseContext& context ) {
+	boost::optional<DNS::QuestionPtr> q;
 	boost::optional<Name> name = parse_name( context );
 	boost::optional<size_t> type = parse_number<size_t, 2>( context );
 	boost::optional<size_t> qclass = parse_number<size_t, 2>( context );
 
 	if( name && type && qclass ) {
-		q = Question(*name, *type, *qclass);
+		q = DNS::QuestionPtr( new Question(*name, *type, *qclass));
 #ifdef LOGGING
-		LOG(INFO) << "Parsed question " << q->to_string();
+		LOG(INFO) << "Parsed question " << (*q)->to_string();
 #endif
 	} 
 #ifdef LOGGING
@@ -416,7 +416,7 @@ void from_data_interntal( const BytesContainer raw, boost::shared_ptr<DNSBuilder
 		LOG(INFO) << "Attempt to parse question " << i << " out of " << question_count;
 #endif
 
-		boost::optional<Question> q = parse_question(context);
+		boost::optional<DNS::QuestionPtr> q = parse_question(context);
 		if ( q ) {
 			b->add_question( *q );
 		} else {	
@@ -426,7 +426,7 @@ void from_data_interntal( const BytesContainer raw, boost::shared_ptr<DNSBuilder
 
 	for( size_t i = 0; i < answer_count + ns_count + ar_count; ++i ) {
 		LOG(INFO) << "Attempt to parse record " << i << " out of " << answer_count;
-		boost::optional<ResourceRecord> r = parse_other_record(context);
+		boost::optional<DNS::ResourcePtr> r = parse_other_record(context);
 		if ( r ) {
 			b->add_resource( *r );
 		} else {
