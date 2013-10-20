@@ -43,6 +43,9 @@ size_t current_index( ParseContext& context ) {
 #endif
 
 bool context_has_bytes_left( const ParseContext& context, size_t bytes ) {
+#ifdef LOGGING
+	LOG(INFO) << std::distance( context.start, context.finish ) << " bytes left";
+#endif
 	return context.finish - context.start >= (int) bytes;
 }
 
@@ -56,6 +59,9 @@ ForwardIterator next(ForwardIterator it, Distance d) {
 template <class T, size_t N>
 boost::optional<T> parse_number( ParseContext& context ) {
 	boost::optional<T> data;
+#ifdef LOGGING
+	LOG(INFO) << "Parsing number of " << N << " bytes";
+#endif
 
 	if( context_has_bytes_left( context, N ) ) {
 		std::bitset<N * BITS_PER_BYTE> bytes;
@@ -257,6 +263,12 @@ boost::optional<ResourceRecord> parse_other_record( ParseContext& context ) {
 	LOG(INFO) << "Finished parsing name and now we are at: " << current_index( context );
 #endif
 	boost::optional<size_t> type = parse_number<size_t, 2>( context );
+	// Check type
+	if( type != (size_t)Type::A ) {
+#ifdef LOGGING
+		LOG(WARNING) << "Parsing unsupported type, the information in this record may not be printed accurately";
+#endif
+	}
 #ifdef LOGGING
 	LOG(INFO) << "Finished parsing type and now we are at: " << current_index( context );
 #endif
@@ -401,6 +413,7 @@ void from_data_interntal( const BytesContainer raw, boost::shared_ptr<DNSBuilder
 		if( i > 0 ) {
 			LOG(WARNING) << "Multiple questions have very little support in the real world and are not guaranteed to work";
 		}
+		LOG(INFO) << "Attempt to parse question " << i << " out of " << question_count;
 #endif
 
 		boost::optional<Question> q = parse_question(context);
@@ -412,6 +425,7 @@ void from_data_interntal( const BytesContainer raw, boost::shared_ptr<DNSBuilder
 	}
 
 	for( size_t i = 0; i < answer_count + ns_count + ar_count; ++i ) {
+		LOG(INFO) << "Attempt to parse record " << i << " out of " << answer_count;
 		boost::optional<ResourceRecord> r = parse_other_record(context);
 		if ( r ) {
 			b->add_resource( *r );

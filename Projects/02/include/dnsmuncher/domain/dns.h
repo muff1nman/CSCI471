@@ -39,8 +39,15 @@ class DNS : public Logging {
 		static const size_t Z_OFFSET = 4;
 		static const size_t RCODE_OFFSET = 0;
 
-
 		static const size_t MAX_LABEL_SIZE = 63;
+
+		// return codes
+		static const size_t NO_ERROR = 0;
+		static const size_t FORMAT_ERROR = 1;
+		static const size_t SERVER_FAILURE = 2;
+		static const size_t NAME_ERROR = 3;
+		static const size_t NOT_IMPLEMENTED = 4;
+		static const size_t REFUSED = 5;
 
 		std::string stringify_object() const {
 			std::stringstream info;
@@ -162,8 +169,40 @@ class DNS : public Logging {
 			return this->questions;
 		}
 
+		const std::vector<ResourceRecord> get_answers() const {
+			std::vector<ResourceRecord> all = get_resource_records();
+			std::vector<ResourceRecord>::const_iterator start_of_answers = all.begin() + get_question_count();
+			return std::vector<ResourceRecord>(start_of_answers, start_of_answers + get_answer_count());
+
+		}
+
 		const std::vector<ResourceRecord> get_resource_records() const {
 			return this->records;
+		}
+
+		size_t get_question_count() const {
+			return qd_count.to_ulong();
+		}
+
+		size_t get_resource_record_count() const {
+			//return get_answer_count() + get_nameserver_count() + get_additional_count();
+			//return get_resource_records().size();
+		}
+		
+		size_t get_answer_count() const {
+			return an_count.to_ulong();
+		}
+
+		size_t get_nameserver_count() const {
+			return ns_count.to_ulong();
+		}
+		
+		size_t get_additional_count() const {
+			return ar_count.to_ulong();
+		}
+
+		size_t response_code() {
+			return rcode.to_ulong();
 		}
 
 	private:

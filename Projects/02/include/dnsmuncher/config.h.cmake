@@ -13,6 +13,7 @@
 #define HELP_OPTION "help"
 #define NAME_OPTION "name"
 #define QUERY_OPTION "query"
+#define TYPE_OPTION "type"
 #define LOG_LEVEL_OPTION "log-level"
 
 #define TEST_LOG_LEVEL 0
