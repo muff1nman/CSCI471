@@ -9,6 +9,7 @@
 
 #include "dnsmuncher/util/logging.h"
 #include "dnsmuncher/domain/dns_builder.h"
+#include "dnsmuncher/domain/ns_resource_record.h"
 #include "dnsmuncher/util/byte/copy.h"
 #include "dnsmuncher/util/join.h"
 
@@ -253,6 +254,35 @@ boost::optional<BytesContainer> parse_data( ParseContext& context, size_t length
 
 }
 
+DNS::ResourcePtr create_specific_resource( const DNS::ResourcePtr& resource, ParseContext& context ) {
+	LOG(INFO) << "Create specific resource called with type: " << resource->get_type();
+	switch( resource->get_type()) {
+		case Type::NS: 
+		case Type::SOA: {
+#ifdef LOGGING
+											LOG(INFO) << "Parsing name for NS";
+#endif
+											boost::optional<Name> name = parse_name(context);
+											if( name ) {
+#ifdef LOGGING
+												LOG(INFO) << "Successfully parsed name for NS record: " << name->to_string();
+#endif
+												return DNS::ResourcePtr( new NsResourceRecord(*resource, *name));
+											} else {
+#ifdef LOGGING
+												LOG(WARNING) << "Could not parse name in rdata for Type: " << Type::NS;
+#endif
+												return resource;
+											}
+											break;
+										}
+		default:		{
+									return resource;
+								}
+	}
+	return resource;  // compiler gives warning without this
+}
+
 boost::optional<DNS::ResourcePtr> parse_other_record( ParseContext& context ) {
 #ifdef LOGGING
 	LOG(INFO) << "Starting to parse resource record at: " << current_index( context );
@@ -264,9 +294,9 @@ boost::optional<DNS::ResourcePtr> parse_other_record( ParseContext& context ) {
 #endif
 	boost::optional<size_t> type = parse_number<size_t, 2>( context );
 	// Check type
-	if( type != (size_t)Type::A ) {
+	if( type && (*type != (size_t)Type::A && *type != (size_t)Type::NS )) {
 #ifdef LOGGING
-		LOG(WARNING) << "Parsing unsupported type, the information in this record may not be printed accurately";
+		LOG(WARNING) << "Parsing unsupported type [" << *type << "], the information in this record may not be printed accurately";
 #endif
 	}
 #ifdef LOGGING
@@ -284,8 +314,9 @@ boost::optional<DNS::ResourcePtr> parse_other_record( ParseContext& context ) {
 #ifdef LOGGING
 	LOG(INFO) << "Finished parsing rdlength and now we are at: " << current_index( context );
 #endif
+	ParseContext duplicate_before_rdata_parse(context, current_index(context));
 	boost::optional<BytesContainer> rdata;
-	if( rdlength ) {
+if( rdlength ) {
 		rdata	= parse_data( context, *rdlength );
 #ifdef LOGGING
 		if(rdata) {
@@ -311,12 +342,19 @@ boost::optional<DNS::ResourcePtr> parse_other_record( ParseContext& context ) {
 #ifdef LOGGING
 		LOG(INFO) << "Parse record: " << (*r)->to_string();
 #endif
+		r = create_specific_resource(*r, duplicate_before_rdata_parse);
 	}
 #ifdef LOGGING
 	else {
 		LOG(WARNING) << "Could not parse record";
 	}
 #endif
+
+	if( duplicate_before_rdata_parse.current > context.current ) {
+		LOG(WARNING) << "Parsing contexts do not match after parsing specific type rdata";
+	} else if ( duplicate_before_rdata_parse.current != context.current ) {
+		LOG(INFO) << "Duplicate at: " << current_index(duplicate_before_rdata_parse) << " and context at: " << current_index( context );
+	}
 
 	return r;
 }

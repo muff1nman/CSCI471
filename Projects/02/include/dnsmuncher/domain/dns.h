@@ -185,9 +185,15 @@ class DNS : public Logging {
 
 		const ResourceList get_answers() const {
 			ResourceList all = get_resource_records();
-			ResourceList::const_iterator start_of_answers = all.begin() + get_question_count();
+			ResourceList::const_iterator start_of_answers = all.begin();
 			return ResourceList(start_of_answers, start_of_answers + get_answer_count());
 
+		}
+
+		const ResourceList get_nameservers() const {
+			ResourceList all = get_resource_records();
+			ResourceList::const_iterator start_of_nameservers = all.begin() + get_answer_count();
+			return ResourceList(start_of_nameservers, start_of_nameservers + get_nameserver_count());
 		}
 
 		const ResourceList get_resource_records() const {

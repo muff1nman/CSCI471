@@ -36,12 +36,18 @@ class Name : public Logging {
 				std::equal( this->labels.begin(), this->labels.end(), other.labels.begin() );
 		}
 
-		std::string stringify_object() const {
+		std::string to_string() const {
 			std::stringstream info;
-			info << "labels: ";
 			for( size_t i = 0; i < labels.size(); ++i ) {
 				info << labels.at(i) << ".";
 			}
+			return info.str();
+		}
+
+		std::string stringify_object() const {
+			std::stringstream info;
+			info << "labels: ";
+			info << this->to_string();
 			return info.str();
 		}
 

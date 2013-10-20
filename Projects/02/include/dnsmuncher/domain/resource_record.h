@@ -57,10 +57,17 @@ class ResourceRecord {
 			return this->rdata;
 		}
 
-	private:
+		Type get_type() const {
+			return this->type;
+		}
+
+		virtual ~ResourceRecord() { }
+		
+
+	protected:
 		Name aname;
 		BytesContainer rdata;
-		QType type;
+		Type type;
 		NetClass aclass;
 		ttl_number ttl;
 		rdata_length_number rdlength;
