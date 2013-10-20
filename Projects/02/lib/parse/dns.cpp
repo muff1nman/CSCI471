@@ -44,9 +44,9 @@ size_t current_index( ParseContext& context ) {
 
 bool context_has_bytes_left( const ParseContext& context, size_t bytes ) {
 #ifdef LOGGING
-	LOG(INFO) << std::distance( context.start, context.finish ) << " bytes left";
+	LOG(INFO) << std::distance( context.current, context.finish ) << " bytes left";
 #endif
-	return context.finish - context.start >= (int) bytes;
+	return std::distance(context.current, context.finish) >= (int) bytes;
 }
 
 template <class ForwardIterator, class Distance>
@@ -158,7 +158,8 @@ boost::optional<std::vector<std::string> > parse_labels( ParseContext& context, 
 	LOG(INFO) << "Starting to look for labels at: " << current_index(context);
 #endif
 
-	while(!is_zero_byte(context) && !is_pointer(context)) {
+	while( (!is_pointer(context)) && (!is_zero_byte(context))) {		
+
 		boost::optional<std::string> label = parse_string_part( context );
 		if( label ) {
 			labels.push_back(*label);
@@ -180,7 +181,6 @@ boost::optional<std::vector<std::string> > parse_labels( ParseContext& context, 
 #endif
 		}
 	}
-
 	return n;
 
 }
@@ -462,8 +462,15 @@ void from_data_interntal( const BytesContainer raw, boost::shared_ptr<DNSBuilder
 	BytesContainer::const_iterator finish = raw.end();
 
 	ParseContext context(raw, raw.begin(), raw.end(), raw.begin(), b);
+#ifdef LOGGING
+	LOG(INFO) << "Context at: " << current_index(context);
+	LOG(INFO) << "Bytes remaining?" << context_has_bytes_left(context, 3);
+#endif
 
 	parse_header( context, question_count, answer_count, ns_count, ar_count );
+#ifdef LOGGING
+	LOG(INFO) << "Context at: " << current_index(context);
+#endif
 
 	b->question_count( question_count );
 	b->answer_count( answer_count );
