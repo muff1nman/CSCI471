@@ -9,6 +9,7 @@
 #define __parse_dns_h__
 
 #include "dnsmuncher/domain/dns.h"
+#include <boost/shared_ptr.hpp>
 
 DNS from_data( const BytesContainer raw );
 

@@ -5,8 +5,8 @@
  * All Rights Reserved.
  */
 
-#ifndef __dns_h__
-#define __dns_h__
+#ifndef __domain_dns_h__
+#define __domain_dns_h__
 
 #include "dnsmuncher/util/logging.h"
 #include "dnsmuncher/util/byte/byte.h"
@@ -180,5 +180,5 @@ class DNS : public Logging {
 		
 };
 
-#endif /* !__dns_h__ */
+#endif /* !__domain__dns_h__ */
 

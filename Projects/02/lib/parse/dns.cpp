@@ -359,6 +359,7 @@ bool parse_header( ParseContext& context, size_t& question_count, size_t& answer
 		ar_count = *arr_count;
 #ifdef LOGGING
 		LOG(INFO) << context.finish - context.current << " bytes remaining after header";
+		LOG(INFO) << "Current build: " << context.b->to_string();
 #endif
 		return true;
 
@@ -379,8 +380,13 @@ void from_data_interntal( const BytesContainer raw, boost::shared_ptr<DNSBuilder
 	size_t ns_count;
 	size_t ar_count;
 
+#ifdef LOGGING
+	LOG(INFO) << "Bytes" << std::endl << demaria_util::to_string( raw );
+#endif
+
 	BytesContainer::const_iterator start = raw.begin();
 	BytesContainer::const_iterator finish = raw.end();
+
 	ParseContext context(raw, raw.begin(), raw.end(), raw.begin(), b);
 
 	parse_header( context, question_count, answer_count, ns_count, ar_count );

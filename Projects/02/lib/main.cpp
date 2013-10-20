@@ -13,6 +13,7 @@
 #include "dnsmuncher/actors/dns_consumer.h"
 #include "dnsmuncher/actors/dns_response_consumer.h"
 #include "dnsmuncher/socket/socket.h"
+#include "dnsmuncher/dns.h"
 #include "main_helper.h"
 
 #include <iostream>
@@ -24,47 +25,6 @@
 
 using namespace std;
 namespace po = boost::program_options;
-
-
-// Runs a consumer and deletes it after completion.
-void socket_thread_runner(int fd, boost::shared_ptr<Consumer> c) {
-	c->run(fd);
-#ifdef LOGGING
-	LOG(INFO) << "Thread finalizing";
-#endif
-
-#ifdef LOGGING
-	LOG(INFO) << "Releasing resources";
-#endif
-	c.reset();
-
-#ifdef LOGGING
-	LOG(INFO) << "Closing spawned socket(not the listening one)";
-#endif
-	// No need to close socket with new Socket class
-	//close_socket(fd);
-#ifdef LOGGING
-	LOG(INFO) << "Thread released";
-#endif
-}
-
-void send_and_receive( boost::shared_ptr<DNS> query ) {	
-	Socket socket(SOCK_DGRAM, 16318);
-	boost::shared_ptr<Convert> dns_data( new DNSConvert(query) );
-	boost::shared_ptr<Consumer> gen(new DataProducer(dns_data));
-	boost::function<void(int)> sfunc = boost::bind(&socket_thread_runner, _1, gen);
-	socket.connect("8.8.8.8", 53, sfunc);
-
-	boost::shared_ptr<DNS> result;
-	boost::shared_ptr<Consumer> parse( new DNSResponseConsumer(result) );
-	boost::function<void(int)> rfunc = boost::bind(&socket_thread_runner, _1, parse);
-	socket.accept( rfunc );
-
-#ifdef LOGGING
-	LOG(INFO) << "Received dns result: " << result->to_string();
-#endif
-
-}
 
 int main( int argc, char** argv ) {
 
@@ -84,7 +44,7 @@ int main( int argc, char** argv ) {
 			.question_count(1)
 			.recursion_desired(true);
 		boost::shared_ptr<DNS> to_send = b.build_ptr();
-		send_and_receive( to_send );
+		send_and_receive( configs[QUERY_OPTION].as< string >(), to_send );
 	}
 
 	return 0;
