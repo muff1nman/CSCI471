@@ -10,6 +10,7 @@
 #include "dnsmuncher/util/logging.h"
 #include "dnsmuncher/domain/dns_builder.h"
 #include "dnsmuncher/domain/ns_resource_record.h"
+#include "dnsmuncher/domain/cname_resource_record.h"
 #include "dnsmuncher/util/byte/copy.h"
 #include "dnsmuncher/util/join.h"
 
@@ -151,7 +152,7 @@ bool parse_zero_byte( ParseContext& context ) {
 	return false;
 }
 
-boost::optional<std::vector<std::string> > parse_labels( ParseContext& context ) {
+boost::optional<std::vector<std::string> > parse_labels( ParseContext& context, bool& pointer_next ) {
 	boost::optional<std::vector<std::string> > n;
 	std::vector<std::string> labels;
 
@@ -168,12 +169,18 @@ boost::optional<std::vector<std::string> > parse_labels( ParseContext& context )
 		}
 	}
 
-	if( !parse_zero_byte(context) && !is_pointer(context) ) {
-#ifdef LOGGING
-		LOG(ERROR) << "Could not parse zero byte or a pointer";
-#endif
-	} else {
+	bool parsed_zero = parse_zero_byte(context);
+	if( parsed_zero ) {
 		n = labels;
+	} else {
+		pointer_next = is_pointer(context);
+		if( pointer_next ) {
+			n = labels;
+		} else {
+#ifdef LOGGING
+			LOG(ERROR) << "Could not parse zero byte or a pointer";
+#endif
+		}
 	}
 
 	return n;
@@ -195,7 +202,8 @@ boost::optional<std::vector<std::string> > parse_label_pointer( ParseContext& co
 			pointer.set(DNS::POINTER_LENGTH - 2, 0);
 			size_t index = pointer.to_ulong();
 			ParseContext temporary(context, index);
-			return parse_labels( temporary );
+			bool dontcare;
+			return parse_labels( temporary, dontcare );
 		}
 	}
 	return boost::optional<std::vector<std::string> >();
@@ -203,10 +211,13 @@ boost::optional<std::vector<std::string> > parse_label_pointer( ParseContext& co
 
 boost::optional<Name> parse_name( ParseContext& context ) {
 	boost::optional<Name> n;
+	bool should_parse_pointer = false;
+	boost::optional<std::vector<std::string> > maybe_pointer_labels;
+	boost::optional<std::vector<std::string> > maybe_labels;
 
 	// first attempt to parse a list of labels that may end with a zero byte or a
 	// pointer
-	boost::optional<std::vector<std::string> > maybe_labels = parse_labels( context );
+	maybe_labels = parse_labels( context, should_parse_pointer );
 #ifdef LOGGING
 	if( maybe_labels ) {
 		LOG(INFO) << "Labels found";
@@ -216,14 +227,16 @@ boost::optional<Name> parse_name( ParseContext& context ) {
 	LOG(INFO) << "Index at: " << current_index( context );
 #endif
 
-	boost::optional<std::vector<std::string> > maybe_pointer_labels = parse_label_pointer( context );
+	if( should_parse_pointer ) {
+		maybe_pointer_labels = parse_label_pointer( context );
 #ifdef LOGGING
-	if( maybe_pointer_labels ) {
-		LOG(INFO) << "Pointer Labels found";
-	} else { 
-		LOG(INFO) << "Pointer Labels not found";
-	}
+		if( maybe_pointer_labels ) {
+			LOG(INFO) << "Pointer Labels found";
+		} else { 
+			LOG(INFO) << "Pointer Labels not found";
+		}
 #endif
+	}
 
 	boost::optional<std::vector<std::string> > combined = maybe_join( maybe_labels, maybe_pointer_labels );
 	if( combined ) {
@@ -276,6 +289,19 @@ DNS::ResourcePtr create_specific_resource( const DNS::ResourcePtr& resource, Par
 											}
 											break;
 										}
+		case Type::CNAME: {
+												boost::optional<Name> name = parse_name(context);
+												if( name ) {
+													return DNS::ResourcePtr( new CNameResourceRecord(*resource, *name));
+												} else {
+#ifdef LOGGING
+													LOG(WARNING) << "Could not parse name in rdata for Type: " << Type::CNAME;
+#endif
+													return resource;
+												}
+												break;
+
+											}
 		default:		{
 									return resource;
 								}
@@ -352,6 +378,7 @@ if( rdlength ) {
 
 	if( duplicate_before_rdata_parse.current > context.current ) {
 		LOG(WARNING) << "Parsing contexts do not match after parsing specific type rdata";
+		LOG(INFO) << "Duplicate at: " << current_index(duplicate_before_rdata_parse) << " and context at: " << current_index( context );
 	} else if ( duplicate_before_rdata_parse.current != context.current ) {
 		LOG(INFO) << "Duplicate at: " << current_index(duplicate_before_rdata_parse) << " and context at: " << current_index( context );
 	}

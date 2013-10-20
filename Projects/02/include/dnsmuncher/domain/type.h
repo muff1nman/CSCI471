@@ -14,6 +14,7 @@ class Type : public Logging {
 	public:
 		static const size_t A = 1;
 		static const size_t NS = 2;
+		static const size_t CNAME = 5;
 		static const size_t SOA = 6;
 
 		Type( size_t type ) : type(type) { }

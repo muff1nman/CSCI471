@@ -84,5 +84,43 @@ boost::shared_ptr<DNS> response_nameserver_google() {
 		build_ptr();
 }
 
+boost::shared_ptr<DNS> response_cname_amazon() {
+	BytesContainer a1 = boost::assign::list_of
+('\x03') ('\x77') ('\x77') ('\x77') ('\x0D') ('\x61') ('\x6E') ('\x64') ('\x72') ('\x65') ('\x77') ('\x64') ('\x65') ('\x6D') ('\x61') ('\x72') ('\x69') ('\x61') ('\x03') ('\x63') ('\x6F') ('\x6D') ('\x14') ('\x73') ('\x33') ('\x2D') ('\x77') ('\x65') ('\x62') ('\x73') ('\x69') ('\x74') ('\x65') ('\x2D') ('\x75') ('\x73') ('\x2D') ('\x77') ('\x65') ('\x73') ('\x74') ('\x2D') ('\x32') ('\x09') ('\x61') ('\x6D') ('\x61') ('\x7A') ('\x6F') ('\x6E') ('\x61') ('\x77') ('\x73') ('\xC0') ('\x1E');
+	ResourceRecord r1("www.andrewdemaria.com", a1, 5, NetClass::IN, 5*60, 55);
+
+	BytesContainer a2 = boost::assign::list_of
+('\x07') ('\x6E') ('\x73') ('\x2D') ('\x31') ('\x34') ('\x39') ('\x32') ('\x09') ('\x61') ('\x77') ('\x73') ('\x64') ('\x6E') ('\x73') ('\x2D') ('\x35') ('\x38') ('\x03') ('\x6F') ('\x72') ('\x67') ('\x00');
+	ResourceRecord r2("andrewdemaria.com", a2, Type::NS, NetClass::IN, 2 * 24 * 60 * 60, 23);
+
+	BytesContainer a3 = boost::assign::list_of
+('\x07') ('\x6E') ('\x73') ('\x2D') ('\x31') ('\x35') ('\x39') ('\x39') ('\x09') ('\x61') ('\x77') ('\x73') ('\x64') ('\x6E') ('\x73') ('\x2D') ('\x30') ('\x37') ('\x02') ('\x63') ('\x6F') ('\x02') ('\x75') ('\x6B') ('\x00');
+	ResourceRecord r3("andrewdemaria.com", a3, Type::NS, NetClass::IN, 2 * 24 * 60 * 60, 25);
+
+	BytesContainer a4 = boost::assign::list_of
+('\x06') ('\x6E') ('\x73') ('\x2D') ('\x32') ('\x38') ('\x32') ('\x09') ('\x61') ('\x77') ('\x73') ('\x64') ('\x6E') ('\x73') ('\x2D') ('\x33') ('\x35') ('\xC0') ('\x1E');
+	ResourceRecord r4("andrewdemaria.com", a4, Type::NS, NetClass::IN, 2 * 24 * 60 * 60, 19);
+
+	BytesContainer a5 = boost::assign::list_of
+('\x06') ('\x6E') ('\x73') ('\x2D') ('\x37') ('\x33') ('\x34') ('\x09') ('\x61') ('\x77') ('\x73') ('\x64') ('\x6E') ('\x73') ('\x2D') ('\x32') ('\x37') ('\x03') ('\x6E') ('\x65') ('\x74') ('\x00');
+	ResourceRecord r5("andrewdemaria.com", a5, Type::NS, NetClass::IN, 2 * 24 * 60 * 60, 22);
+
+	return DNSBuilder().
+		set_id(234).
+		is_response().
+		authoritative_bit(true).
+		recursion_desired(true).
+		question_count(1).
+		answer_count(1).
+		nameserver_count(4).
+		add_question( Question("www.andrewdemaria.com", Type::CNAME, NetClass::IN)).
+		add_resource( r1 ).
+		add_resource( r2 ).
+		add_resource( r3 ).
+		add_resource( r4 ).
+		add_resource( r5 ).
+		build_ptr();
+}
+
 #endif /* !__dns_common_h__ */
 

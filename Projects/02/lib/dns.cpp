@@ -7,14 +7,12 @@
 
 #include "dnsmuncher/config.h"
 #include "dnsmuncher/dns.h"
-//#include "dnsmuncher/actors/consumer.h"
 #include "dnsmuncher/actors/data_producer.h"
 #include "dnsmuncher/data/dns_convert.h"
-//#include "dnsmuncher/domain/dns_builder.h"
-//#include "dnsmuncher/actors/dns_consumer.h"
 #include "dnsmuncher/actors/dns_response_consumer.h"
 #include "dnsmuncher/socket/socket.h"
 #include <boost/bind.hpp>
+#include <string>
 
 // Runs a consumer and deletes it after completion.
 void socket_thread_runner(int fd, boost::shared_ptr<Consumer> c) {
@@ -37,6 +35,18 @@ void socket_thread_runner(int fd, boost::shared_ptr<Consumer> c) {
 	LOG(INFO) << "Thread released";
 #endif
 }
+
+//boost::optional<std::string> filter_first_ip( boost::shared_ptr<DNS> query ) {
+
+//}
+
+//boost::optional<std::string> filter_first_ns( boost::shared_ptr<DNS> query ) {
+
+//}
+
+//boost::optional<std::string> filter_first_cname( boost::shared_ptr<DNS> query ) {
+
+//}
 
 void send_and_receive( const std::string& server, boost::shared_ptr<DNS> query ) {	
 	Socket socket(SOCK_DGRAM, 16318);
