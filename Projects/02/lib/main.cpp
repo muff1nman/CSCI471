@@ -42,9 +42,9 @@ int main( int argc, char** argv ) {
 			.is_query()
 			.add_question( Question(configs[NAME_OPTION].as< string >(), configs[TYPE_OPTION].as< size_t>(), NetClass::IN) )
 			.question_count(1)
-			.recursion_desired(true);
+			.recursion_desired(false);
 		boost::shared_ptr<DNS> to_send = b.build_ptr();
-		send_and_receive( configs[QUERY_OPTION].as< string >(), to_send );
+		recursive_send_and_recieve( configs[QUERY_OPTION].as< string >(), to_send );
 	}
 
 	return 0;

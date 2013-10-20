@@ -15,14 +15,22 @@
 #include <string>
 #include <vector>
 
-std::vector<std::string> filter_ips( boost::shared_ptr<DNS> query );
-boost::optional<std::string> filter_first_ip( boost::shared_ptr<DNS> query );
-std::vector<std::string> filter_nameservers( boost::shared_ptr<DNS> query );
-boost::optional<std::string> filter_first_ns( boost::shared_ptr<DNS> query );
-std::vector<std::string> filter_cnames( boost::shared_ptr<DNS> query );
-boost::optional<std::string> filter_first_cname( boost::shared_ptr<DNS> query );
+static const char* ROOT_SERVER = "198.41.0.4";
 
-void send_and_receive( const std::string& server, boost::shared_ptr<DNS> query );
+typedef   boost::shared_ptr<DNS>      DnsPtr;
+typedef   std::string                 NameOrIp;
+typedef   boost::optional<NameOrIp>   MaybeNameOrIp;
+typedef   std::vector<NameOrIp>       ListNameOrIp;
+
+ListNameOrIp    filter_ips         ( DnsPtr query );
+MaybeNameOrIp   filter_first_ip    ( DnsPtr query );
+ListNameOrIp    filter_nameservers ( DnsPtr query );
+MaybeNameOrIp   filter_first_ns    ( DnsPtr query );
+ListNameOrIp    filter_cnames      ( DnsPtr query );
+MaybeNameOrIp   filter_first_cname ( DnsPtr query );
+
+DnsPtr send_and_receive           ( const std::string& server, DnsPtr query );
+DnsPtr recursive_send_and_recieve ( const std::string& server, DnsPtr query );
 
 #endif /* !__dns_h__ */
 

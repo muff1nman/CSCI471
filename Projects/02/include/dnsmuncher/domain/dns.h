@@ -196,6 +196,12 @@ class DNS : public Logging {
 			return ResourceList(start_of_nameservers, start_of_nameservers + get_nameserver_count());
 		}
 
+		const ResourceList get_additionals() const {
+			ResourceList all = get_resource_records();
+			ResourceList::const_iterator start_of_additionals = all.begin() + get_answer_count() + get_nameserver_count();
+			return ResourceList(start_of_additionals, start_of_additionals + get_additional_count());
+		}
+
 		const ResourceList get_resource_records() const {
 			return this->records;
 		}

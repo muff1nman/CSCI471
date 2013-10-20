@@ -61,6 +61,10 @@ class ResourceRecord {
 			return this->type;
 		}
 
+		Name get_label_name() const {
+			return this->aname;
+		}
+
 		virtual ~ResourceRecord() { }
 		
 
