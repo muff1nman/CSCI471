@@ -38,6 +38,10 @@ class Question : public Logging {
 			return info.str();
 		}
 
+		Type get_type() const {
+			return type;
+		}
+
 	private:
 		Name qname;
 		QType type;

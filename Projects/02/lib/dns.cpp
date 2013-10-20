@@ -62,6 +62,9 @@ std::vector<std::string> filter_resource_by_type( boost::shared_ptr<DNS> query, 
 }
 
 boost::optional<std::string> ip_filter_function( DNS::ResourcePtr resource ) {
+#ifdef LOGGING
+	LOG(INFO) << "Interpreting as ips";
+#endif
 	return ip_from_data( resource->get_data() );
 }
 
@@ -74,6 +77,9 @@ boost::optional<std::string> filter_first_ip( boost::shared_ptr<DNS> query ) {
 }
 
 boost::optional<std::string> ns_filter_function( DNS::ResourcePtr resource ) {
+#ifdef LOGGING
+	LOG(INFO) << "Interpreting as ns";
+#endif
 	boost::optional<std::string> ns;
 	boost::shared_ptr<NsResourceRecord> casted = boost::dynamic_pointer_cast<NsResourceRecord>(resource);
 	if( casted ) {
@@ -96,6 +102,9 @@ boost::optional<std::string> filter_first_ns( boost::shared_ptr<DNS> query ) {
 }
 
 boost::optional<std::string> cname_filter_function( DNS::ResourcePtr resource ) {
+#ifdef LOGGING
+	LOG(INFO) << "Interpreting as cname";
+#endif
 	boost::optional<std::string> cname;
 	boost::shared_ptr<CNameResourceRecord> casted = boost::dynamic_pointer_cast<CNameResourceRecord>(resource);
 	if( casted ) {
@@ -125,7 +134,7 @@ void send_and_receive( const std::string& server, boost::shared_ptr<DNS> query )
 	socket.connect(server.c_str(), 53, sfunc);
 
 	boost::shared_ptr<DNS> result;
-	boost::shared_ptr<Consumer> parse( new DNSResponseConsumer(result) );
+	boost::shared_ptr<Consumer> parse( new DNSResponseConsumer(result, query->get_questions().at(0)->get_type() ) );
 	boost::function<void(int)> rfunc = boost::bind(&socket_thread_runner, _1, parse);
 	socket.accept( rfunc );
 
