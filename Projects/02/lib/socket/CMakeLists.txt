@@ -5,7 +5,7 @@ set(SRCS
 add_library(muncher_socket ${SRCS})
 
 set(Boost_USE_MULTITHREADED ON)
-include_directories(${Boost_INCLUDE_DIR})
+include_directories(SYSTEM ${Boost_INCLUDE_DIR})
 find_package(Boost 1.33.1 COMPONENTS regex thread date_time program_options filesystem system REQUIRED)
 
 find_package(Threads REQUIRED)

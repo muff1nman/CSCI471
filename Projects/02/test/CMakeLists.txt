@@ -8,7 +8,7 @@ add_subdirectory( ${GTEST_DIR} )
 
 configure_file( ${TEST_INCLUDE}/file_names.h.cmake ${TEST_INCLUDE_CONFIGURED}/file_names.h )
 
-include_directories( 
+include_directories( SYSTEM
 	${GTEST_DIR}/include 
 	${TEST_INCLUDE}
 	${TEST_INCLUDE_CONFIGURED})
