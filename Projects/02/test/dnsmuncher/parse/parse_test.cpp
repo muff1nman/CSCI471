@@ -44,6 +44,10 @@ TEST(ParseDNS, CnameResponse) {
 	EXPECT_EQ( *response_cname_amazon(), from_data(bytes_from_file( RESPONSE_CNAME_AMAZON )));
 }
 
+TEST(ParseDNS, NameserverAmazonResponse) {
+	EXPECT_EQ( *response_nameserver_amazon(), from_data(bytes_from_file( RESPONSE_NAMESERVER_AMAZON )));
+}
+
 // TODO test for root query
 
 TEST(ParseIP, SimpleIP) {

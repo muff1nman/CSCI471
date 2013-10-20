@@ -184,37 +184,12 @@ boost::optional<std::vector<std::string> > parse_labels( ParseContext& context, 
 	return n;
 
 }
+boost::optional<std::vector<std::string> > parse_label_pointer( ParseContext& context );
 
-boost::optional<std::vector<std::string> > parse_label_pointer( ParseContext& context ) {
-#ifdef LOGGING
-	LOG(INFO) << "Starting pare of label pointer at: " << current_index( context);
-#endif
-	if( is_pointer(context) ) {
-		boost::optional<size_t> bytes = parse_number<size_t,DNS::POINTER_LENGTH / BITS_PER_BYTE>( context );
-		if( bytes ) {
-#ifdef LOGGING
-			LOG(INFO) << "Consumed ptr, now at: " << current_index(context);
-#endif
-			std::bitset<DNS::POINTER_LENGTH> pointer = std::bitset<DNS::POINTER_LENGTH>(*bytes);
-			pointer.set(DNS::POINTER_LENGTH - 1, 0);
-			pointer.set(DNS::POINTER_LENGTH - 2, 0);
-			size_t index = pointer.to_ulong();
-			ParseContext temporary(context, index);
-			bool dontcare;
-			return parse_labels( temporary, dontcare );
-		}
-	}
-	return boost::optional<std::vector<std::string> >();
-}
-
-boost::optional<Name> parse_name( ParseContext& context ) {
-	boost::optional<Name> n;
-	bool should_parse_pointer = false;
+boost::optional<std::vector<std::string> > parse_name_recursive( ParseContext& context ) {
 	boost::optional<std::vector<std::string> > maybe_pointer_labels;
 	boost::optional<std::vector<std::string> > maybe_labels;
-
-	// first attempt to parse a list of labels that may end with a zero byte or a
-	// pointer
+	bool should_parse_pointer = false;
 	maybe_labels = parse_labels( context, should_parse_pointer );
 #ifdef LOGGING
 	if( maybe_labels ) {
@@ -237,12 +212,37 @@ boost::optional<Name> parse_name( ParseContext& context ) {
 	}
 
 	boost::optional<std::vector<std::string> > combined = maybe_join( maybe_labels, maybe_pointer_labels );
-	if( combined ) {
-		n = Name(*combined);
+	return combined;
+}
+
+boost::optional<std::vector<std::string> > parse_label_pointer( ParseContext& context ) {
+#ifdef LOGGING
+	LOG(INFO) << "Starting pare of label pointer at: " << current_index( context);
+#endif
+	if( is_pointer(context) ) {
+		boost::optional<size_t> bytes = parse_number<size_t,DNS::POINTER_LENGTH / BITS_PER_BYTE>( context );
+		if( bytes ) {
+#ifdef LOGGING
+			LOG(INFO) << "Consumed ptr, now at: " << current_index(context);
+#endif
+			std::bitset<DNS::POINTER_LENGTH> pointer = std::bitset<DNS::POINTER_LENGTH>(*bytes);
+			pointer.set(DNS::POINTER_LENGTH - 1, 0);
+			pointer.set(DNS::POINTER_LENGTH - 2, 0);
+			size_t index = pointer.to_ulong();
+			ParseContext temporary(context, index);
+			return parse_name_recursive( temporary );
+		}
 	}
+	return boost::optional<std::vector<std::string> >();
+}
 
+boost::optional<Name> parse_name( ParseContext& context ) {
+	boost::optional<Name> n;
+	boost::optional<std::vector<std::string> > name_parts = parse_name_recursive( context );
+	if( name_parts ) {
+		n = Name(*name_parts);
+	}
 	return n;
-
 }
 
 boost::optional<BytesContainer> parse_data( ParseContext& context, size_t length ) {
