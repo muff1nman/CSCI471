@@ -13,6 +13,7 @@
 class Type : public Logging {
 	public:
 		static const size_t A = 1;
+		static const size_t NS = 2;
 
 		Type( size_t type ) : type(type) { }
 

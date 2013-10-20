@@ -30,13 +30,14 @@ class ResourceRecord {
 		friend class ResourceRecordConvert;
 
 		bool operator==( const ResourceRecord& other ) const {
-			return this->aname == other.aname &&
+            bool value = this->aname == other.aname &&
 				this->type == other.type &&
 				this->aclass == other.aclass &&
 				this->ttl == other.ttl &&
 				this->rdlength == other.rdlength &&
 				this->rdata.size() == other.rdata.size() &&
 				std::equal( this->rdata.begin(), this->rdata.end(), other.rdata.begin() );
+            return value;
 		}
 
 		std::string to_string() const {

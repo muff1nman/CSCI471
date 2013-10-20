@@ -53,6 +53,9 @@ configure_file(
 include_directories( ${PROJECT_INCLUDE_DIR} 
 	${CMAKE_CURRENT_BINARY_DIR}/include )
 
+FILE(GLOB_RECURSE INC_ALL ${CMAKE_SOURCE_DIR}/include/*.h)
+message(STATUS "include files: ${INC_ALL}")
+
 # Go do work CMake!
 add_subdirectory( lib )
 

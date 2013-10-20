@@ -12,6 +12,7 @@
 #define QUERY_A_GOOGLE "${RESOURCES_OUTPUT_DIR}/query_a_google"
 #define RESPONSE_COMPLEX_GOOGLE "${RESOURCES_OUTPUT_DIR}/response_complex_google"
 #define RESPONSE_A_INTEL_WITHOUT_LINK "${RESOURCES_OUTPUT_DIR}/response_a_intel_without_link"
+#define RESPONSE_NAMESERVER_GOOGLE "${RESOURCES_OUTPUT_DIR}/response_nameserver_google"
 
 #endif /* !__file_names_h__ */
 

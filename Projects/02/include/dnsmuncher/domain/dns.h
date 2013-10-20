@@ -108,11 +108,12 @@ class DNS : public Logging {
 #ifdef LOGGING
 			LOG(INFO) << "Checking contents are equal";
 #endif
-			return
+            bool value =
 				this->questions.size() == other.questions.size() &&
 				this->records.size() == other.records.size() &&
 				std::equal(this->questions.begin(), this->questions.end(), other.questions.begin()) &&
 				std::equal(this->records.begin(), this->records.end(), other.records.begin());
+            return value;
 		}
 
 		/**
@@ -185,7 +186,7 @@ class DNS : public Logging {
 		}
 
 		size_t get_resource_record_count() const {
-			//return get_answer_count() + get_nameserver_count() + get_additional_count();
+			return get_answer_count() + get_nameserver_count() + get_additional_count();
 			//return get_resource_records().size();
 		}
 		

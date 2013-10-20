@@ -63,5 +63,26 @@ boost::shared_ptr<DNS> response_a_intel_without_link() {
 		build_ptr();
 }
 
+boost::shared_ptr<DNS> response_nameserver_google() {
+	BytesContainer a1 = boost::assign::list_of
+('\x03') ('\x6E') ('\x73') ('\x31') ('\xC0') ('\x10') ('\x09') ('\x64') ('\x6E')
+('\x73') ('\x2D') ('\x61') ('\x64') ('\x6D') ('\x69') ('\x6E') ('\xC0') ('\x10')
+('\x00') ('\x17') ('\x6F') ('\x53') ('\x00') ('\x00') ('\x1C') ('\x20') ('\x00')
+('\x00') ('\x07') ('\x08') ('\x00') ('\x12') ('\x75') ('\x00') ('\x00') ('\x00')
+('\x01') ('\x2C');
+
+	ResourceRecord r("google.com", a1, 6, NetClass::IN, 14, 38);
+	return DNSBuilder().
+		set_id(48908).
+		is_response().
+		recursion_desired(true).
+		recursion_available().
+		question_count(1).
+		nameserver_count(1).
+		add_question( Question("www.google.com", Type::NS, NetClass::IN) ).
+		add_resource( r ).
+		build_ptr();
+}
+
 #endif /* !__dns_common_h__ */
 

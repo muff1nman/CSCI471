@@ -36,6 +36,10 @@ TEST(ParseDNS, ComplexResponse) {
 	EXPECT_EQ( *response_complex_google(), from_data(bytes_from_file( RESPONSE_COMPLEX_GOOGLE )));
 }
 
+TEST(ParseDNS, NameserverResponse) {
+	EXPECT_EQ( *response_nameserver_google(), from_data(bytes_from_file( RESPONSE_NAMESERVER_GOOGLE )));
+}
+
 // TODO test for root query
 
 TEST(ParseIP, SimpleIP) {
