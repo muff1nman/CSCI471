@@ -320,7 +320,7 @@ boost::optional<DNS::ResourcePtr> parse_other_record( ParseContext& context ) {
 #endif
 	boost::optional<size_t> type = parse_number<size_t, 2>( context );
 	// Check type
-	if( type && (*type != (size_t)Type::A && *type != (size_t)Type::NS )) {
+	if( type && (*type != (size_t)Type::A && *type != (size_t)Type::NS && *type != (size_t)Type::CNAME)) {
 #ifdef LOGGING
 		LOG(WARNING) << "Parsing unsupported type [" << *type << "], the information in this record may not be printed accurately";
 #endif
