@@ -13,7 +13,7 @@
 #include <boost/shared_ptr.hpp>
 #include "dns.h"
 
-class DNSBuilder {
+class DNSBuilder : public Logging {
 
 	public:
 
@@ -145,6 +145,44 @@ class DNSBuilder {
 		boost::shared_ptr<DNS> build_ptr() {
 			return boost::shared_ptr<DNS>(new DNS(id, qd_count, an_count, ns_count, ar_count, response, aa, tc, rd, ra,
 					opcode, z, rcode, questions, other_records));
+		}
+
+		std::string stringify_object() const {
+			std::stringstream info;
+			info << std::string("id: ") << this->id.to_string() << list_sep;
+			info << std::string("qd_count: ") << this->qd_count.to_string() << list_sep;
+			info << std::string( "an_count : ") << this->an_count.to_string() << list_sep;
+			info << std::string( "ns_count : ") << this->ns_count.to_string() << list_sep;
+			info << std::string( "ar_count : ") << this->ar_count.to_string() << list_sep;
+			info << std::string( "response : ") << this->response << list_sep;
+			info << std::string( "aa : ") << this->aa << list_sep;
+			info << std::string( "tc : ") << this->tc << list_sep;
+			info << std::string( "rd : ") << this->rd << list_sep;
+			info << std::string( "ra : ") << this->ra << list_sep;
+			info << std::string( "opcode : ") << this->opcode.to_string() << list_sep;
+			info << std::string( "z : ") << this->z.to_string() << list_sep;
+			info << std::string( "rcode : ") << this->rcode.to_string() << list_sep;
+			info << std::string("questions: ") + nested_start;
+			for( size_t i = 0; i < questions.size(); ++i ) {
+				info << questions.at(i).to_string() + list_sep;
+			}
+			info << nested_finish;
+			info << list_sep;
+			info <<  std::string("records: ") + nested_start;
+			for( size_t i = 0; i < other_records.size(); ++i ) {
+				info << other_records.at(i).to_string() + list_sep;
+			}
+			info << nested_finish;
+			return info.str();
+		}
+
+		/**
+		 * For testing purposes
+		 */
+		friend std::ostream& operator<<(std::ostream& os, const DNSBuilder& dns) {
+			os << std::endl;
+			os<< dns.to_string();
+			return os;
 		}
 
 	protected:
