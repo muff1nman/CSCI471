@@ -77,8 +77,8 @@ po::variables_map parse_args( int argc, char** argv ) {
 
 
 	po::positional_options_description positions;
-	positions.add(QUERY_OPTION, 1);
 	positions.add(NAME_OPTION, 1);
+	positions.add(QUERY_OPTION, 1);
 
 	po::variables_map configs;
 
