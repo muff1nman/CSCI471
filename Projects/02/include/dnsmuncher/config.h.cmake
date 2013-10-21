@@ -17,6 +17,7 @@
 #define DAEMON_OPTION "daemon"
 #define PORT_OPTION "port"
 #define LOG_LEVEL_OPTION "log-level"
+#define DEBUG_OPTION "debug"
 
 #define TEST_LOG_LEVEL 0
 
@@ -26,6 +27,5 @@
 #define DNS_PORT 53
 
 #define DNSMUNCHER_SEND_PORT 16318
-
 
 #endif /* !__config_h__ */

@@ -86,6 +86,21 @@ class DNS : public Logging {
 			return info.str();
 		}
 
+		std::string debug_response() const {
+			std::stringstream info;
+			info << "DNS response:\n";
+			info << "  Authoritative?: " << this->aa << "\n";
+			info << "  Response Code: " << this->rcode.to_string() << "\n";
+			for( size_t i = 0; i < records.size(); ++i ) {
+				if( i == 0 ) {
+					info << "  Records:\n";
+				}
+				info << records.at(i)->debug_string(4) << "\n";
+			}
+
+			return info.str();
+		}
+
 		friend class DNSConvert;
 
 		/**

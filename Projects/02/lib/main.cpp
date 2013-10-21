@@ -35,7 +35,14 @@ int main( int argc, char** argv ) {
 		cout << "Invalid options" << endl;
 	}
 
+	bool DEBUG_CMD = false;
+
 	init_log(configs[LOG_LEVEL_OPTION].as< size_t>());
+
+	if( configs.count(DEBUG_OPTION) == 1 ) {
+		cout << "Enabling debugging" << endl;
+		DEBUG_CMD = true;
+	}
 
 	if( configs.count(QUERY_OPTION) == 1 ) {
 		DNSBuilder b;
@@ -47,7 +54,7 @@ int main( int argc, char** argv ) {
 		boost::shared_ptr<DNS> to_send = b.build_ptr();
 		Socket socket(SOCK_DGRAM, DNSMUNCHER_SEND_PORT);
 		socket.set_timeout(TIMEOUT_IN_USEC, TIMEOUT_IN_SEC);
-		DnsMaybePtr result = query_once_and_then_try_recursive( configs[QUERY_OPTION].as< string >(), to_send, socket);
+		DnsMaybePtr result = query_once_and_then_try_recursive( configs[QUERY_OPTION].as< string >(), to_send, socket, DEBUG_CMD);
 		if( result && (*result)->response_code() == DNS::NO_ERROR ) {
 			MaybeNameOrIp ip = filter_first_ip( *result );
 			if( ip ) { 

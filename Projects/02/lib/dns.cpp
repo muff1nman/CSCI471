@@ -287,28 +287,41 @@ bool is_cname_or_ip_or_end_nameservers( DnsPtr response ) {
 	return is_end_nameservers(response) || is_cname( response ) || is_ip( response );
 }
 
-DnsMaybePtr recursive_send_and_recieve( const std::string& server, DnsPtr query, Socket& socket ) {
-	DnsMaybePtr first_response = send_and_receive( server, query, socket );
+DnsMaybePtr recursive_send_and_recieve( const std::string& server, DnsPtr query, Socket& socket, bool print_intermediate ) {
+	DnsMaybePtr first_response = send_and_receive( server, query, socket, print_intermediate );
 	if( !first_response ) { 
+		if(print_intermediate ) {
+			std::cout << "No valid response" << std::endl << std::endl;
+		}
 		return first_response;
+	}
+	if(print_intermediate) { 
+		std::cout << (*first_response)->debug_response() << std::endl;
 	}
 	if( nxdomain(query, *first_response) ) {
 #ifdef LOGGING
-		LOG(INFO) << "No such domain";
+		LOG(INFO) << "No such domain response";
 #endif
-		std::cout << "No domain found" << std::endl;
+		if( print_intermediate) {
+			std::cout << "No domain found \\/" << std::endl << std::endl;
+		}
 		return first_response;
 	} else if( is_cname_or_ip_or_end_nameservers( *first_response ) ) {
+
 		MaybeNameOrIp ip_result = filter_first_ip( *first_response );
 		if( ip_result ) {
-			std::cout << *ip_result << std::endl;
+			if(print_intermediate) {
+				std::cout  << "Interpreting previous as A record" << std::endl << std::endl;
+			}
 			return first_response;
 		}
 
 		MaybeNameOrIp cname_result = filter_first_cname( *first_response );
 		if( cname_result ) {
-			//TODO
-			std::cout << *cname_result << std::endl;
+			if(print_intermediate) {
+				std::cout  << "Interpreting previous as CNAME record" << std::endl;
+				std::cout << "Initializing new recursive query for Canonical Name [" << *cname_result<< "]" << std::endl << std::endl;
+			}
 			DnsPtr cname_query = DNSBuilder().
 				recursion_desired(false).
 				is_query().
@@ -316,27 +329,42 @@ DnsMaybePtr recursive_send_and_recieve( const std::string& server, DnsPtr query,
 				add_question( Question( *cname_result, Type::NS, NetClass::IN ) ).
 				build_ptr();
 
-			return recursive_send_and_recieve( ROOT_SERVER, cname_query, socket );
+			return recursive_send_and_recieve( ROOT_SERVER, cname_query, socket, print_intermediate );
 		}
 
-
-		return recursive_send_and_recieve( server, create_a_query(query), socket);
+		if(print_intermediate) {
+			std::cout << "Interpreting previous as end to NS chain. Changing question type to A" << std::endl << std::endl;
+		}
+		return recursive_send_and_recieve( server, create_a_query(query), socket, print_intermediate );
 
 	} else if( is_soa( query, *first_response )) {
+			if(print_intermediate) {
+				std::cout  << "Interpreting previous as SOA record" << std::endl << std::endl;
+			}
 #ifdef LOGGING
 			LOG(INFO) << "Sending query to SOA";
 #endif
-		return recursive_send_and_recieve( server, create_a_query(query), socket);
+		return recursive_send_and_recieve( server, create_a_query(query), socket, print_intermediate);
 	} else {
-
-		return recursive_send_and_recieve(resolve_nameserver_ip_via_additional(*first_response, socket), create_ns_query( query ), socket );
+			if(print_intermediate) {
+				std::cout  << "Answer should contain NS." << std::endl << std::endl;
+			}
+		return recursive_send_and_recieve(resolve_nameserver_ip_via_additional(*first_response, socket), create_ns_query( query ), socket, print_intermediate );
+	}
+	if( print_intermediate ) {
+		std::cout << "NOT GOOD" << std::endl;
 	}
 }
 
-DnsMaybePtr query_once_and_then_try_recursive( const std::string& server, DnsPtr query, Socket& socket ) {
-	std::cout << "Trying given server [" << server << "]" << std::endl;
+DnsMaybePtr query_once_and_then_try_recursive( const std::string& server, DnsPtr query, Socket& socket, bool print_intermediate ) {
+	if( print_intermediate ) {
+		std::cout << "Trying given server [" << server << "]" << std::endl;
+	}
 	DnsMaybePtr first_response = send_and_receive( server, query, socket );
 	if( first_response ) {
+		if( print_intermediate ) {
+			//std::cout << (*first_response)->debug_response() << std::endl;
+		}
 		if( is_ip( *first_response ) ) {
 			MaybeNameOrIp ip_result = filter_first_ip( *first_response );
 			if( ip_result ) {
@@ -345,8 +373,10 @@ DnsMaybePtr query_once_and_then_try_recursive( const std::string& server, DnsPtr
 		}
 	}
 
-	std::cout << "No response, attempt recursive lookup" << std::endl;
-	return recursive_send_and_recieve( ROOT_SERVER, query, socket );
+	if( print_intermediate ) {
+		std::cout << "No valid response, attempt recursive lookup" << std::endl;
+	}
+	return recursive_send_and_recieve( ROOT_SERVER, query, socket, print_intermediate );
 }
 
 void server(int socket) {
@@ -354,15 +384,15 @@ void server(int socket) {
 	handler->run( socket );
 }
 
-DnsMaybePtr send_and_receive( const std::string& server, DnsPtr query, Socket& socket ) {	
+DnsMaybePtr send_and_receive( const std::string& server, DnsPtr query, Socket& socket, bool print_intermediate ) {	
 	boost::shared_ptr<Convert> dns_data( new DNSConvert(query) );
 	boost::shared_ptr<Consumer> gen(new DataProducer(dns_data));
 	boost::function<void(int)> sfunc = boost::bind(&socket_thread_runner, _1, gen);
 	socket.connect(server.c_str(), DNS_PORT, sfunc);
 
 	DnsMaybePtr result;
-	boost::shared_ptr<Consumer> parse( new DNSResponseConsumer(result, query->get_questions().at(0)->get_type() ) );
-	//boost::shared_ptr<Consumer> parse( new DNSConsumer(result) );
+	//boost::shared_ptr<Consumer> parse( new DNSResponseConsumer(result, query->get_questions().at(0)->get_type() ) );
+	boost::shared_ptr<Consumer> parse( new DNSConsumer(result) );
 	boost::function<void(int)> rfunc = boost::bind(&socket_thread_runner, _1, parse);
 	socket.accept( rfunc );
 

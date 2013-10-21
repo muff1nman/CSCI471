@@ -31,9 +31,9 @@ MaybeNameOrIp   filter_first_ns    ( DnsPtr query );
 ListNameOrIp    filter_cnames      ( DnsPtr query );
 MaybeNameOrIp   filter_first_cname ( DnsPtr query );
 
-DnsMaybePtr send_and_receive                  ( const std::string& server, DnsPtr query, Socket& socket );
-DnsMaybePtr recursive_send_and_recieve        ( const std::string& server, DnsPtr query, Socket& socket );
-DnsMaybePtr query_once_and_then_try_recursive ( const std::string& server, DnsPtr query, Socket& socket );
+DnsMaybePtr send_and_receive                  ( const std::string& server, DnsPtr query, Socket& socket, bool print_intermediate = false );
+DnsMaybePtr recursive_send_and_recieve        ( const std::string& server, DnsPtr query, Socket& socket, bool print_intermediate = false );
+DnsMaybePtr query_once_and_then_try_recursive ( const std::string& server, DnsPtr query, Socket& socket, bool print_intermediate = false );
 void server(int socket);
 
 #endif /* !__dns_h__ */
