@@ -29,8 +29,14 @@ class Socket {
 
 		void connect(const char* server, Port dest_port, SocketFunction f);
 
+		void set_timeout(size_t usec, size_t sec);
+
 		// TODO not implemented yet
 		//void handle_c( int sig );
+		
+		int get_socket() {
+			return socket_fd;
+		}
 
 	private:
 		int socket_fd;

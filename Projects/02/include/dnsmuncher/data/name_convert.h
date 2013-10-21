@@ -9,22 +9,25 @@
 #define __name_convert_h__
 
 #include "convert_all.h"
+#include "dnsmuncher/domain/name.h"
 
 class NameConvert : public Convert {
 	public:
-		NameConvert(const Name& name) : name(name) { }
+		NameConvert(const Name& name) : iname(name) { }
 		virtual BytesContainer to_data() const {
 			BytesContainer c;
-			for( size_t i = 0; i < name.labels.size(); ++i ) {
-				c.push_back( (Byte) name.labels.at(i).size() );
-				c.insert( c.end(), name.labels.at(i).begin(), name.labels.at(i).end());
+			std::vector<std::string> labels = this->iname.get_labels();
+			for( size_t i = 0; i < labels.size(); ++i ) {
+				c.push_back( (Byte) labels.at(i).size() );
+				c.insert( c.end(), labels.at(i).begin(), labels.at(i).end());
 			}
 			c.push_back( (Byte) 0 );
 			return c;
 		}
 
 	protected:
-		const Name& name;
+		NameConvert(const NameConvert& other ) : iname(other.iname) { }
+		Name iname;
 
 };
 

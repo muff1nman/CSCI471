@@ -12,6 +12,7 @@
 #include "dnsmuncher/data/dns_convert.h"
 #include "dnsmuncher/domain/dns_builder.h"
 #include "dnsmuncher/actors/dns_consumer.h"
+#include "dnsmuncher/actors/dns_producer.h"
 #include "dnsmuncher/actors/dns_response_consumer.h"
 #include "dnsmuncher/socket/socket.h"
 #include "dnsmuncher/dns.h"
@@ -44,7 +45,9 @@ int main( int argc, char** argv ) {
 			.question_count(1)
 			.recursion_desired(false);
 		boost::shared_ptr<DNS> to_send = b.build_ptr();
-		DnsMaybePtr result = query_once_and_then_try_recursive( configs[QUERY_OPTION].as< string >(), to_send );
+		Socket socket(SOCK_DGRAM, DNSMUNCHER_SEND_PORT);
+		socket.set_timeout(TIMEOUT_IN_USEC, TIMEOUT_IN_SEC);
+		DnsMaybePtr result = query_once_and_then_try_recursive( configs[QUERY_OPTION].as< string >(), to_send, socket);
 		if( result && (*result)->response_code() == DNS::NO_ERROR ) {
 			MaybeNameOrIp ip = filter_first_ip( *result );
 			if( ip ) { 
@@ -57,9 +60,19 @@ int main( int argc, char** argv ) {
 				return 0;
 			}
 		}
-
+		cout << "No domain" << endl;
+		return 1;
 	}
-	cout << "No domain" << endl;
+
+	else if( configs.count(DAEMON_OPTION) == 1 ) {
+		cout << "Running server on port [" <<  configs[PORT_OPTION].as< size_t >() << "]" << endl;
+		while(true) {
+			Socket socket(SOCK_DGRAM, configs[PORT_OPTION].as< size_t >());
+			socket.accept( &server );
+			close(socket.get_socket());
+		}
+	}
+
 	return 1;
 }
 

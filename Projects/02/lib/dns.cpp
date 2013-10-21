@@ -12,6 +12,7 @@
 #include "dnsmuncher/data/dns_convert.h"
 #include "dnsmuncher/domain/dns.h"
 #include "dnsmuncher/actors/dns_response_consumer.h"
+#include "dnsmuncher/actors/dns_producer.h"
 #include "dnsmuncher/domain/resource_record_all.h"
 #include "dnsmuncher/domain/dns_builder.h"
 #include "dnsmuncher/socket/socket.h"
@@ -33,9 +34,6 @@ void socket_thread_runner(int fd, boost::shared_ptr<Consumer> c) {
 #endif
 	c.reset();
 
-#ifdef LOGGING
-	LOG(INFO) << "Closing spawned socket(not the listening one)";
-#endif
 	// No need to close socket with new Socket class
 	//close_socket(fd);
 #ifdef LOGGING
@@ -179,7 +177,7 @@ std::string find_ip_with_name_in_additional( DnsPtr query, const std::string& na
 	throw "No additionals found with given name";
 }
 
-std::string resolve_nameserver_ip_via_additional( DnsPtr query ) {
+std::string resolve_nameserver_ip_via_additional( DnsPtr query, Socket& socket ) {
 	DNS::ResourceList nameservers = query->get_resource_records();
 	for( size_t i = 0; i< nameservers.size(); ++i ) {
 		DNS::ResourcePtr nameserver = nameservers.at(i);
@@ -203,7 +201,7 @@ std::string resolve_nameserver_ip_via_additional( DnsPtr query ) {
 						build_ptr();
 
 					// try to resolve nameserver
-					DnsMaybePtr name_result = recursive_send_and_recieve( ROOT_SERVER, name_query );
+					DnsMaybePtr name_result = recursive_send_and_recieve( ROOT_SERVER, name_query, socket );
 					if( name_result ) { 
 						MaybeNameOrIp name_ip = filter_first_ip( *name_result );
 						if( name_ip ) {
@@ -287,8 +285,8 @@ bool is_cname_or_ip_or_end_nameservers( DnsPtr response ) {
 	return is_end_nameservers(response) || is_cname( response ) || is_ip( response );
 }
 
-DnsMaybePtr recursive_send_and_recieve( const std::string& server, DnsPtr query ) {
-	DnsMaybePtr first_response = send_and_receive( server, query );
+DnsMaybePtr recursive_send_and_recieve( const std::string& server, DnsPtr query, Socket& socket ) {
+	DnsMaybePtr first_response = send_and_receive( server, query, socket );
 	if( !first_response ) { 
 		return first_response;
 	}
@@ -319,27 +317,27 @@ DnsMaybePtr recursive_send_and_recieve( const std::string& server, DnsPtr query 
 				add_question( Question( *cname_result, Type::NS, NetClass::IN ) ).
 				build_ptr();
 
-			return recursive_send_and_recieve( ROOT_SERVER, cname_query );
+			return recursive_send_and_recieve( ROOT_SERVER, cname_query, socket );
 		}
 
 		LOG(INFO) << "Is this a nameserver crazy end point at [" << server << "]?";
 
-		return recursive_send_and_recieve( server, create_a_query(query));
+		return recursive_send_and_recieve( server, create_a_query(query), socket);
 
 	} else if( is_soa( query, *first_response )) {
 #ifdef LOGGING
 			LOG(INFO) << "Sending query to SOA";
 #endif
-		return recursive_send_and_recieve( server, create_a_query(query));
+		return recursive_send_and_recieve( server, create_a_query(query), socket);
 	} else {
 
-		return recursive_send_and_recieve(resolve_nameserver_ip_via_additional(*first_response), create_ns_query( query ) );
+		return recursive_send_and_recieve(resolve_nameserver_ip_via_additional(*first_response, socket), create_ns_query( query ), socket );
 	}
 }
 
-DnsMaybePtr query_once_and_then_try_recursive( const std::string& server, DnsPtr query ) {
+DnsMaybePtr query_once_and_then_try_recursive( const std::string& server, DnsPtr query, Socket& socket ) {
 	std::cout << "Trying given server [" << server << "]" << std::endl;
-	DnsMaybePtr first_response = send_and_receive( server, query );
+	DnsMaybePtr first_response = send_and_receive( server, query, socket );
 	if( first_response ) {
 		if( is_ip( *first_response ) ) {
 			MaybeNameOrIp ip_result = filter_first_ip( *first_response );
@@ -347,19 +345,22 @@ DnsMaybePtr query_once_and_then_try_recursive( const std::string& server, DnsPtr
 				return first_response;
 			}
 		}
-		std::cout << "No response, attempt recursive lookup" << std::endl;
-		return recursive_send_and_recieve( ROOT_SERVER, query );
 	}
 
-	return first_response;
+	std::cout << "No response, attempt recursive lookup" << std::endl;
+	return recursive_send_and_recieve( ROOT_SERVER, query, socket );
 }
 
-DnsMaybePtr send_and_receive( const std::string& server, DnsPtr query ) {	
-	static Socket socket(SOCK_DGRAM, 16318);
+void server(int socket) {
+	boost::shared_ptr<Consumer> handler( new DnsProducer() );	
+	handler->run( socket );
+}
+
+DnsMaybePtr send_and_receive( const std::string& server, DnsPtr query, Socket& socket ) {	
 	boost::shared_ptr<Convert> dns_data( new DNSConvert(query) );
 	boost::shared_ptr<Consumer> gen(new DataProducer(dns_data));
 	boost::function<void(int)> sfunc = boost::bind(&socket_thread_runner, _1, gen);
-	socket.connect(server.c_str(), 53, sfunc);
+	socket.connect(server.c_str(), DNS_PORT, sfunc);
 
 	DnsMaybePtr result;
 	boost::shared_ptr<Consumer> parse( new DNSResponseConsumer(result, query->get_questions().at(0)->get_type() ) );

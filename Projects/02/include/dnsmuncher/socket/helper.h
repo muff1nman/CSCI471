@@ -14,6 +14,7 @@
 
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <netinet/in.h>
 #include <boost/shared_ptr.hpp>
 #include <cstdlib>
 
@@ -47,7 +48,7 @@ inline bool check_allocated( void* data ) {
 	return true;
 }
 
-inline BytesContainer all_data( int socket_fd, size_t buf_size ) {
+inline BytesContainer all_data( int socket_fd, size_t buf_size, sockaddr_in& remote_info, socklen_t& remote_info_size ) {
 #ifdef LOGGING
 	LOG(INFO) << "Buffer size set to [" << buf_size << "]";
 #endif
@@ -64,7 +65,7 @@ inline BytesContainer all_data( int socket_fd, size_t buf_size ) {
 #ifdef LOGGING
 		LOG(INFO) << "Reading from socket...";
 #endif
-		int read_status = read(socket_fd, data+bytes_read, buf_size - 1 );
+		int read_status = recvfrom(socket_fd, data+bytes_read, buf_size - 1, 0, (sockaddr*) &remote_info, &remote_info_size );
 
 		if( read_status > 0 ) {
 			bytes_read += read_status;
@@ -117,9 +118,15 @@ inline size_t guess_buffer_size(int socket_fd) {
 	return 65536;
 }
 
-inline BytesContainer all_data( int socket_fd ) {
-	return all_data( socket_fd, guess_buffer_size(socket_fd) );
+inline BytesContainer all_data( int socket_fd, sockaddr_in& remote_info, socklen_t& remote_info_size ) {
+	return all_data( socket_fd, guess_buffer_size(socket_fd), remote_info, remote_info_size);
 }
 
+inline BytesContainer all_data( int socket_fd ) {
+	socklen_t discard_len;
+	sockaddr_in discard;
+
+	return all_data( socket_fd, guess_buffer_size(socket_fd), discard, discard_len);
+}
 #endif /* !__helper_h__ */
 

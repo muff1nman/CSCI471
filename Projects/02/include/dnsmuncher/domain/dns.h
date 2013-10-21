@@ -235,6 +235,10 @@ class DNS : public Logging {
 			return aa;
 		}
 
+		size_t get_id() const {
+			return this->id.to_ulong();
+		}
+
 	private:
 		// dont use
 		DNS() { };

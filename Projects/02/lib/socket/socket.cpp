@@ -42,7 +42,7 @@ int open_socket(int type) {
 	return socket(AF_INET, type, 0);
 }
 
-int set_timeout(int socket_fd, size_t timeout_in_usec, size_t timeout_in_sec ) {
+int set_timeout_internal(int socket_fd, size_t timeout_in_usec, size_t timeout_in_sec ) {
 	struct timeval timeout;
 	timeout.tv_sec = timeout_in_sec;
 	timeout.tv_usec = timeout_in_usec;
@@ -104,6 +104,18 @@ void Socket::connect(const char* server, Port dest_port, SocketFunction f) {
 	bound_func();
 }
 
+void Socket::set_timeout(size_t usec, size_t sec) {
+	int timeout_result = set_timeout_internal( this->socket_fd, usec, sec);
+	if( timeout_result < SUCCESS ) {
+#ifdef LOGGING
+		LOG(ERROR) << ERROR_TIMEOUT << ": " << strerror(errno);
+#else
+		perror(ERROR_TIMEOUT);
+#endif
+	}
+
+}
+
 Socket::Socket( int socket_type, Port port) : socket_type(socket_type), port(port) {
 	this->socket_fd = open_socket(socket_type);
 	if( this->socket_fd <  SUCCESS ) {
@@ -130,15 +142,6 @@ Socket::Socket( int socket_type, Port port) : socket_type(socket_type), port(por
 	}
 #endif
 
-	int timeout_result = set_timeout( this->socket_fd, TIMEOUT_IN_USEC, TIMEOUT_IN_SEC );
-	if( timeout_result < SUCCESS ) {
-#ifdef LOGGING
-		LOG(ERROR) << ERROR_TIMEOUT << ": " << strerror(errno);
-#else
-		perror(ERROR_TIMEOUT);
-#endif
-	}
-	
 }
 
 

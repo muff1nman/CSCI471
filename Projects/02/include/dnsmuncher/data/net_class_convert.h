@@ -9,6 +9,7 @@
 #define __net_class_convert_h__
 
 #include "convert_all.h"
+#include "dnsmuncher/util/byte/convert.h"
 
 class NetClassConvert : public Convert {
 	public:

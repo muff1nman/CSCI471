@@ -14,12 +14,18 @@
 #define NAME_OPTION "name"
 #define QUERY_OPTION "query"
 #define TYPE_OPTION "type"
+#define DAEMON_OPTION "daemon"
+#define PORT_OPTION "port"
 #define LOG_LEVEL_OPTION "log-level"
 
 #define TEST_LOG_LEVEL 0
 
 #define TIMEOUT_IN_USEC 100
 #define TIMEOUT_IN_SEC 3
+
+#define DNS_PORT 53
+
+#define DNSMUNCHER_SEND_PORT 16318
 
 
 #endif /* !__config_h__ */
