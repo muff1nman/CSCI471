@@ -187,7 +187,9 @@ std::string resolve_nameserver_ip_via_additional( DnsPtr query, Socket& socket )
 				std::string name = casted->get_name().to_string();
 				try {
 					std::string ip = find_ip_with_name_in_additional( query, name );
+#ifdef LOGGING
 					LOG(INFO) << "Returning ip [" << ip << "] for name: " << name;
+#endif
 					return ip;
 				} catch(...) {
 #ifdef LOGGING
@@ -297,17 +299,14 @@ DnsMaybePtr recursive_send_and_recieve( const std::string& server, DnsPtr query,
 		std::cout << "No domain found" << std::endl;
 		return first_response;
 	} else if( is_cname_or_ip_or_end_nameservers( *first_response ) ) {
-		LOG(INFO) << "Found end point?";
 		MaybeNameOrIp ip_result = filter_first_ip( *first_response );
 		if( ip_result ) {
-			LOG(INFO) << "Found end ip";
 			std::cout << *ip_result << std::endl;
 			return first_response;
 		}
 
 		MaybeNameOrIp cname_result = filter_first_cname( *first_response );
 		if( cname_result ) {
-			LOG(INFO) << "Found end cname";
 			//TODO
 			std::cout << *cname_result << std::endl;
 			DnsPtr cname_query = DNSBuilder().
@@ -320,7 +319,6 @@ DnsMaybePtr recursive_send_and_recieve( const std::string& server, DnsPtr query,
 			return recursive_send_and_recieve( ROOT_SERVER, cname_query, socket );
 		}
 
-		LOG(INFO) << "Is this a nameserver crazy end point at [" << server << "]?";
 
 		return recursive_send_and_recieve( server, create_a_query(query), socket);
 
