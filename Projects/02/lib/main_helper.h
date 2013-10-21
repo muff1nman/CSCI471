@@ -39,7 +39,13 @@ bool check_args( po::variables_map configs ) {
 
 po::variables_map parse_args( int argc, char** argv ) {
 
-	po::options_description dns_options("Welcome to the DNS Muncher!" "\n" "Here are your options");
+	po::options_description dns_options(
+			"Welcome to the DNS Muncher!\n"
+			"The program can be either run interactively or as a daemon. "
+			"To run interactively you can use the query and the name option and optionally with the type option. "
+			"Also, the program will automatically interpret two arguments as the name and query if you do not use the switches. \n"
+			"i.e. dnsmuncher [name] [server_to_query] ~ dnsmuncher www.google.com 8.8.8.8\n"
+			"Here is a description of each option");
 	dns_options.add_options()
 
 		/**
@@ -56,7 +62,6 @@ po::variables_map parse_args( int argc, char** argv ) {
 		 "Use the given domain name. Acceptable domain names are in the form of:\n"
 		 "  some.name.com.\n"
 		 "  some.name.com\n"
-		 "  . (For the root server)\n"
 		 "Empty strings are not allowed")
 
 		(TYPE_OPTION, po::value< size_t >()->default_value(1),
