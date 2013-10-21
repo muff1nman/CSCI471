@@ -84,7 +84,7 @@ po::variables_map parse_args( int argc, char** argv ) {
 		 "  3: FATAL\n")
 
 		(DEBUG_OPTION,
-		 "Debug should be compiled in by default. Use this option to enable its output.")
+		 "Debug should be compiled in by default. Use this option to enable its output. Does not work for daemon mode.")
 
 		// Semi colon marks end of options (DONT REMOVE)
 		;

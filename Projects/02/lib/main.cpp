@@ -56,14 +56,16 @@ int main( int argc, char** argv ) {
 		socket.set_timeout(TIMEOUT_IN_USEC, TIMEOUT_IN_SEC);
 		DnsMaybePtr result = query_once_and_then_try_recursive( configs[QUERY_OPTION].as< string >(), to_send, socket, DEBUG_CMD);
 		if( result && (*result)->response_code() == DNS::NO_ERROR ) {
-			MaybeNameOrIp ip = filter_first_ip( *result );
-			if( ip ) { 
-				if( (*result)->is_authoritative() ) {
-					cout << "Authoritative answer: ";
-				} else {
-					cout << "Non-Authoritative answer: ";
+			ListNameOrIp ips = filter_ips( *result );
+			if( !ips.empty() ) {
+				for( size_t i = 0; i < ips.size(); ++i ) {
+					if( (*result)->is_authoritative() ) {
+						cout << "Authoritative answer: ";
+					} else {
+						cout << "Non-Authoritative answer: ";
+					}
+					cout << ips.at(i) << endl;
 				}
-				cout << *ip << endl;
 				return 0;
 			}
 		}
