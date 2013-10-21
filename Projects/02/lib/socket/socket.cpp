@@ -42,6 +42,14 @@ int open_socket(int type) {
 	return socket(AF_INET, type, 0);
 }
 
+int set_timeout(int socket_fd, size_t timeout_in_usec, size_t timeout_in_sec ) {
+	struct timeval timeout;
+	timeout.tv_sec = timeout_in_sec;
+	timeout.tv_usec = timeout_in_usec;
+
+	return setsockopt(socket_fd, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
+}
+
 /**
  * Connects to a socket
  */
@@ -71,19 +79,6 @@ int connect_to_socket(int fd, const char* server, unsigned short port) {
 
 	return fd;
 }
-
-//void Socket::handle_c( int sig ) {
-	//int close_status = close(this->socket_fd);
-	//if(close_status < 0 ) {
-//#ifdef LOGGING
-		//LOG(ERROR) << "Could not close listening socket";
-//#endif
-	//} else {
-//#ifdef LOGGING
-		//LOG(INFO) << "Closed listening socket";
-//#endif
-	//}
-//}
 
 void Socket::accept( SocketFunction f) {
 	f(this->socket_fd);
@@ -134,6 +129,15 @@ Socket::Socket( int socket_type, Port port) : socket_type(socket_type), port(por
 		LOG(INFO) << "Bound socket";
 	}
 #endif
+
+	int timeout_result = set_timeout( this->socket_fd, TIMEOUT_IN_USEC, TIMEOUT_IN_SEC );
+	if( timeout_result < SUCCESS ) {
+#ifdef LOGGING
+		LOG(ERROR) << ERROR_TIMEOUT << ": " << strerror(errno);
+#else
+		perror(ERROR_TIMEOUT);
+#endif
+	}
 	
 }
 

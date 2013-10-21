@@ -18,5 +18,8 @@
 
 #define TEST_LOG_LEVEL 0
 
+#define TIMEOUT_IN_USEC 100
+#define TIMEOUT_IN_SEC 3
+
 
 #endif /* !__config_h__ */

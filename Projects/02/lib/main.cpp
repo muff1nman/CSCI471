@@ -44,10 +44,23 @@ int main( int argc, char** argv ) {
 			.question_count(1)
 			.recursion_desired(false);
 		boost::shared_ptr<DNS> to_send = b.build_ptr();
-		recursive_send_and_recieve( configs[QUERY_OPTION].as< string >(), to_send );
-	}
+		DnsPtr result = query_once_and_then_try_recursive( configs[QUERY_OPTION].as< string >(), to_send );
+		if( result->response_code() == DNS::NO_ERROR ) {
+			MaybeNameOrIp ip = filter_first_ip( result );
+			if( ip ) { 
+				if( result->is_authoritative() ) {
+					cout << "Authoritative answer: ";
+				} else {
+					cout << "Non-Authoritative answer: ";
+				}
+				cout << *ip << endl;
+				return 0;
+			}
+		}
 
-	return 0;
+	}
+	cout << "No domain" << endl;
+	return 1;
 }
 
 

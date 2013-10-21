@@ -20,14 +20,17 @@ void DNSResponseConsumer::run(int socket_fd) {
 #endif
 	switch( this->t ) {
 		case Type::CNAME:
+			std::cout << "CNAME records" << std::endl;
 			records	= filter_cnames( this->result );
 			break;
 		case Type::SOA:
 		case Type::NS:
+			std::cout << "NS records:" << std::endl;
 			records = filter_nameservers( this->result);
 			break;
 		case Type::A:
 		default:
+			std::cout << "A records:" << std::endl;
 			records = filter_ips( this->result );
 			break;
 	}

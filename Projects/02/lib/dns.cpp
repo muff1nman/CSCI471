@@ -51,7 +51,7 @@ std::vector<std::string> filter_resource_by_type( DnsPtr query, Type t, FilterFu
 		DNS::ResourceList resources  = query->get_resource_records();
 		if( !resources.empty()) {
 			for( size_t i = 0; i < resources.size(); ++i ) {
-				if( resources.at(i)->get_type() == t ) {
+				if( resources.at(i)->get_type() == t ) { //|| t == Type::ANY ) {
 					boost::optional<std::string> result = f( resources.at(i) );
 					if( result ) {
 						results.push_back( *result );
@@ -195,16 +195,34 @@ std::string resolve_nameserver_ip_via_additional( DnsPtr query ) {
 #ifdef LOGGING
 					LOG(WARNING) << "No ip found for: " << name;
 #endif
+					DnsPtr name_query = DNSBuilder().
+						recursion_desired(false).
+						is_query().
+						question_count(1).
+						add_question( Question( name, Type::A, NetClass::IN ) ).
+						build_ptr();
+
+					// try to resolve nameserver
+					DnsPtr name_result = recursive_send_and_recieve( ROOT_SERVER, name_query );
+					MaybeNameOrIp name_ip = filter_first_ip( name_result );
+					if( name_ip ) {
+						return *name_ip;
+					}
 				}
 			}
 		}
 	}
+
 
 #ifdef LOGGGING
 	LOG(WARNING) << "No nameservers found in query";
 #endif
 
 	throw "No nameservers found in query";
+}
+
+bool nxdomain( DnsPtr query, DnsPtr response ) {
+	return response->response_code() != DNS::NO_ERROR;
 }
 
 bool is_soa( DnsPtr query, DnsPtr response ) {
@@ -218,19 +236,33 @@ bool is_soa( DnsPtr query, DnsPtr response ) {
 	return false;
 }
 
-bool is_cname_or_ip_or_end_nameservers( DnsPtr query, DnsPtr response ) {
-#ifdef LOGGING
-	LOG(INFO) << "Inside ipcnameipnameserver function";
-#endif
+bool is_ip( DnsPtr response ) {
 	DNS::ResourceList answers = response->get_answers();
 	for( size_t i = 0; i < answers.size(); ++i ) {
 		DNS::ResourcePtr answer = answers.at(i);
-#ifdef LOGGING
-		LOG(INFO) << "Checking answer for possible match";
-#endif
-		if( answer->get_type() == Type::A || answer->get_type() == Type::CNAME ) {
+		if( answer->get_type() == Type::A ) {
 			return true;
 		}
+	}
+	return false;
+}
+
+// TODO code dup
+bool is_cname( DnsPtr response ) {
+	DNS::ResourceList answers = response->get_answers();
+	for( size_t i = 0; i < answers.size(); ++i ) {
+		DNS::ResourcePtr answer = answers.at(i);
+		if( answer->get_type() == Type::CNAME ) {
+			return true;
+		}
+	}
+	return false;
+}
+
+bool is_end_nameservers( DnsPtr response ) {
+	DNS::ResourceList answers = response->get_answers();
+	for( size_t i = 0; i < answers.size(); ++i ) {
+		DNS::ResourcePtr answer = answers.at(i);
 		if( answer->get_type() == Type::NS ) {
 #ifdef LOGGING
 			LOG(INFO) << "Checking ns type";
@@ -246,27 +278,23 @@ bool is_cname_or_ip_or_end_nameservers( DnsPtr query, DnsPtr response ) {
 #endif
 		}
 	}
-
 	return false;
 }
 
-DnsPtr recursive_send_and_recieve_internal( const std::string& server, DnsPtr query ) {
-	std::cout << "Asking for nameserver from: " << server << std::endl;
-	DnsPtr nameserver_response = send_and_receive( server, query );
-	if( is_cname_or_ip_or_end_nameservers( query, nameserver_response ) ) {
-		return recursive_send_and_recieve( server, query );
-	} else {
-		return recursive_send_and_recieve_internal( resolve_nameserver_ip_via_additional(nameserver_response), create_ns_query( query ));
-	}
+bool is_cname_or_ip_or_end_nameservers( DnsPtr response ) {
+	return is_end_nameservers(response) || is_cname( response ) || is_ip( response );
 }
 
-
 DnsPtr recursive_send_and_recieve( const std::string& server, DnsPtr query ) {
-	std::cout << "First asking the given nameserver" << std::endl;
 	DnsPtr first_response = send_and_receive( server, query );
-	if( is_cname_or_ip_or_end_nameservers( query, first_response ) ) {
+	if( nxdomain(query, first_response) ) {
+#ifdef LOGGING
+		LOG(INFO) << "No such domain";
+#endif
+		std::cout << "No domain found" << std::endl;
+		return first_response;
+	} else if( is_cname_or_ip_or_end_nameservers( first_response ) ) {
 		LOG(INFO) << "Found end point?";
-		// TODO also check cname
 		MaybeNameOrIp ip_result = filter_first_ip( first_response );
 		if( ip_result ) {
 			LOG(INFO) << "Found end ip";
@@ -277,8 +305,16 @@ DnsPtr recursive_send_and_recieve( const std::string& server, DnsPtr query ) {
 		MaybeNameOrIp cname_result = filter_first_cname( first_response );
 		if( cname_result ) {
 			LOG(INFO) << "Found end cname";
+			//TODO
 			std::cout << *cname_result << std::endl;
-			return first_response;
+			DnsPtr cname_query = DNSBuilder().
+				recursion_desired(false).
+				is_query().
+				question_count(1).
+				add_question( Question( *cname_result, Type::NS, NetClass::IN ) ).
+				build_ptr();
+
+			return recursive_send_and_recieve( ROOT_SERVER, cname_query );
 		}
 
 		LOG(INFO) << "Is this a nameserver crazy end point at [" << server << "]?";
@@ -291,11 +327,26 @@ DnsPtr recursive_send_and_recieve( const std::string& server, DnsPtr query ) {
 #endif
 		return recursive_send_and_recieve( server, create_a_query(query));
 	} else {
-		// lets recurse!
-		std::cout << "Starting recursion" << std::endl;
-			
+
 		return recursive_send_and_recieve(resolve_nameserver_ip_via_additional(first_response), create_ns_query( query ) );
 	}
+}
+
+DnsPtr query_once_and_then_try_recursive( const std::string& server, DnsPtr query ) {
+	std::cout << "Trying given server [" << server << "]" << std::endl;
+	DnsPtr first_response = send_and_receive( server, query );
+	if( is_ip( first_response ) ) {
+		MaybeNameOrIp ip_result = filter_first_ip( first_response );
+		if( ip_result ) {
+#ifdef LOGGING
+			LOG(INFO) << "Found end ip";
+#endif
+			std::cout << "Response: " << *ip_result << std::endl;
+			return first_response;
+		}
+	}
+	std::cout << "No response, attempt recursive lookup" << std::endl;
+	return recursive_send_and_recieve( ROOT_SERVER, query );
 }
 
 DnsPtr send_and_receive( const std::string& server, DnsPtr query ) {	
@@ -307,8 +358,8 @@ DnsPtr send_and_receive( const std::string& server, DnsPtr query ) {
 	socket.connect(server.c_str(), 53, sfunc);
 
 	DnsPtr result;
-	//boost::shared_ptr<Consumer> parse( new DNSResponseConsumer(result, query->get_questions().at(0)->get_type() ) );
-	boost::shared_ptr<Consumer> parse( new DNSConsumer(result) );
+	boost::shared_ptr<Consumer> parse( new DNSResponseConsumer(result, query->get_questions().at(0)->get_type() ) );
+	//boost::shared_ptr<Consumer> parse( new DNSConsumer(result) );
 	boost::function<void(int)> rfunc = boost::bind(&socket_thread_runner, _1, parse);
 	socket.accept( rfunc );
 

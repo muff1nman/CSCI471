@@ -230,6 +230,10 @@ class DNS : public Logging {
 		size_t response_code() {
 			return rcode.to_ulong();
 		}
+		
+		bool is_authoritative() {
+			return aa;
+		}
 
 	private:
 		// dont use

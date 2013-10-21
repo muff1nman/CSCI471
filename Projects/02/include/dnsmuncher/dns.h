@@ -29,8 +29,9 @@ MaybeNameOrIp   filter_first_ns    ( DnsPtr query );
 ListNameOrIp    filter_cnames      ( DnsPtr query );
 MaybeNameOrIp   filter_first_cname ( DnsPtr query );
 
-DnsPtr send_and_receive           ( const std::string& server, DnsPtr query );
-DnsPtr recursive_send_and_recieve ( const std::string& server, DnsPtr query );
+DnsPtr send_and_receive                  ( const std::string& server, DnsPtr query );
+DnsPtr recursive_send_and_recieve        ( const std::string& server, DnsPtr query );
+DnsPtr query_once_and_then_try_recursive ( const std::string& server, DnsPtr query );
 
 #endif /* !__dns_h__ */
 

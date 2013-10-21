@@ -13,6 +13,7 @@
 #define ERROR_LISTEN "Could not listen on socket"
 #define ERROR_IP_ADDR_CONVERT "Could not convert the given string to a proper IP address"
 #define ERROR_CONNECT "Could not connect to socket"
+#define ERROR_TIMEOUT "Could not set timeout"
 
 #endif /* !__messages_h__ */
 
