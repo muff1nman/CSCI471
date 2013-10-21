@@ -53,12 +53,22 @@ class ResourceRecord {
 			return info.str();
 		}
 
+		std::string debug_string(size_t padding) const {
+			std::stringstream info;
+			info << std::string(padding, ' ') << aname.to_string() << "  type: [" << type.to_string() << "] " << " data: \n" << demaria_util::to_string( rdata, demaria_util::GROUP_SPACE_DEFAULT, demaria_util::GROUP_NEWLINE_DEFAULT, padding + 2 );
+			return info.str();
+		}
+
 		BytesContainer get_data() const {
 			return this->rdata;
 		}
 
 		Type get_type() const {
 			return this->type;
+		}
+
+		Name get_label_name() const {
+			return this->aname;
 		}
 
 		virtual ~ResourceRecord() { }

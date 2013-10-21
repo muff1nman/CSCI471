@@ -16,6 +16,7 @@ class Type : public Logging {
 		static const size_t NS = 2;
 		static const size_t CNAME = 5;
 		static const size_t SOA = 6;
+		static const size_t ANY = 255;
 
 		Type( size_t type ) : type(type) { }
 

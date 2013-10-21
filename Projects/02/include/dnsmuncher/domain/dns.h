@@ -86,6 +86,21 @@ class DNS : public Logging {
 			return info.str();
 		}
 
+		std::string debug_response() const {
+			std::stringstream info;
+			info << "DNS response:\n";
+			info << "  Authoritative?: " << this->aa << "\n";
+			info << "  Response Code: " << this->rcode.to_string() << "\n";
+			for( size_t i = 0; i < records.size(); ++i ) {
+				if( i == 0 ) {
+					info << "  Records:\n";
+				}
+				info << records.at(i)->debug_string(4) << "\n";
+			}
+
+			return info.str();
+		}
+
 		friend class DNSConvert;
 
 		/**
@@ -196,6 +211,12 @@ class DNS : public Logging {
 			return ResourceList(start_of_nameservers, start_of_nameservers + get_nameserver_count());
 		}
 
+		const ResourceList get_additionals() const {
+			ResourceList all = get_resource_records();
+			ResourceList::const_iterator start_of_additionals = all.begin() + get_answer_count() + get_nameserver_count();
+			return ResourceList(start_of_additionals, start_of_additionals + get_additional_count());
+		}
+
 		const ResourceList get_resource_records() const {
 			return this->records;
 		}
@@ -223,6 +244,14 @@ class DNS : public Logging {
 
 		size_t response_code() {
 			return rcode.to_ulong();
+		}
+		
+		bool is_authoritative() {
+			return aa;
+		}
+
+		size_t get_id() const {
+			return this->id.to_ulong();
 		}
 
 	private:

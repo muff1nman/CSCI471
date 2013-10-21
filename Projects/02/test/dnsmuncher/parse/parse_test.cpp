@@ -25,23 +25,27 @@ TEST(ParseBytesFile, Helper) {
 }
 
 TEST(ParseDNS, SimpleQuery) {
-	EXPECT_EQ( *query_a_google_obj(), from_data(bytes_from_file( QUERY_A_GOOGLE )));
+	EXPECT_EQ( *query_a_google_obj(), *from_data(bytes_from_file( QUERY_A_GOOGLE )));
 }
 
 TEST(ParseDNS, SimpleResponse) {
-	EXPECT_EQ( *response_a_intel_without_link(), from_data(bytes_from_file( RESPONSE_A_INTEL_WITHOUT_LINK )));
+	EXPECT_EQ( *response_a_intel_without_link(), *from_data(bytes_from_file( RESPONSE_A_INTEL_WITHOUT_LINK )));
 }
 
 TEST(ParseDNS, ComplexResponse) {
-	EXPECT_EQ( *response_complex_google(), from_data(bytes_from_file( RESPONSE_COMPLEX_GOOGLE )));
+	EXPECT_EQ( *response_complex_google(), *from_data(bytes_from_file( RESPONSE_COMPLEX_GOOGLE )));
 }
 
 TEST(ParseDNS, NameserverResponse) {
-	EXPECT_EQ( *response_nameserver_google(), from_data(bytes_from_file( RESPONSE_NAMESERVER_GOOGLE )));
+	EXPECT_EQ( *response_nameserver_google(), *from_data(bytes_from_file( RESPONSE_NAMESERVER_GOOGLE )));
 }
 
 TEST(ParseDNS, CnameResponse) {
-	EXPECT_EQ( *response_cname_amazon(), from_data(bytes_from_file( RESPONSE_CNAME_AMAZON )));
+	EXPECT_EQ( *response_cname_amazon(), *from_data(bytes_from_file( RESPONSE_CNAME_AMAZON )));
+}
+
+TEST(ParseDNS, NameserverAmazonResponse) {
+	EXPECT_EQ( *response_nameserver_amazon(), *from_data(bytes_from_file( RESPONSE_NAMESERVER_AMAZON )));
 }
 
 // TODO test for root query

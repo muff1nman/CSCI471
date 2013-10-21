@@ -34,7 +34,7 @@ class DataProducer : public Consumer {
 			int result = send(socket_fd, bytes.data(), bytes.size(), 0);
 #ifdef LOGGING
 			if( result < 0 ) {
-				LOG(INFO) << "Could not write to socket: " << strerror(errno);
+				LOG(WARNING) << "Could not write to socket: " << strerror(errno);
 			} else {
 				LOG(INFO) << "[" << result << "] bytes written";
 			}

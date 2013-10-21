@@ -10,7 +10,5 @@
 
 const int SUCCESS = 0;
 
-#define BACKLOG 12
-
 #endif /* !__socket_config_h__ */
 

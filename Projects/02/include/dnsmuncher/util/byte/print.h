@@ -20,7 +20,11 @@
 
 namespace demaria_util {
 
-	inline std::string to_string( const Byte* data, size_t length, size_t group_space, size_t group_newline ) {
+	const size_t GROUP_SPACE_DEFAULT = 1;
+	const size_t GROUP_NEWLINE_DEFAULT = 16;
+	const size_t PADDING_FRONT_DEFAULT = 0;
+
+	inline std::string to_string( const Byte* data, size_t length, size_t group_space = GROUP_SPACE_DEFAULT, size_t group_newline = GROUP_NEWLINE_DEFAULT, size_t padding_front = PADDING_FRONT_DEFAULT ) {
 		std::stringstream ss;
 		for( size_t i = 0; i < length; ++i ) {
 			if( i % group_newline == 0 ) { 
@@ -29,7 +33,7 @@ namespace demaria_util {
 				} else {
 					ss << "|\n";
 				}
-				ss << i  << " |";
+				ss << std::string(padding_front, ' ') <<  i  << " |";
 			}
 			ss << std::hex << std::setfill('0') << std::setw(2) << (unsigned int) (unsigned char) data[i];
 			if( i % group_space == 0 ) {
@@ -39,8 +43,8 @@ namespace demaria_util {
 		return ss.str();
 	}
 
-	inline std::string to_string( const BytesContainer data, size_t group_space = 1, size_t group_newline = 16 ) {
-		return to_string( data.data(), data.size(), group_space, group_newline );
+	inline std::string to_string( const BytesContainer data, size_t group_space = GROUP_SPACE_DEFAULT, size_t group_newline = GROUP_NEWLINE_DEFAULT, size_t padding_front = PADDING_FRONT_DEFAULT) {
+		return to_string( data.data(), data.size(), group_space, group_newline, padding_front );
 	}
 
 }

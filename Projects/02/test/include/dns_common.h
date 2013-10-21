@@ -122,5 +122,83 @@ boost::shared_ptr<DNS> response_cname_amazon() {
 		build_ptr();
 }
 
+boost::shared_ptr<DNS> response_nameserver_amazon() {
+
+	return DNSBuilder().
+		set_id(0).
+		is_response().
+		question_count(1).
+		nameserver_count(8).
+		additional_count(8).
+		add_question( Question("www.amazon.com", Type::NS, NetClass::IN)).
+		add_resource( 
+				ResourceRecord("www.amazon.com", boost::assign::list_of
+('\x06')('\x6e')('\x73')('\x2d')('\x39')('\x32')('\x32')('\xc0')('\x10'),
+Type::NS, NetClass::IN, 3655, 9) ).
+		add_resource( 
+				ResourceRecord("www.amazon.com", boost::assign::list_of
+('\x06')('\x6e')('\x73')('\x2d')('\x39')('\x32')('\x34')('\xc0')('\x10'),
+Type::NS, NetClass::IN, 3655, 9) ).
+		add_resource( 
+				ResourceRecord("www.amazon.com", boost::assign::list_of
+('\x06')('\x6e')('\x73')('\x2d')('\x39')('\x34')('\x31')('\xc0')('\x10'),
+Type::NS, NetClass::IN, 3655, 9) ).
+		add_resource( 
+				ResourceRecord("www.amazon.com", boost::assign::list_of
+('\x06')('\x6e')('\x73')('\x2d')('\x39')('\x34')('\x32')('\xc0')('\x10'),
+Type::NS, NetClass::IN, 3655, 9) ).
+		add_resource( 
+				ResourceRecord("www.amazon.com", boost::assign::list_of
+('\x06')('\x6e')('\x73')('\x2d')('\x39')('\x32')('\x33')('\xc0')('\x10'),
+Type::NS, NetClass::IN, 3655, 9) ).
+		add_resource( 
+				ResourceRecord("www.amazon.com", boost::assign::list_of
+('\x06')('\x6e')('\x73')('\x2d')('\x39')('\x32')('\x31')('\xc0')('\x10'),
+Type::NS, NetClass::IN, 3655, 9) ).
+		add_resource( 
+				ResourceRecord("www.amazon.com", boost::assign::list_of
+('\x06')('\x6e')('\x73')('\x2d')('\x39')('\x31')('\x31')('\xc0')('\x10'),
+Type::NS, NetClass::IN, 3655, 9) ).
+		add_resource( 
+				ResourceRecord("www.amazon.com", boost::assign::list_of
+('\x06')('\x6e')('\x73')('\x2d')('\x39')('\x31')('\x32')('\xc0')('\x10'),
+Type::NS, NetClass::IN, 3655, 9) ).
+
+		add_resource( 
+				ResourceRecord("ns-911.amazon.com", boost::assign::list_of
+('\xcf')('\xab')('\xb2')('\x06'),
+Type::A, NetClass::IN, 900, 4) ).
+		add_resource( 
+				ResourceRecord("ns-912.amazon.com", boost::assign::list_of
+('\xcc')('\xf6')('\xa2')('\x05'),
+Type::A, NetClass::IN, 600, 4) ).
+		add_resource( 
+				ResourceRecord("ns-921.amazon.com", boost::assign::list_of
+('\x48')('\x15')('\xc0')('\xd7'),
+Type::A, NetClass::IN, 600, 4) ).
+		add_resource( 
+				ResourceRecord("ns-922.amazon.com", boost::assign::list_of
+('\x48')('\x15')('\xc0')('\xd3'),
+Type::A, NetClass::IN, 900, 4) ).
+		add_resource( 
+				ResourceRecord("ns-923.amazon.com", boost::assign::list_of
+('\x48')('\x15')('\xd0')('\xd7'),
+Type::A, NetClass::IN, 900, 4) ).
+		add_resource( 
+				ResourceRecord("ns-924.amazon.com", boost::assign::list_of
+('\x48')('\x15')('\xd0')('\xd7'),
+Type::A, NetClass::IN, 600, 4) ).
+		add_resource( 
+				ResourceRecord("ns-941.amazon.com", boost::assign::list_of
+('\xcc')('\xf6')('\xa0')('\x05'),
+Type::A, NetClass::IN, 900, 4) ).
+		add_resource( 
+				ResourceRecord("ns-942.amazon.com", boost::assign::list_of
+('\xcc')('\xf6')('\xa0')('\x07'),
+Type::A, NetClass::IN, 900, 4) ).
+		build_ptr();
+
+}
+
 #endif /* !__dns_common_h__ */
 

@@ -14,29 +14,34 @@
 
 void DNSResponseConsumer::run(int socket_fd) {
 	DNSConsumer::run(socket_fd);
-	std::vector<std::string> records;
+	if( this->result ) {
+		std::vector<std::string> records;
 #ifdef LOGGING
-	LOG(INFO) << "Consuming response of type: " << this->t;
+		LOG(INFO) << "Consuming response of type: " << this->t;
 #endif
-	switch( this->t ) {
-		case Type::CNAME:
-			records	= filter_cnames( this->result );
-			break;
-		case Type::SOA:
-		case Type::NS:
-			records = filter_nameservers( this->result);
-			break;
-		case Type::A:
-		default:
-			records = filter_ips( this->result );
-			break;
-	}
-	if( !records.empty() ) {
-		for( std::vector<std::string>::const_iterator i = records.begin(); i != records.end(); ++i ) {
-			std::cout << *i << std::endl;
+		switch( this->t ) {
+			case Type::CNAME:
+				std::cout << "CNAME records" << std::endl;
+				records	= filter_cnames( *(this->result) );
+				break;
+			case Type::SOA:
+			case Type::NS:
+				std::cout << "NS records:" << std::endl;
+				records = filter_nameservers( *(this->result) );
+				break;
+			case Type::A:
+			default:
+				std::cout << "A records:" << std::endl;
+				records = filter_ips( *(this->result) );
+				break;
 		}
-	} else {
-		std::cerr << "No record available" << std::endl;
+		if( !records.empty() ) {
+			for( std::vector<std::string>::const_iterator i = records.begin(); i != records.end(); ++i ) {
+				std::cout << *i << std::endl;
+			}
+		} else {
+			std::cerr << "No record available" << std::endl;
+		}
 	}
 }
 

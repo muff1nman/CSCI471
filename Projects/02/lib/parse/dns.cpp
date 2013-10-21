@@ -101,7 +101,7 @@ boost::optional<std::string> parse_string_part( ParseContext& context ) {
 		LOG(INFO) << "length of next string: " << length;
 #endif
 		if( length > DNS::MAX_LABEL_SIZE ) {
-			Logging::do_error( "Label size too large");
+			return to_return;
 		}
 		if( context_has_bytes_left( context, length )) {
 			BytesContainer::const_iterator end_of_string = context.current;
@@ -177,44 +177,19 @@ boost::optional<std::vector<std::string> > parse_labels( ParseContext& context, 
 			n = labels;
 		} else {
 #ifdef LOGGING
-			LOG(ERROR) << "Could not parse zero byte or a pointer";
+			LOG(WARNING) << "Could not parse zero byte or a pointer";
 #endif
 		}
 	}
 	return n;
 
 }
+boost::optional<std::vector<std::string> > parse_label_pointer( ParseContext& context );
 
-boost::optional<std::vector<std::string> > parse_label_pointer( ParseContext& context ) {
-#ifdef LOGGING
-	LOG(INFO) << "Starting pare of label pointer at: " << current_index( context);
-#endif
-	if( is_pointer(context) ) {
-		boost::optional<size_t> bytes = parse_number<size_t,DNS::POINTER_LENGTH / BITS_PER_BYTE>( context );
-		if( bytes ) {
-#ifdef LOGGING
-			LOG(INFO) << "Consumed ptr, now at: " << current_index(context);
-#endif
-			std::bitset<DNS::POINTER_LENGTH> pointer = std::bitset<DNS::POINTER_LENGTH>(*bytes);
-			pointer.set(DNS::POINTER_LENGTH - 1, 0);
-			pointer.set(DNS::POINTER_LENGTH - 2, 0);
-			size_t index = pointer.to_ulong();
-			ParseContext temporary(context, index);
-			bool dontcare;
-			return parse_labels( temporary, dontcare );
-		}
-	}
-	return boost::optional<std::vector<std::string> >();
-}
-
-boost::optional<Name> parse_name( ParseContext& context ) {
-	boost::optional<Name> n;
-	bool should_parse_pointer = false;
+boost::optional<std::vector<std::string> > parse_name_recursive( ParseContext& context ) {
 	boost::optional<std::vector<std::string> > maybe_pointer_labels;
 	boost::optional<std::vector<std::string> > maybe_labels;
-
-	// first attempt to parse a list of labels that may end with a zero byte or a
-	// pointer
+	bool should_parse_pointer = false;
 	maybe_labels = parse_labels( context, should_parse_pointer );
 #ifdef LOGGING
 	if( maybe_labels ) {
@@ -237,12 +212,37 @@ boost::optional<Name> parse_name( ParseContext& context ) {
 	}
 
 	boost::optional<std::vector<std::string> > combined = maybe_join( maybe_labels, maybe_pointer_labels );
-	if( combined ) {
-		n = Name(*combined);
+	return combined;
+}
+
+boost::optional<std::vector<std::string> > parse_label_pointer( ParseContext& context ) {
+#ifdef LOGGING
+	LOG(INFO) << "Starting pare of label pointer at: " << current_index( context);
+#endif
+	if( is_pointer(context) ) {
+		boost::optional<size_t> bytes = parse_number<size_t,DNS::POINTER_LENGTH / BITS_PER_BYTE>( context );
+		if( bytes ) {
+#ifdef LOGGING
+			LOG(INFO) << "Consumed ptr, now at: " << current_index(context);
+#endif
+			std::bitset<DNS::POINTER_LENGTH> pointer = std::bitset<DNS::POINTER_LENGTH>(*bytes);
+			pointer.set(DNS::POINTER_LENGTH - 1, 0);
+			pointer.set(DNS::POINTER_LENGTH - 2, 0);
+			size_t index = pointer.to_ulong();
+			ParseContext temporary(context, index);
+			return parse_name_recursive( temporary );
+		}
 	}
+	return boost::optional<std::vector<std::string> >();
+}
 
+boost::optional<Name> parse_name( ParseContext& context ) {
+	boost::optional<Name> n;
+	boost::optional<std::vector<std::string> > name_parts = parse_name_recursive( context );
+	if( name_parts ) {
+		n = Name(*name_parts);
+	}
 	return n;
-
 }
 
 boost::optional<BytesContainer> parse_data( ParseContext& context, size_t length ) {
@@ -440,14 +440,14 @@ bool parse_header( ParseContext& context, size_t& question_count, size_t& answer
 	}  else {
 
 #ifdef LOGGING
-		LOG(ERROR) << "Could not parse header";
+		LOG(WARNING) << "Could not parse header";
 #endif
 		return false;
 	}
 
 }
 
-void from_data_interntal( const BytesContainer raw, boost::shared_ptr<DNSBuilder> b ) {
+bool from_data_interntal( const BytesContainer raw, boost::shared_ptr<DNSBuilder> b ) {
 	// data holders
 	size_t question_count;
 	size_t answer_count;
@@ -467,7 +467,10 @@ void from_data_interntal( const BytesContainer raw, boost::shared_ptr<DNSBuilder
 	LOG(INFO) << "Bytes remaining?" << context_has_bytes_left(context, 3);
 #endif
 
-	parse_header( context, question_count, answer_count, ns_count, ar_count );
+	bool good_header = parse_header( context, question_count, answer_count, ns_count, ar_count );
+	if( !good_header ) {
+		return false;
+	}
 #ifdef LOGGING
 	LOG(INFO) << "Context at: " << current_index(context);
 #endif
@@ -489,7 +492,7 @@ void from_data_interntal( const BytesContainer raw, boost::shared_ptr<DNSBuilder
 		if ( q ) {
 			b->add_question( *q );
 		} else {	
-			Logging::do_error( "Could not parse questions correctly" );
+			return false;
 		} 
 	}
 
@@ -501,27 +504,36 @@ void from_data_interntal( const BytesContainer raw, boost::shared_ptr<DNSBuilder
 		if ( r ) {
 			b->add_resource( *r );
 		} else {
-			Logging::do_error( "Could not parse other records correctly" );
+			return false;
 		}
 	}
-
+	return true;
 }
 
-DNS from_data( const BytesContainer raw ) {
+boost::optional<DNS> from_data( const BytesContainer raw ) {
 
 	boost::shared_ptr<DNSBuilder> b( new DNSBuilder() );
+	boost::optional<DNS> to_return;
 
-	from_data_interntal( raw, b );
+	bool valid = from_data_interntal( raw, b );
+	if( valid ) { 
+		to_return = b->build();
+	}
 
-	return b->build();
+	return to_return;
 }
 
-boost::shared_ptr<DNS> from_data_as_ptr( const BytesContainer raw ) {
+DnsMaybePtr from_data_as_ptr( const BytesContainer raw ) {
+
 	boost::shared_ptr<DNSBuilder> b( new DNSBuilder() );
+	DnsMaybePtr to_return;
 
-	from_data_interntal( raw, b );
+	bool valid = from_data_interntal( raw, b );
+	if( valid ) { 
+		to_return = b->build_ptr();
+	}
 
-	return b->build_ptr();
+	return to_return;
 
 }
 

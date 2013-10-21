@@ -11,14 +11,17 @@
 #include "dnsmuncher/config.h"
 #include "echo_consumer.h"
 #include "dnsmuncher/domain/dns.h"
+#include "dnsmuncher/dns.h"
+#include <boost/optional.hpp>
+#include <boost/shared_ptr.hpp>
 
 class DNSConsumer: public EchoConsumer {
 	public:
-		DNSConsumer( boost::shared_ptr<DNS>& result ) : result(result) { }
+		DNSConsumer( DnsMaybePtr& result ) : result(result) { }
 		virtual void run(int socket_fd);
 
 	protected:
-		boost::shared_ptr<DNS>& result;
+		DnsMaybePtr& result;
 
 };
 #endif /* !__dns_consumer_h__ */

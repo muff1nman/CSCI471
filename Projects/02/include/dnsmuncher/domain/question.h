@@ -42,6 +42,10 @@ class Question : public Logging {
 			return type;
 		}
 
+		Name get_name() const {
+			return qname;
+		}
+
 	private:
 		Name qname;
 		QType type;

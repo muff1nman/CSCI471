@@ -29,8 +29,6 @@ class Name : public Logging {
 
 		Name( const std::vector<std::string> name ) : labels(name) { }
 
-		friend class NameConvert;
-
 		bool operator==( const Name& other ) const {
 			return this->labels.size() == other.labels.size() &&
 				std::equal( this->labels.begin(), this->labels.end(), other.labels.begin() );
@@ -49,6 +47,10 @@ class Name : public Logging {
 			info << "labels: ";
 			info << this->to_string();
 			return info.str();
+		}
+
+		std::vector<std::string> get_labels() const {
+			return labels;
 		}
 
 	private:

@@ -12,6 +12,8 @@
 #include "dnsmuncher/util/byte/byte.h"
 #include <boost/shared_ptr.hpp>
 #include "dns.h"
+#include <stdlib.h>
+#include <time.h>
 
 class DNSBuilder : public Logging {
 
@@ -19,6 +21,13 @@ class DNSBuilder : public Logging {
 
 		DNSBuilder() {
 			this->zero_all();
+			srand(time(NULL));
+			this->random_id();
+		}
+
+		DNSBuilder& random_id() {
+			this->id = rand() % 65535;
+			return do_common();
 		}
 
 		DNSBuilder& set_id( generic_number num) {
