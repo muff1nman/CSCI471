@@ -203,10 +203,12 @@ std::string resolve_nameserver_ip_via_additional( DnsPtr query ) {
 						build_ptr();
 
 					// try to resolve nameserver
-					DnsPtr name_result = recursive_send_and_recieve( ROOT_SERVER, name_query );
-					MaybeNameOrIp name_ip = filter_first_ip( name_result );
-					if( name_ip ) {
-						return *name_ip;
+					DnsMaybePtr name_result = recursive_send_and_recieve( ROOT_SERVER, name_query );
+					if( name_result ) { 
+						MaybeNameOrIp name_ip = filter_first_ip( *name_result );
+						if( name_ip ) {
+							return *name_ip;
+						}
 					}
 				}
 			}
@@ -285,24 +287,27 @@ bool is_cname_or_ip_or_end_nameservers( DnsPtr response ) {
 	return is_end_nameservers(response) || is_cname( response ) || is_ip( response );
 }
 
-DnsPtr recursive_send_and_recieve( const std::string& server, DnsPtr query ) {
-	DnsPtr first_response = send_and_receive( server, query );
-	if( nxdomain(query, first_response) ) {
+DnsMaybePtr recursive_send_and_recieve( const std::string& server, DnsPtr query ) {
+	DnsMaybePtr first_response = send_and_receive( server, query );
+	if( !first_response ) { 
+		return first_response;
+	}
+	if( nxdomain(query, *first_response) ) {
 #ifdef LOGGING
 		LOG(INFO) << "No such domain";
 #endif
 		std::cout << "No domain found" << std::endl;
 		return first_response;
-	} else if( is_cname_or_ip_or_end_nameservers( first_response ) ) {
+	} else if( is_cname_or_ip_or_end_nameservers( *first_response ) ) {
 		LOG(INFO) << "Found end point?";
-		MaybeNameOrIp ip_result = filter_first_ip( first_response );
+		MaybeNameOrIp ip_result = filter_first_ip( *first_response );
 		if( ip_result ) {
 			LOG(INFO) << "Found end ip";
 			std::cout << *ip_result << std::endl;
 			return first_response;
 		}
 
-		MaybeNameOrIp cname_result = filter_first_cname( first_response );
+		MaybeNameOrIp cname_result = filter_first_cname( *first_response );
 		if( cname_result ) {
 			LOG(INFO) << "Found end cname";
 			//TODO
@@ -321,51 +326,46 @@ DnsPtr recursive_send_and_recieve( const std::string& server, DnsPtr query ) {
 
 		return recursive_send_and_recieve( server, create_a_query(query));
 
-	} else if( is_soa( query, first_response )) {
+	} else if( is_soa( query, *first_response )) {
 #ifdef LOGGING
 			LOG(INFO) << "Sending query to SOA";
 #endif
 		return recursive_send_and_recieve( server, create_a_query(query));
 	} else {
 
-		return recursive_send_and_recieve(resolve_nameserver_ip_via_additional(first_response), create_ns_query( query ) );
+		return recursive_send_and_recieve(resolve_nameserver_ip_via_additional(*first_response), create_ns_query( query ) );
 	}
 }
 
-DnsPtr query_once_and_then_try_recursive( const std::string& server, DnsPtr query ) {
+DnsMaybePtr query_once_and_then_try_recursive( const std::string& server, DnsPtr query ) {
 	std::cout << "Trying given server [" << server << "]" << std::endl;
-	DnsPtr first_response = send_and_receive( server, query );
-	if( is_ip( first_response ) ) {
-		MaybeNameOrIp ip_result = filter_first_ip( first_response );
-		if( ip_result ) {
-#ifdef LOGGING
-			LOG(INFO) << "Found end ip";
-#endif
-			std::cout << "Response: " << *ip_result << std::endl;
-			return first_response;
+	DnsMaybePtr first_response = send_and_receive( server, query );
+	if( first_response ) {
+		if( is_ip( *first_response ) ) {
+			MaybeNameOrIp ip_result = filter_first_ip( *first_response );
+			if( ip_result ) {
+				return first_response;
+			}
 		}
+		std::cout << "No response, attempt recursive lookup" << std::endl;
+		return recursive_send_and_recieve( ROOT_SERVER, query );
 	}
-	std::cout << "No response, attempt recursive lookup" << std::endl;
-	return recursive_send_and_recieve( ROOT_SERVER, query );
+
+	return first_response;
 }
 
-DnsPtr send_and_receive( const std::string& server, DnsPtr query ) {	
-	// TODO add timeout
+DnsMaybePtr send_and_receive( const std::string& server, DnsPtr query ) {	
 	static Socket socket(SOCK_DGRAM, 16318);
 	boost::shared_ptr<Convert> dns_data( new DNSConvert(query) );
 	boost::shared_ptr<Consumer> gen(new DataProducer(dns_data));
 	boost::function<void(int)> sfunc = boost::bind(&socket_thread_runner, _1, gen);
 	socket.connect(server.c_str(), 53, sfunc);
 
-	DnsPtr result;
+	DnsMaybePtr result;
 	boost::shared_ptr<Consumer> parse( new DNSResponseConsumer(result, query->get_questions().at(0)->get_type() ) );
 	//boost::shared_ptr<Consumer> parse( new DNSConsumer(result) );
 	boost::function<void(int)> rfunc = boost::bind(&socket_thread_runner, _1, parse);
 	socket.accept( rfunc );
-
-#ifdef LOGGING
-	LOG(INFO) << "Received dns result: " << result->to_string();
-#endif
 
 	return result;
 

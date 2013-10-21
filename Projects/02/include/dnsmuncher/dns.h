@@ -18,6 +18,7 @@
 static const char* ROOT_SERVER = "198.41.0.4";
 
 typedef   boost::shared_ptr<DNS>      DnsPtr;
+typedef   boost::optional<DnsPtr>     DnsMaybePtr;
 typedef   std::string                 NameOrIp;
 typedef   boost::optional<NameOrIp>   MaybeNameOrIp;
 typedef   std::vector<NameOrIp>       ListNameOrIp;
@@ -29,9 +30,9 @@ MaybeNameOrIp   filter_first_ns    ( DnsPtr query );
 ListNameOrIp    filter_cnames      ( DnsPtr query );
 MaybeNameOrIp   filter_first_cname ( DnsPtr query );
 
-DnsPtr send_and_receive                  ( const std::string& server, DnsPtr query );
-DnsPtr recursive_send_and_recieve        ( const std::string& server, DnsPtr query );
-DnsPtr query_once_and_then_try_recursive ( const std::string& server, DnsPtr query );
+DnsMaybePtr send_and_receive                  ( const std::string& server, DnsPtr query );
+DnsMaybePtr recursive_send_and_recieve        ( const std::string& server, DnsPtr query );
+DnsMaybePtr query_once_and_then_try_recursive ( const std::string& server, DnsPtr query );
 
 #endif /* !__dns_h__ */
 

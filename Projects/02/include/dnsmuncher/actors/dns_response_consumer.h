@@ -14,7 +14,7 @@
 
 class DNSResponseConsumer: public DNSConsumer {
 	public:
-		DNSResponseConsumer( boost::shared_ptr<DNS>& result, Type t = Type::A ) : DNSConsumer(result), t(t) { }
+		DNSResponseConsumer( DnsMaybePtr& result, Type t = Type::A ) : DNSConsumer(result), t(t) { }
 		virtual void run(int socket_fd);
 
 	protected:
