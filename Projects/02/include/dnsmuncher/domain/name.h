@@ -52,7 +52,6 @@ class Name : public Logging {
 		std::vector<std::string> get_labels() const {
 			return labels;
 		}
-		Name( const Name& other ) :labels(other.labels) { }
 
 	private:
 		std::vector<std::string> labels;

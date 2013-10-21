@@ -26,7 +26,6 @@ class NameConvert : public Convert {
 		}
 
 	protected:
-		NameConvert(const NameConvert& other ) : iname(other.iname) { }
 		Name iname;
 
 };

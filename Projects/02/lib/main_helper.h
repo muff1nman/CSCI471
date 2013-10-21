@@ -67,7 +67,7 @@ po::variables_map parse_args( int argc, char** argv ) {
 		(TYPE_OPTION, po::value< size_t >()->default_value(1),
 		 "Query for the given type. Defaults to 1 (A)")
 
-		(DAEMON_OPTION, po::value< bool >()->implicit_value(true),
+		(DAEMON_OPTION, 
 		 "Daemonize the program so as to receive dns udp queries on the specifice port (see --port).")
 
 		(PORT_OPTION, po::value< size_t >()->default_value(42345),
