@@ -60,7 +60,7 @@ po::variables_map parse_args( int argc, char** argv ) {
 		 "Empty strings are not allowed")
 
 		(TYPE_OPTION, po::value< size_t >()->default_value(1),
-		 "Query for the given type. Defaults to 1 (NS)")
+		 "Query for the given type. Defaults to 1 (A)")
 
 		/**
 		 * Debugging options
