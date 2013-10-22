@@ -17,16 +17,23 @@
 class Socket {
 	public:
 		typedef unsigned short Port;
-		//typedef void (*SocketFunction)(int);
 		typedef boost::function<void(int)> SocketFunction;
+
 		Socket( int socket_type, Port port);
 
 		// TODO only for TCP socket
 		//void listen(Port port);
-	
-		// TODO accept in thread?
+
+		/** 
+		 * Accept a connection and run the given socket function with the opened
+		 * socket file descriptor
+		 */
 		void accept( SocketFunction f);
 
+		/**
+		 * connects and runs the given socket function with the created socket file
+		 * descriptor
+		 */
 		void connect(const char* server, Port dest_port, SocketFunction f);
 
 		void set_timeout(size_t usec, size_t sec);
@@ -34,6 +41,11 @@ class Socket {
 		// TODO not implemented yet
 		//void handle_c( int sig );
 		
+		/**
+		 * Returns the internal socket fd.  It is okay to use this to close the
+		 * socket. // TODO change it so that closing the socket is done in
+		 * destructor
+		 */
 		int get_socket() {
 			return socket_fd;
 		}

@@ -19,8 +19,11 @@
 #include "domain/dns_builder.h"
 #include "domain/dns.h"
 
+// TODO clean up file: put impl into its own cpp file
+
 typedef std::map< std::string, DNS::ResourceList> DnsCache;
 
+// TODO move this somewhere else
 boost::optional<DNS::QuestionPtr> filter_first_question( DnsPtr query ) {
 	boost::optional<DNS::QuestionPtr> question;
 	DNS::QuestionList qs = query->get_questions();

@@ -26,6 +26,6 @@ if(${LOGGING} STREQUAL "ON")
 	set(LINK_LIBRARIES ${LINK_LIBRARIES} glog)
 endif()
 
-add_executable(dnsmuncher main.cpp)
-target_link_libraries(dnsmuncher ${LINK_LIBRARIES})
+add_executable(dug main.cpp)
+target_link_libraries(dug ${LINK_LIBRARIES})
 

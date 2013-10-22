@@ -8,7 +8,7 @@ all: cp_execute
 .PHONY: cp_execute
 
 cp_execute: build
-	cp build/lib/dnsmuncher .
+	cp build/lib/dug .
 
 .PHONY: build
 
@@ -21,7 +21,7 @@ build: clean
 
 clean:
 	rm -rf build
-	rm -f dnsmuncher
+	rm -f dug
 
 # vim:ft=make
 #

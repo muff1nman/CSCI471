@@ -10,6 +10,13 @@
 
 #include "consumer.h"
 
+/**
+ * Main intent is to be used for the server/daemon feature.  It will parse a
+ * given request, fire off a separte series of queries to find the answer and
+ * then respond to the first request. Although this class should really have
+ * inherited from DnsConsumer, there were some incompatabilities that I hope to
+ * resolve in the future \\TODO
+ */
 class DnsProducer : public Consumer {
 	public:
 		DnsProducer() { }

@@ -23,6 +23,9 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/iterator/indirect_iterator.hpp>
 
+/**
+ * A DNS class to represent any DNS packet.
+ */
 class DNS : public Logging {
 	public:
 
@@ -86,6 +89,10 @@ class DNS : public Logging {
 			return info.str();
 		}
 
+		/**
+		 * Why? Becuase I thought to_string was a bit ugly but I needed to keep
+		 * to_string around for its sweet compactness
+		 */
 		std::string debug_response() const {
 			std::stringstream info;
 			info << "DNS response:\n";

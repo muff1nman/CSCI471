@@ -12,6 +12,9 @@
 #include "dns_consumer.h"
 #include "dnsmuncher/domain/dns.h"
 
+/**
+ * Does some additional logging in addition to what DNSConsumer provides
+ */
 class DNSResponseConsumer: public DNSConsumer {
 	public:
 		DNSResponseConsumer( DnsMaybePtr& result, Type t = Type::A ) : DNSConsumer(result), t(t) { }
