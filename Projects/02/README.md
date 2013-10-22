@@ -47,3 +47,24 @@ cd build # if you aren't there already
 ./lib/dnsmuncher --help
 ```
 
+Extra Credit
+----------
+Caching should be working fine. The best way to test it is to run in daemon mode
+and check that no queries are sent the second time.
+
+Querying for other types (SOA, NS, etc) are supported internally and at one
+point worked, but this feature fell by the way side as I started trying to hurry
+to get things done and you can no longer use the --type switch. So unless having
+some code counts for partial credit, theres not much there.
+
+
+Bugs
+------
+You can't put a nameserver into the server ip query field, it needs to be an ip
+address. Although the docs seem to imply this is fine, I thought it was
+annoying.
+
+There is an issue when trying to query for the root domain. I didn't have enough
+time to look into this however.
+
+
