@@ -14,7 +14,7 @@ set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 option(CACHING "Enable DNS caching" ON)
 option(DEBUG "Turn debuggin on or off" ON)
 option(LOGGING "Turn loggin on or off" OFF)
-option(TEST "Turn testing on or off" ON)
+option(TEST "Turn testing on or off" OFF)
 
 if(DEBUG)
 	set( CMAKE_BUILD_TYPE debug)
