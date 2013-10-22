@@ -17,6 +17,9 @@
 #include "dnsmuncher/domain/dns_builder.h"
 #include "dnsmuncher/socket/socket.h"
 #include "dnsmuncher/parse/ip.h"
+#ifdef CACHING
+#include "dnsmuncher/cache.h"
+#endif
 #include "dnsmuncher/util/collection.h"
 #include <boost/bind.hpp>
 #include <string>
@@ -351,16 +354,31 @@ DnsMaybePtr recursive_send_and_recieve( const std::string& server, DnsPtr query,
 			}
 		return recursive_send_and_recieve(resolve_nameserver_ip_via_additional(*first_response, socket), create_ns_query( query ), socket, print_intermediate );
 	}
-	if( print_intermediate ) {
-		std::cout << "NOT GOOD" << std::endl;
-	}
 }
 
-DnsMaybePtr query_once_and_then_try_recursive( const std::string& server, DnsPtr query, Socket& socket, bool print_intermediate ) {
+DnsMaybePtr check_or_add_to_cache( DnsPtr query, DnsMaybePtr result ) {
+	static DnsCache cache;
+	DnsMaybePtr cached;
+	if( result ) {
+		add_to_cache( cache, query, *result );
+	} else {
+		cached = get_from_cache( cache, query );
+	}
+	return cached;
+}
+
+DnsMaybePtr query_once_and_then_try_recursive( const std::string& server, DnsPtr query, Socket& socket, bool print_intermediate) {
+	DnsMaybePtr first_response;
+#ifdef CACHING
+	DnsMaybePtr from_cache = check_or_add_to_cache( query, first_response );
+	if( from_cache ) {
+		return from_cache;
+	}
+#endif
 	if( print_intermediate ) {
 		std::cout << "Trying given server [" << server << "]" << std::endl;
 	}
-	DnsMaybePtr first_response = send_and_receive( server, query, socket );
+	first_response = send_and_receive( server, query, socket );
 	if( first_response ) {
 		if( print_intermediate ) {
 			//std::cout << (*first_response)->debug_response() << std::endl;
@@ -368,6 +386,9 @@ DnsMaybePtr query_once_and_then_try_recursive( const std::string& server, DnsPtr
 		if( is_ip( *first_response ) ) {
 			MaybeNameOrIp ip_result = filter_first_ip( *first_response );
 			if( ip_result ) {
+#ifdef CACHING
+				check_or_add_to_cache( query, first_response);
+#endif
 				return first_response;
 			}
 		}
@@ -376,7 +397,13 @@ DnsMaybePtr query_once_and_then_try_recursive( const std::string& server, DnsPtr
 	if( print_intermediate ) {
 		std::cout << "No valid response, attempt recursive lookup" << std::endl;
 	}
-	return recursive_send_and_recieve( ROOT_SERVER, query, socket, print_intermediate );
+
+
+	first_response = recursive_send_and_recieve( ROOT_SERVER, query, socket, print_intermediate );
+#ifdef CACHING
+	check_or_add_to_cache( query, first_response);
+#endif
+	return first_response;
 }
 
 void server(int socket) {
@@ -385,12 +412,12 @@ void server(int socket) {
 }
 
 DnsMaybePtr send_and_receive( const std::string& server, DnsPtr query, Socket& socket, bool print_intermediate ) {	
+	DnsMaybePtr result;
 	boost::shared_ptr<Convert> dns_data( new DNSConvert(query) );
 	boost::shared_ptr<Consumer> gen(new DataProducer(dns_data));
 	boost::function<void(int)> sfunc = boost::bind(&socket_thread_runner, _1, gen);
 	socket.connect(server.c_str(), DNS_PORT, sfunc);
 
-	DnsMaybePtr result;
 	//boost::shared_ptr<Consumer> parse( new DNSResponseConsumer(result, query->get_questions().at(0)->get_type() ) );
 	boost::shared_ptr<Consumer> parse( new DNSConsumer(result) );
 	boost::function<void(int)> rfunc = boost::bind(&socket_thread_runner, _1, parse);

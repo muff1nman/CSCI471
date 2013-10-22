@@ -24,6 +24,7 @@ typedef   std::string                 NameOrIp;
 typedef   boost::optional<NameOrIp>   MaybeNameOrIp;
 typedef   std::vector<NameOrIp>       ListNameOrIp;
 
+// TODO the argument name should not be query but response
 ListNameOrIp    filter_ips         ( DnsPtr query );
 MaybeNameOrIp   filter_first_ip    ( DnsPtr query );
 ListNameOrIp    filter_nameservers ( DnsPtr query );

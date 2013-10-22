@@ -30,7 +30,7 @@ void DnsProducer::run(int socket_fd) {
 #ifdef LOGGING
 		LOG(INFO) << "Created auxilary socket";
 #endif
-		DnsMaybePtr lookup = recursive_send_and_recieve( ROOT_SERVER, *parsed_query, socket );
+		DnsMaybePtr lookup = query_once_and_then_try_recursive( ROOT_SERVER, *parsed_query, socket );
 		close(socket.get_socket());
 		DnsPtr to_send_back;
 		if( lookup && (*lookup)->get_answers().size() > 0) {

@@ -4,6 +4,8 @@
 #cmakedefine DEBUG
 #cmakedefine LOGGING
 
+#cmakedefine CACHING
+
 #cmakedefine OLDBOOST
 
 #define LISTEN_PORT 16318
