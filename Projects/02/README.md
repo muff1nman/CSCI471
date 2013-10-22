@@ -1,3 +1,7 @@
+Although not the best way about things, if you don't want to read the rest of
+this document just run `make` with the included Makefile. Otherwise to do things
+the proper way, read on.
+
 Building
 ----------
 ```
