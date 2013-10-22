@@ -63,38 +63,38 @@ bool check_args( po::variables_map configs ) {
 po::variables_map parse_args( int argc, char** argv ) {
 
 	po::options_description dns_options(
-			"Welcome to the DNS Muncher!\n"
+			"Welcome to the DNS Muncher! (the original name before I changed it to dug)\n"
 			"The program can be either run interactively or as a daemon. "
 			"To run interactively you can use the query and the name option and optionally with the type option. "
 			"Also, the program will automatically interpret two arguments as the name and query if you do not use the switches. \n"
 			"i.e. dnsmuncher [name] [server_to_query] ~ dnsmuncher www.google.com 8.8.8.8\n"
-			"Here is a description of each option");
+			"Here is a description of each option\n");
 	dns_options.add_options()
 
 		/**
 		 * Standard options
 		 */
 		(HELP_OPTION_LS,
-		 "Show help")
+		 "Show help\n")
 
 		(QUERY_OPTION_LS, po::value< std::string >(),
 		 "Send a query to the given server.  Currenlty server must be an ip address as I will not resolve your server names for you\n"
-		 "  i.e. 8.8.8.8")
+		 "  i.e. 8.8.8.8\n")
 
 		(NAME_OPTION_LS, po::value< std::string >(),
 		 "Use the given domain name. Acceptable domain names are in the form of:\n"
 		 "  some.name.com.\n"
 		 "  some.name.com\n"
-		 "Empty strings are not allowed")
+		 "Empty strings are not allowed\n")
 
 		(TYPE_OPTION_LS, po::value< size_t >()->default_value(1),
-		 "Query for the given type. Defaults to 1 (A)")
+		 "Query for the given type. Defaults to 1 (A)\n")
 
 		(DAEMON_OPTION_LS, 
-		 "Daemonize the program so as to receive dns udp queries on the specifice port (see --port).")
+		 "Daemonize the program so as to receive dns udp queries on the specifice port (see --port).\n")
 
 		(PORT_OPTION_LS, po::value< size_t >()->default_value(42345),
-		 "When using the daemon option, you can change the default listening port")
+		 "When using the daemon option, you can change the default listening port\n")
 
 		/**
 		 * Debugging options
@@ -107,7 +107,7 @@ po::variables_map parse_args( int argc, char** argv ) {
 		 "  3: FATAL\n")
 
 		(DEBUG_OPTION_LS,
-		 "Debug should be compiled in by default. Use this option to enable its output. Does not work for daemon mode.")
+		 "Debug should be compiled in by default. Use this option to enable its output. Does not work for daemon mode.\n")
 
 		// Semi colon marks end of options (DONT REMOVE)
 		;
