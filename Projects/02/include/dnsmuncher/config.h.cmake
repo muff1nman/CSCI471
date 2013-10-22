@@ -8,6 +8,8 @@
 
 #cmakedefine OLDBOOST
 
+#cmakedefine DAEMON_DEBUG 
+
 #define LISTEN_PORT 16318
 
 #cmakedefine PROJECT_NAME "${CMAKE_PROJECT_NAME}"

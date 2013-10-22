@@ -67,4 +67,9 @@ annoying.
 There is an issue when trying to query for the root domain. I didn't have enough
 time to look into this however.
 
+You cant use the debug option with the daemon option.  I had planned to fix
+this, but involved passing a silly bool down way too many levels of abstraction
+so I decided it wasn't worth the time. If you want this feature use the
+DAEMON_DEBUG option when compiling (see Building)
+
 

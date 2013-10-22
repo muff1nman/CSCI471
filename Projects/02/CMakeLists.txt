@@ -15,6 +15,7 @@ option(CACHING "Enable DNS caching" ON)
 option(DEBUG "Turn debuggin on or off" ON)
 option(LOGGING "Turn loggin on or off" OFF)
 option(TEST "Turn testing on or off" OFF)
+option(DAEMON_DEBUG "Turn debug on while in daemon mode" OFF)
 
 if(DEBUG)
 	set( CMAKE_BUILD_TYPE debug)

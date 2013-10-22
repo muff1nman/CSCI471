@@ -30,7 +30,11 @@ void DnsProducer::run(int socket_fd) {
 #ifdef LOGGING
 		LOG(INFO) << "Created auxilary socket";
 #endif
+#ifdef DAEMON_DEBUG
+		DnsMaybePtr lookup = query_once_and_then_try_recursive( ROOT_SERVER, *parsed_query, socket, true );
+#else
 		DnsMaybePtr lookup = query_once_and_then_try_recursive( ROOT_SERVER, *parsed_query, socket );
+#endif
 		close(socket.get_socket());
 		DnsPtr to_send_back;
 		if( lookup && (*lookup)->get_answers().size() > 0) {
