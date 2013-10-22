@@ -33,6 +33,7 @@ int main( int argc, char** argv ) {
 
 	if( !check_args(configs) ) {
 		cout << "Invalid options" << endl;
+		exit(1);
 	}
 
 	bool DEBUG_CMD = false;

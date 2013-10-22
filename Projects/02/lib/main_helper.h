@@ -32,9 +32,32 @@ void init_log(size_t log_level) {
 #endif
 }
 
+bool check_query_optionals( po::variables_map configs ) {
+	// TODO need to have these as implicit values in order to check this
+	// return configs.count( TYPE_OPTION ) == 1;
+	return false;
+}
+
+bool check_server_optionals( po::variables_map configs ) {
+	// TODO need to have these as implicit values in order to check this
+	// return configs.count( PORT_OPTION ) == 1;
+	return false;
+}
+
+bool check_query( po::variables_map configs ) {
+	return configs.count( QUERY_OPTION ) == 1 
+		&& configs.count( NAME_OPTION ) == 1 
+		&& !check_server_optionals( configs );
+}
+
+bool check_server( po::variables_map configs ) {
+	return configs.count( DAEMON_OPTION ) == 1 
+		&& !check_query_optionals( configs );
+}
+
 bool check_args( po::variables_map configs ) {
-	// TODO
-	return true;
+	// Just a simple XOR op
+	return check_query( configs ) != check_server( configs );
 }
 
 po::variables_map parse_args( int argc, char** argv ) {
@@ -51,39 +74,39 @@ po::variables_map parse_args( int argc, char** argv ) {
 		/**
 		 * Standard options
 		 */
-		(HELP_OPTION,
+		(HELP_OPTION_LS,
 		 "Show help")
 
-		(QUERY_OPTION, po::value< std::string >(),
+		(QUERY_OPTION_LS, po::value< std::string >(),
 		 "Send a query to the given server.  Currenlty server must be an ip address as I will not resolve your server names for you\n"
 		 "  i.e. 8.8.8.8")
 
-		(NAME_OPTION, po::value< std::string >(),
+		(NAME_OPTION_LS, po::value< std::string >(),
 		 "Use the given domain name. Acceptable domain names are in the form of:\n"
 		 "  some.name.com.\n"
 		 "  some.name.com\n"
 		 "Empty strings are not allowed")
 
-		(TYPE_OPTION, po::value< size_t >()->default_value(1),
+		(TYPE_OPTION_LS, po::value< size_t >()->default_value(1),
 		 "Query for the given type. Defaults to 1 (A)")
 
-		(DAEMON_OPTION, 
+		(DAEMON_OPTION_LS, 
 		 "Daemonize the program so as to receive dns udp queries on the specifice port (see --port).")
 
-		(PORT_OPTION, po::value< size_t >()->default_value(42345),
+		(PORT_OPTION_LS, po::value< size_t >()->default_value(42345),
 		 "When using the daemon option, you can change the default listening port")
 
 		/**
 		 * Debugging options
 		 */
-		(LOG_LEVEL_OPTION, po::value< size_t >()->default_value(1),
+		(LOG_LEVEL_OPTION_LS, po::value< size_t >()->default_value(1),
 		 "If you have compiled dnsmuncher with LOGGING enabled, you can change the log level. Levels are as follows:\n"
 		 "  0: INFO\n"
 		 "  1: WARNING\n"
 		 "  2: ERROR\n"
 		 "  3: FATAL\n")
 
-		(DEBUG_OPTION,
+		(DEBUG_OPTION_LS,
 		 "Debug should be compiled in by default. Use this option to enable its output. Does not work for daemon mode.")
 
 		// Semi colon marks end of options (DONT REMOVE)
@@ -101,11 +124,13 @@ po::variables_map parse_args( int argc, char** argv ) {
 		// TODO call this in main?
 		po::notify(configs);
 	} catch(...) {
-		perror("Invalid options");
+		std::cerr << "Invalid options" << std::endl;
+		exit(1);
 	}
 
 	if (configs.count(HELP_OPTION)) {
 		std::cout << dns_options << std::endl;
+		exit(0);
 	}
 
 	return configs;
