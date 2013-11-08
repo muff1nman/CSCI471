@@ -52,6 +52,11 @@ configure_file(
 	${PROJECT_INCLUDE_DIR}/networkmuncher/config.h.cmake
 	${CMAKE_CURRENT_BINARY_DIR}/include/networkmuncher/config.h )
 
+#ensure this is after we find the boost version
+configure_file( 
+	${PROJECT_INCLUDE_DIR}/networkmuncher/dns/config.h.cmake
+	${CMAKE_CURRENT_BINARY_DIR}/include/networkmuncher/dns/config.h )
+
 # Project includes 
 include_directories( ${PROJECT_INCLUDE_DIR} 
 	${CMAKE_CURRENT_BINARY_DIR}/include )

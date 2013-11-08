@@ -8,7 +8,7 @@ all: cp_execute
 .PHONY: cp_execute
 
 cp_execute: build
-	cp build/lib/dug .
+	cp build/lib/dns/dug .
 
 .PHONY: build
 

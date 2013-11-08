@@ -5,8 +5,8 @@
  * All Rights Reserved.
  */
 
-#ifndef __convert_h__
-#define __convert_h__
+#ifndef __dns_convert_h__
+#define __dns_convert_h__
 
 #include "networkmuncher/util/byte/byte.h"
 
@@ -17,5 +17,5 @@ class Convert {
 		virtual ~Convert() { }
 };
 
-#endif /* !__convert_h__ */
+#endif /* !__dns_convert_h__ */
 
