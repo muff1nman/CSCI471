@@ -8,8 +8,9 @@
 #include "test_helper.h"
 #include "file_ops.h"
 #include "file_names.h"
+#include "dns_common.h"
 
-#include "networkmuncher/parse/ip.h"
+#include "dns/parse/dns.h"
 
 #include <boost/assign/list_of.hpp>
 
@@ -22,23 +23,31 @@ TEST(ParseBytesFile, Helper) {
 	EXPECT_EQ( test, bytes_from_file( QUERY_A_GOOGLE ));
 }
 
-TEST(ParseIP, SimpleIP) {
-	const BytesContainer test = boost::assign::list_of
-		('\x9c')('\x7b')('\x91')('\xf8');
-	EXPECT_EQ( std::string("156.123.145.248"), ip_from_data( test ));
+TEST(ParseDNS, SimpleQuery) {
+	EXPECT_EQ( *query_a_google_obj(), *from_data(bytes_from_file( QUERY_A_GOOGLE )));
 }
 
-TEST(ParseIP, Extrabytes) {
-	const BytesContainer test = boost::assign::list_of
-		('\x9c')('\x7b')('\x91')('\xf8')('\x93')('\xa3');
-	EXPECT_EQ( std::string("156.123.145.248"), ip_from_data( test ));
+TEST(ParseDNS, SimpleResponse) {
+	EXPECT_EQ( *response_a_intel_without_link(), *from_data(bytes_from_file( RESPONSE_A_INTEL_WITHOUT_LINK )));
 }
 
-TEST(ParseIP, NumbersSmallerThan64) {
-	const BytesContainer test = boost::assign::list_of
-		('\x63')('\x00')('\x25')('\x01');
-	EXPECT_EQ( std::string("99.0.37.1"), ip_from_data( test ));
+TEST(ParseDNS, ComplexResponse) {
+	EXPECT_EQ( *response_complex_google(), *from_data(bytes_from_file( RESPONSE_COMPLEX_GOOGLE )));
 }
+
+TEST(ParseDNS, NameserverResponse) {
+	EXPECT_EQ( *response_nameserver_google(), *from_data(bytes_from_file( RESPONSE_NAMESERVER_GOOGLE )));
+}
+
+TEST(ParseDNS, CnameResponse) {
+	EXPECT_EQ( *response_cname_amazon(), *from_data(bytes_from_file( RESPONSE_CNAME_AMAZON )));
+}
+
+TEST(ParseDNS, NameserverAmazonResponse) {
+	EXPECT_EQ( *response_nameserver_amazon(), *from_data(bytes_from_file( RESPONSE_NAMESERVER_AMAZON )));
+}
+
+// TODO test for root query
 
 int main(int argc, char **argv) {
   ::testing::InitGoogleTest(&argc, argv);

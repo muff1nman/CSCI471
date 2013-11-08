@@ -13,8 +13,6 @@ set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 # Configuration Stuff
 # TODO
 option(CACHING "Enable DNS caching" ON)
-option(DEBUG "Turn debuggin on or off" ON)
-option(LOGGING "Turn loggin on or off" OFF)
 option(TEST "Turn testing on or off" OFF)
 option(DAEMON_DEBUG "Turn debug on while in daemon mode" OFF)
 

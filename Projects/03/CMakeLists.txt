@@ -11,10 +11,13 @@ set( PROJECT_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include )
 set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 
 # Configuration Stuff
-option(CACHING "Enable DNS caching" ON)
 option(DEBUG "Turn debuggin on or off" ON)
 option(LOGGING "Turn loggin on or off" OFF)
+
 option(TEST "Turn testing on or off" OFF)
+
+# DNS options
+option(CACHING "Enable DNS caching" ON)
 option(DAEMON_DEBUG "Turn debug on while in daemon mode" OFF)
 
 if(DEBUG)
@@ -61,10 +64,15 @@ FILE(GLOB_RECURSE INC_ALL ${CMAKE_SOURCE_DIR}/include/*.h)
 # Go do work CMake!
 add_subdirectory( lib )
 
-add_subdirectory( protocols )
-
 # if testing do some tests!
 if( ${TEST} STREQUAL "ON" )
 	enable_testing()
+	set( GTEST_DIR test-lib/gtest-1.7.0 )
+	add_subdirectory( ${GTEST_DIR} )
+	include_directories( SYSTEM
+		${GTEST_DIR}/include )
+
 	add_subdirectory( test )
 endif()
+
+add_subdirectory( protocols )

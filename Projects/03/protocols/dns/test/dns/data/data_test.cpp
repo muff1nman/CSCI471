@@ -10,7 +10,7 @@
 #include "file_names.h"
 #include "dns_common.h"
 
-#include "networkmuncher/data/dns_convert.h"
+#include "dns/data/dns_convert.h"
 
 #include <string>
 
