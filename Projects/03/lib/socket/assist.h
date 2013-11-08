@@ -8,7 +8,7 @@
 #ifndef __assist_h__
 #define __assist_h__
 
-#include "dnsmuncher/config.h"
+#include "networkmuncher/config.h"
 
 #ifdef LOGGING
 #include <glog/logging.h>

@@ -13,7 +13,7 @@ include_directories( SYSTEM
 	${TEST_INCLUDE}
 	${TEST_INCLUDE_CONFIGURED})
 
-add_subdirectory( dnsmuncher )
+add_subdirectory( networkmuncher )
 
 # New cmake copy command
 #file(COPY ${RESOURCES_DIR} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

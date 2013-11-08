@@ -5,7 +5,7 @@
  * All Rights Reserved.
  */
 
-#include "dnsmuncher/parse/ip.h"
+#include "networkmuncher/parse/ip.h"
 #include <sstream>
 
 std::string ip_from_data( const BytesContainer& data ) {

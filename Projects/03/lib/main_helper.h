@@ -8,9 +8,9 @@
 #ifndef __main_helper_h__
 #define __main_helper_h__
 
-#include "dnsmuncher/config.h"
-#include "dnsmuncher/domain/type.h"
-#include "dnsmuncher/domain/qtype.h"
+#include "networkmuncher/config.h"
+#include "networkmuncher/domain/type.h"
+#include "networkmuncher/domain/qtype.h"
 
 #ifdef LOGGING
 #include <glog/logging.h>
@@ -67,7 +67,7 @@ po::variables_map parse_args( int argc, char** argv ) {
 			"The program can be either run interactively or as a daemon. "
 			"To run interactively you can use the query and the name option and optionally with the type option. "
 			"Also, the program will automatically interpret two arguments as the name and query if you do not use the switches. \n"
-			"i.e. dnsmuncher [name] [server_to_query] ~ dnsmuncher www.google.com 8.8.8.8\n"
+			"i.e. networkmuncher [name] [server_to_query] ~ networkmuncher www.google.com 8.8.8.8\n"
 			"Here is a description of each option\n");
 	dns_options.add_options()
 
@@ -100,7 +100,7 @@ po::variables_map parse_args( int argc, char** argv ) {
 		 * Debugging options
 		 */
 		(LOG_LEVEL_OPTION_LS, po::value< size_t >()->default_value(1),
-		 "If you have compiled dnsmuncher with LOGGING enabled, you can change the log level. Levels are as follows:\n"
+		 "If you have compiled networkmuncher with LOGGING enabled, you can change the log level. Levels are as follows:\n"
 		 "  0: INFO\n"
 		 "  1: WARNING\n"
 		 "  2: ERROR\n"

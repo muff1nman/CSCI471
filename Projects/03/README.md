@@ -44,7 +44,7 @@ Running
 -------
 ```
 cd build # if you aren't there already
-./lib/dnsmuncher --help
+./lib/networkmuncher --help
 ```
 
 Extra Credit

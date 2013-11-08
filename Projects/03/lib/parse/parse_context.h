@@ -9,7 +9,7 @@
 #define __parse_context_h__
 
 
-#include "dnsmuncher/util/byte/byte.h"
+#include "networkmuncher/util/byte/byte.h"
 #include <boost/shared_ptr.hpp>
 
 class ParseContext {

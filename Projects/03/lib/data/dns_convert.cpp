@@ -5,11 +5,11 @@
  * All Rights Reserved.
  */
 
-#include "dnsmuncher/config.h"
-#include "dnsmuncher/util/byte/convert.h"
-#include "dnsmuncher/util/byte/copy.h"
-#include "dnsmuncher/util/join.h"
-#include "dnsmuncher/data/convert_all.h"
+#include "networkmuncher/config.h"
+#include "networkmuncher/util/byte/convert.h"
+#include "networkmuncher/util/byte/copy.h"
+#include "networkmuncher/util/join.h"
+#include "networkmuncher/data/convert_all.h"
 
 #include <cstring>
 #ifdef LOGGING

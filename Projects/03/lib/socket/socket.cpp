@@ -5,8 +5,8 @@
  * All Rights Reserved.
  */
 
-#include "dnsmuncher/socket/socket.h"
-#include "dnsmuncher/util/logging.h"
+#include "networkmuncher/socket/socket.h"
+#include "networkmuncher/util/logging.h"
 #include "assist.h"
 #include "socket_config.h"
 #include "messages.h"

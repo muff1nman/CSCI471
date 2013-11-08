@@ -5,11 +5,11 @@
  * All Rights Reserved.
  */
 
-#include "dnsmuncher/actors/dns_response_consumer.h"
-#include "dnsmuncher/parse/ip.h"
-#include "dnsmuncher/domain/ns_resource_record.h"
-#include "dnsmuncher/domain/cname_resource_record.h"
-#include "dnsmuncher/dns.h"
+#include "networkmuncher/actors/dns_response_consumer.h"
+#include "networkmuncher/parse/ip.h"
+#include "networkmuncher/domain/ns_resource_record.h"
+#include "networkmuncher/domain/cname_resource_record.h"
+#include "networkmuncher/dns.h"
 #include <iostream>
 
 void DNSResponseConsumer::run(int socket_fd) {

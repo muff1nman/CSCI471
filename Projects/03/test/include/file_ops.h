@@ -8,7 +8,7 @@
 #ifndef __file_ops_h__
 #define __file_ops_h__
 
-#include "dnsmuncher/util/byte/byte.h"
+#include "networkmuncher/util/byte/byte.h"
 #ifdef LOGGING
 #include <glog/logging.h>
 #endif

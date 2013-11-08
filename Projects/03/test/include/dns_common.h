@@ -8,8 +8,8 @@
 #ifndef __dns_common_h__
 #define __dns_common_h__
 
-#include "dnsmuncher/domain/dns.h"
-#include "dnsmuncher/domain/dns_builder.h"
+#include "networkmuncher/domain/dns.h"
+#include "networkmuncher/domain/dns_builder.h"
 #include <boost/shared_ptr.hpp>
 #include <boost/assign/list_of.hpp>
 

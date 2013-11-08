@@ -5,17 +5,17 @@
  * All Rights Reserved.
  */
 
-#include "dnsmuncher/parse/dns.h"
+#include "networkmuncher/parse/dns.h"
 
-#include "dnsmuncher/util/logging.h"
-#include "dnsmuncher/domain/dns_builder.h"
-#include "dnsmuncher/domain/ns_resource_record.h"
-#include "dnsmuncher/domain/cname_resource_record.h"
-#include "dnsmuncher/util/byte/copy.h"
-#include "dnsmuncher/util/join.h"
+#include "networkmuncher/util/logging.h"
+#include "networkmuncher/domain/dns_builder.h"
+#include "networkmuncher/domain/ns_resource_record.h"
+#include "networkmuncher/domain/cname_resource_record.h"
+#include "networkmuncher/util/byte/copy.h"
+#include "networkmuncher/util/join.h"
 
 #ifdef LOGGING
-#include "dnsmuncher/util/byte/print.h"
+#include "networkmuncher/util/byte/print.h"
 #endif
 
 #include <boost/bind.hpp>

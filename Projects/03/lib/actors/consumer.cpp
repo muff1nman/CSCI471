@@ -5,8 +5,8 @@
  * All Rights Reserved.
  */
 
-#include "dnsmuncher/actors/consumer.h"
-#include "dnsmuncher/config.h"
+#include "networkmuncher/actors/consumer.h"
+#include "networkmuncher/config.h"
 
 #ifdef DEBUG
 #include <iostream>

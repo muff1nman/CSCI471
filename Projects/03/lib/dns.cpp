@@ -5,22 +5,22 @@
  * All Rights Reserved.
  */
 
-#include "dnsmuncher/config.h"
-#include "dnsmuncher/util/logging.h"
-#include "dnsmuncher/dns.h"
-#include "dnsmuncher/actors/data_producer.h"
-#include "dnsmuncher/data/dns_convert.h"
-#include "dnsmuncher/domain/dns.h"
-#include "dnsmuncher/actors/dns_response_consumer.h"
-#include "dnsmuncher/actors/dns_producer.h"
-#include "dnsmuncher/domain/resource_record_all.h"
-#include "dnsmuncher/domain/dns_builder.h"
-#include "dnsmuncher/socket/socket.h"
-#include "dnsmuncher/parse/ip.h"
+#include "networkmuncher/config.h"
+#include "networkmuncher/util/logging.h"
+#include "networkmuncher/dns.h"
+#include "networkmuncher/actors/data_producer.h"
+#include "networkmuncher/data/dns_convert.h"
+#include "networkmuncher/domain/dns.h"
+#include "networkmuncher/actors/dns_response_consumer.h"
+#include "networkmuncher/actors/dns_producer.h"
+#include "networkmuncher/domain/resource_record_all.h"
+#include "networkmuncher/domain/dns_builder.h"
+#include "networkmuncher/socket/socket.h"
+#include "networkmuncher/parse/ip.h"
 #ifdef CACHING
-#include "dnsmuncher/cache.h"
+#include "networkmuncher/cache.h"
 #endif
-#include "dnsmuncher/util/collection.h"
+#include "networkmuncher/util/collection.h"
 #include <boost/bind.hpp>
 #include <string>
 #include <iostream>

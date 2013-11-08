@@ -5,13 +5,13 @@
  * All Rights Reserved.
  */
 
-#include "dnsmuncher/actors/dns_producer.h"
-#include "dnsmuncher/dns.h"
-#include "dnsmuncher/domain/dns_builder.h"
-#include "dnsmuncher/parse/dns.h"
-#include "dnsmuncher/socket/helper.h"
-#include "dnsmuncher/data/convert_all.h"
-#include "dnsmuncher/actors/data_producer.h"
+#include "networkmuncher/actors/dns_producer.h"
+#include "networkmuncher/dns.h"
+#include "networkmuncher/domain/dns_builder.h"
+#include "networkmuncher/parse/dns.h"
+#include "networkmuncher/socket/helper.h"
+#include "networkmuncher/data/convert_all.h"
+#include "networkmuncher/actors/data_producer.h"
 
 void DnsProducer::run(int socket_fd) {
 	sockaddr_in remote_info;

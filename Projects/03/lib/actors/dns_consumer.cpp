@@ -5,9 +5,9 @@
  * All Rights Reserved.
  */
 
-#include "dnsmuncher/actors/dns_consumer.h"
-#include "dnsmuncher/socket/helper.h"
-#include "dnsmuncher/parse/dns.h"
+#include "networkmuncher/actors/dns_consumer.h"
+#include "networkmuncher/socket/helper.h"
+#include "networkmuncher/parse/dns.h"
 
 void DNSConsumer::run(int socket_fd) {
 	BytesContainer raw_data = all_data(socket_fd);

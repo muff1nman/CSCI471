@@ -5,17 +5,17 @@
  * All Rights Reserved.
  */
 
-#include "dnsmuncher/config.h"
+#include "networkmuncher/config.h"
 #include "main_helper.h"
-#include "dnsmuncher/actors/consumer.h"
-#include "dnsmuncher/actors/data_producer.h"
-#include "dnsmuncher/data/dns_convert.h"
-#include "dnsmuncher/domain/dns_builder.h"
-#include "dnsmuncher/actors/dns_consumer.h"
-#include "dnsmuncher/actors/dns_producer.h"
-#include "dnsmuncher/actors/dns_response_consumer.h"
-#include "dnsmuncher/socket/socket.h"
-#include "dnsmuncher/dns.h"
+#include "networkmuncher/actors/consumer.h"
+#include "networkmuncher/actors/data_producer.h"
+#include "networkmuncher/data/dns_convert.h"
+#include "networkmuncher/domain/dns_builder.h"
+#include "networkmuncher/actors/dns_consumer.h"
+#include "networkmuncher/actors/dns_producer.h"
+#include "networkmuncher/actors/dns_response_consumer.h"
+#include "networkmuncher/socket/socket.h"
+#include "networkmuncher/dns.h"
 
 #include <iostream>
 #include <boost/bind.hpp>
