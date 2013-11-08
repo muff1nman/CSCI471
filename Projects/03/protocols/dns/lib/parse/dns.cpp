@@ -6,10 +6,10 @@
  */
 #include "parse_context.h"
 
-#include "networkmuncher/dns/parse/dns.h"
-#include "networkmuncher/dns/domain/dns_builder.h"
-#include "networkmuncher/dns/domain/ns_resource_record.h"
-#include "networkmuncher/dns/domain/cname_resource_record.h"
+#include "dns/parse/dns.h"
+#include "dns/domain/dns_builder.h"
+#include "dns/domain/ns_resource_record.h"
+#include "dns/domain/cname_resource_record.h"
 
 #include "networkmuncher/util/logging.h"
 #include "networkmuncher/util/byte/copy.h"

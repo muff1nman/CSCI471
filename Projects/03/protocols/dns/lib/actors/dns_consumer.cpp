@@ -5,8 +5,8 @@
  * All Rights Reserved.
  */
 
-#include "networkmuncher/dns/actors/dns_consumer.h"
-#include "networkmuncher/dns/parse/dns.h"
+#include "dns/actors/dns_consumer.h"
+#include "dns/parse/dns.h"
 
 #include "networkmuncher/socket/helper.h"
 

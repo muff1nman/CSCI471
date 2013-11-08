@@ -10,7 +10,7 @@
 
 #include "convert_all.h"
 
-#include "networkmuncher/dns/domain/name.h"
+#include "dns/domain/name.h"
 
 class NameConvert : public Convert {
 	public:

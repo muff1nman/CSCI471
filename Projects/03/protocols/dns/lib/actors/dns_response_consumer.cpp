@@ -5,10 +5,10 @@
  * All Rights Reserved.
  */
 
-#include "networkmuncher/dns/actors/dns_response_consumer.h"
-#include "networkmuncher/dns/domain/ns_resource_record.h"
-#include "networkmuncher/dns/domain/cname_resource_record.h"
-#include "networkmuncher/dns/dns.h"
+#include "dns/actors/dns_response_consumer.h"
+#include "dns/domain/ns_resource_record.h"
+#include "dns/domain/cname_resource_record.h"
+#include "dns/dns.h"
 
 #include "networkmuncher/parse/ip.h"
 

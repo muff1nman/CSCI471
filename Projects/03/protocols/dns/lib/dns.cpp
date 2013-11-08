@@ -12,16 +12,16 @@
 #include "networkmuncher/parse/ip.h"
 #include "networkmuncher/util/collection.h"
 
-#include "networkmuncher/dns/config.h"
-#include "networkmuncher/dns/dns.h"
-#include "networkmuncher/dns/data/dns_convert.h"
-#include "networkmuncher/dns/domain/dns.h"
-#include "networkmuncher/dns/actors/dns_response_consumer.h"
-#include "networkmuncher/dns/actors/dns_producer.h"
-#include "networkmuncher/dns/domain/resource_record_all.h"
-#include "networkmuncher/dns/domain/dns_builder.h"
+#include "dns/config.h"
+#include "dns/dns.h"
+#include "dns/data/dns_convert.h"
+#include "dns/domain/dns.h"
+#include "dns/actors/dns_response_consumer.h"
+#include "dns/actors/dns_producer.h"
+#include "dns/domain/resource_record_all.h"
+#include "dns/domain/dns_builder.h"
 #ifdef CACHING
-#include "networkmuncher/dns/cache.h"
+#include "dns/cache.h"
 #endif
 
 #include <boost/bind.hpp>

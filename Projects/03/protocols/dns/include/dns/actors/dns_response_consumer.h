@@ -10,8 +10,8 @@
 
 #include "dns_consumer.h"
 
-#include "networkmuncher/dns/domain/dns.h"
-#include "networkmuncher/dns/config.h"
+#include "dns/domain/dns.h"
+#include "dns/config.h"
 
 /**
  * Does some additional logging in addition to what DNSConsumer provides

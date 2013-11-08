@@ -8,8 +8,8 @@
 #ifndef __parse_dns_h__
 #define __parse_dns_h__
 
-#include "networkmuncher/dns/domain/dns.h"
-#include "networkmuncher/dns/dns.h"
+#include "dns/domain/dns.h"
+#include "dns/dns.h"
 
 #include <boost/shared_ptr.hpp>
 #include <boost/optional.hpp>

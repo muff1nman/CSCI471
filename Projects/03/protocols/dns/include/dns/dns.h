@@ -8,7 +8,7 @@
 #ifndef __dns_h__
 #define __dns_h__
 
-#include "networkmuncher/dns/domain/dns.h"
+#include "dns/domain/dns.h"
 
 #include "networkmuncher/socket/socket.h"
 

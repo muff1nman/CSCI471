@@ -10,8 +10,8 @@
 #include "networkmuncher/util/byte/copy.h"
 #include "networkmuncher/util/join.h"
 
-#include "networkmuncher/dns/config.h"
-#include "networkmuncher/dns/data/convert_all.h"
+#include "dns/config.h"
+#include "dns/data/convert_all.h"
 
 #include <cstring>
 #ifdef LOGGING

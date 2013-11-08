@@ -10,7 +10,8 @@
 
 
 #include "networkmuncher/data/convert.h"
-#include "networkmuncher/dns/domain/dns.h"
+
+#include "dns/domain/dns.h"
 
 #include <boost/shared_ptr.hpp>
 

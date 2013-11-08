@@ -10,7 +10,7 @@
 
 #include "convert_all.h"
 
-#include "networkmuncher/dns/domain/resource_record.h"
+#include "dns/domain/resource_record.h"
 
 class ResourceRecordConvert : public Convert {
 	public:

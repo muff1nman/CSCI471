@@ -5,12 +5,12 @@
  * All Rights Reserved.
  */
 
-#include "networkmuncher/dns/config.h"
-#include "networkmuncher/dns/actors/dns_producer.h"
-#include "networkmuncher/dns/dns.h"
-#include "networkmuncher/dns/domain/dns_builder.h"
-#include "networkmuncher/dns/parse/dns.h"
-#include "networkmuncher/dns/data/convert_all.h"
+#include "dns/config.h"
+#include "dns/actors/dns_producer.h"
+#include "dns/dns.h"
+#include "dns/domain/dns_builder.h"
+#include "dns/parse/dns.h"
+#include "dns/data/convert_all.h"
 
 #include "networkmuncher/socket/helper.h"
 #include "networkmuncher/actors/data_producer.h"

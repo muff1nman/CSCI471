@@ -18,7 +18,7 @@
 #include "random_convert.h"
 #include "resource_record_convert.h"
 
-#include "networkmuncher/dns/domain/domain.h"
+#include "dns/domain/domain.h"
 
 #include "networkmuncher/util/byte/convert.h"
 

@@ -8,7 +8,7 @@
 #ifndef __parse_context_h__
 #define __parse_context_h__
 
-#include "networkmuncher/dns/domain/dns_builder.h"
+#include "dns/domain/dns_builder.h"
 
 #include "networkmuncher/util/byte/byte.h"
 

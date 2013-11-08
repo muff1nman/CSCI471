@@ -9,9 +9,10 @@
 #define __main_helper_h__
 
 #include "networkmuncher/config.h"
-#include "networkmuncher/dns/config.h"
-#include "networkmuncher/dns/domain/type.h"
-#include "networkmuncher/dns/domain/qtype.h"
+
+#include "dns/config.h"
+#include "dns/domain/type.h"
+#include "dns/domain/qtype.h"
 
 #ifdef LOGGING
 #include <glog/logging.h>

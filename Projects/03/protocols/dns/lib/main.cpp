@@ -4,14 +4,15 @@
  *
  * All Rights Reserved.
  */
+#include "main_helper.h"
 
 #include "networkmuncher/config.h"
-#include "networkmuncher/dns/config.h"
-#include "networkmuncher/dns/dns.h"
-#include "main_helper.h"
-#include "networkmuncher/dns/domain/dns_builder.h"
 #include "networkmuncher/socket/socket.h"
 #include "networkmuncher/util/logging.h"
+
+#include "dns/config.h"
+#include "dns/dns.h"
+#include "dns/domain/dns_builder.h"
 
 #include <iostream>
 #include <boost/bind.hpp>

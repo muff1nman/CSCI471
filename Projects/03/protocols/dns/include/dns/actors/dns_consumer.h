@@ -8,9 +8,9 @@
 #ifndef __dns_consumer_h__
 #define __dns_consumer_h__
 
-#include "networkmuncher/dns/config.h"
-#include "networkmuncher/dns/domain/dns.h"
-#include "networkmuncher/dns/dns.h"
+#include "dns/config.h"
+#include "dns/domain/dns.h"
+#include "dns/dns.h"
 
 #include "networkmuncher/actors/echo_consumer.h"
 #include "networkmuncher/config.h"
