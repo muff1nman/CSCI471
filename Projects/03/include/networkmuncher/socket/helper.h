@@ -126,10 +126,17 @@ inline size_t guess_buffer_size(int socket_fd) {
 	return 65536;
 }
 
+/*
+ * Acts like the kernel call recvfrom and can be used on either a bound or
+ * unbound socket
+ */
 inline BytesContainer all_data( int socket_fd, sockaddr_in& remote_info, socklen_t& remote_info_size ) {
 	return all_data( socket_fd, guess_buffer_size(socket_fd), remote_info, remote_info_size);
 }
 
+/*
+ * Acts like the kernel call recv and should be used on a bound socket
+ */
 inline BytesContainer all_data( int socket_fd ) {
 	socklen_t discard_len;
 	sockaddr_in discard;

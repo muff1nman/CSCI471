@@ -98,8 +98,18 @@ int connect_to_socket(int fd, const char* server, unsigned short port) {
 	return fd;
 }
 
+Socket::SocketFunction convert_to_socket_function( Socket::ConsumerProvider cp ) {
+	boost::shared_ptr<Consumer> c = cp();
+	return boost::bind(&socket_thread_runner, _1, c);
+
+}
+
 void Socket::accept( SocketFunction f) {
 	f(this->socket_fd);
+}
+
+void Socket::accept( ConsumerProvider cp, bool discarded) {
+	accept(convert_to_socket_function(cp));
 }
 
 void Socket::connect(const char* server, Port dest_port, SocketFunction f) {
@@ -120,6 +130,10 @@ void Socket::connect(const char* server, Port dest_port, SocketFunction f) {
 	boost::function<void()> bound_func = boost::bind(f, this->socket_fd);
 	//boost::thread t(bound_func);
 	bound_func();
+}
+
+void Socket::connect(const char* server, Port dest_port, ConsumerProvider cp, bool discarded) {
+	connect( server, dest_port, convert_to_socket_function(cp));
 }
 
 void Socket::set_timeout(size_t usec, size_t sec) {

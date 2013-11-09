@@ -12,9 +12,8 @@
 
 #include <iostream>
 
-void echo(int fd) {
-	boost::shared_ptr<Consumer> c = boost::shared_ptr<Consumer>(new EchoConsumer());
-	socket_thread_runner(fd, c);
+boost::shared_ptr<Consumer> gen_consumer() {
+	return boost::shared_ptr<Consumer>(new EchoConsumer());
 }
 
 using namespace std;
@@ -26,7 +25,7 @@ int main( int argc, char** argv ) {
 	while(true) {
 		Socket socket(SOCK_DGRAM, port );
 		// Here is where the real work gets done.  See the #server function
-		socket.accept( &echo );
+		socket.accept( &gen_consumer, true );
 	}
 }
 
