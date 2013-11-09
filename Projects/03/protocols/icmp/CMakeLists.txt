@@ -12,6 +12,8 @@ set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 
 # Configuration Stuff
 option(TEST "Turn testing on or off" OFF)
+option(DEBUG "Turn debuggin on or off" ON)
+option(LOGGING "Turn loggin on or off" OFF)
 
 if(DEBUG)
 	set( CMAKE_BUILD_TYPE debug)

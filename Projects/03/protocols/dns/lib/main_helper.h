@@ -9,14 +9,11 @@
 #define __main_helper_h__
 
 #include "networkmuncher/config.h"
+#include "networkmuncher/util/logging.h"
 
 #include "dns/config.h"
 #include "dns/domain/type.h"
 #include "dns/domain/qtype.h"
-
-#ifdef LOGGING
-#include <glog/logging.h>
-#endif
 
 #include <boost/program_options.hpp>
 #include <string>
@@ -25,13 +22,9 @@
 
 namespace po = boost::program_options;
 
-void init_log(size_t log_level) {
-#ifdef LOGGING
-	google::InitGoogleLogging(PROJECT_NAME);
-	FLAGS_minloglevel = log_level;
-	FLAGS_alsologtostderr = 1;
-	FLAGS_colorlogtostderr = 1;
-#endif
+
+void start_logging(size_t log_level) {
+	init_log(log_level, PROJECT_NAME);
 }
 
 bool check_query_optionals( po::variables_map configs ) {

@@ -32,7 +32,7 @@ int main( int argc, char** argv ) {
 	bool DEBUG_CMD = false;
 
 	// For enabling google log ... if this wasnt compiled in this is a no-op
-	init_log(configs[LOG_LEVEL_OPTION].as< size_t>());
+	start_logging(configs[LOG_LEVEL_OPTION].as< size_t>());
 
 	if( configs.count(DEBUG_OPTION) == 1 ) {
 		cout << "Enabling debugging" << endl;
@@ -89,7 +89,6 @@ int main( int argc, char** argv ) {
 			Socket socket(SOCK_DGRAM, configs[PORT_OPTION].as< size_t >());
 			// Here is where the real work gets done.  See the #server function
 			socket.accept( &server );
-			close(socket.get_socket());
 		}
 	}
 
