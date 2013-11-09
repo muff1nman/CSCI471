@@ -6,6 +6,7 @@
  */
 
 #include "networkmuncher/socket/socket.h"
+#include "networkmuncher/socket/helper.h"
 #include "networkmuncher/util/logging.h"
 #include "assist.h"
 #include "socket_config.h"
@@ -49,6 +50,23 @@ int set_timeout_internal(int socket_fd, size_t timeout_in_usec, size_t timeout_i
 
 	return setsockopt(socket_fd, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
 }
+
+inline void close_socket(int socket_fd) {
+	int close_status = close(socket_fd);
+	if( close_status < 0 ) {
+#ifdef LOGGING
+		// TODO put error code here
+		LOG(ERROR) << "Could not close socket: ";
+		// TODO do something better?
+#endif
+	}
+#ifdef LOGGING
+	else {
+		LOG(INFO) << "Closed socket";
+	}
+#endif
+}
+
 
 /**
  * Connects to a socket
@@ -146,6 +164,14 @@ void Socket::bind(Port port) {
 	}
 #endif
 
+}
+
+void Socket::close() {
+	close_socket(this->socket_fd);
+}
+
+Socket::~Socket() { 
+	close();
 }
 
 Socket::Socket( int socket_type ) : socket_type(socket_type) {

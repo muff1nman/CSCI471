@@ -13,10 +13,6 @@
 
 #include <unistd.h>
 
-#ifdef DEBUG
-#include <iostream>
-#endif
-
 /**
  * The consumer class of classes are used for doing some action with a given
  * socket.  Typically they have a minimal constructor and the true meat is in

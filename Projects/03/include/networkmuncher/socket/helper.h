@@ -11,6 +11,7 @@
 #include "networkmuncher/util/logging.h"
 #include "networkmuncher/util/byte/byte.h"
 #include "networkmuncher/util/byte/print.h"
+#include "networkmuncher/actors/consumer.h"
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -19,22 +20,6 @@
 #include <cstdlib>
 
 const char* const ALLOCATE_ERROR = "Could not allocate buffer space";
-
-inline void close_socket(int socket_fd) {
-	int close_status = close(socket_fd);
-	if( close_status < 0 ) {
-#ifdef LOGGING
-		// TODO put error code here
-		LOG(ERROR) << "Could not close socket: ";
-		// TODO do something better?
-#endif
-	}
-#ifdef LOGGING
-	else {
-		LOG(INFO) << "Closed socket";
-	}
-#endif
-}
 
 /*
  * Runs a consumer and deletes it after completion.

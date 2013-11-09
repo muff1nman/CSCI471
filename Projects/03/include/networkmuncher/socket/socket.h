@@ -59,6 +59,8 @@ class Socket {
 			return socket_fd;
 		}
 
+		~Socket();
+
 	private:
 		int socket_fd;
 		int socket_type;
@@ -66,6 +68,12 @@ class Socket {
 
 		void open();
 		void bind(Port port);
+
+		/**
+		 * Attempts to close this socket.  This is automatically called by the
+		 * destructor.  
+		 */
+		void close();
 
 
 };

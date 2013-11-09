@@ -16,11 +16,19 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 
+#ifndef LOGGING
+#include <iostream>
+#endif
+
 class EchoConsumer : public Consumer {
 	public:
 
 		virtual void run(int socket_fd) {
 			BytesContainer b = all_data(socket_fd);
+#ifndef LOGGING
+			std::cout << "Recieved bytes:" << std::endl;
+			std::cout << demaria_util::to_string(b) << std::endl;
+#endif
 		}
 
 };
