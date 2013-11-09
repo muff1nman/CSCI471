@@ -9,6 +9,7 @@
 #include "networkmuncher/util/logging.h"
 #include "networkmuncher/actors/data_producer.h"
 #include "networkmuncher/socket/socket.h"
+#include "networkmuncher/socket/helper.h"
 #include "networkmuncher/parse/ip.h"
 #include "networkmuncher/util/collection.h"
 
@@ -28,24 +29,6 @@
 #include <string>
 #include <iostream>
 
-// Runs a consumer and deletes it after completion.
-void socket_thread_runner(int fd, boost::shared_ptr<Consumer> c) {
-	c->run(fd);
-#ifdef LOGGING
-	LOG(INFO) << "Thread finalizing";
-#endif
-
-#ifdef LOGGING
-	LOG(INFO) << "Releasing resources";
-#endif
-	c.reset();
-
-	// No need to close socket with new Socket class
-	//close_socket(fd);
-#ifdef LOGGING
-	LOG(INFO) << "Thread released";
-#endif
-}
 
 typedef boost::function< boost::optional<std::string> ( DNS::ResourcePtr ) > FilterFunction;
 
@@ -411,7 +394,7 @@ DnsMaybePtr query_once_and_then_try_recursive( const std::string& server, DnsPtr
 
 void server(int socket) {
 	boost::shared_ptr<Consumer> handler( new DnsProducer() );	
-	handler->run( socket );
+	socket_thread_runner(socket,handler);
 }
 
 DnsMaybePtr send_and_receive( const std::string& server, DnsPtr query, Socket& socket, bool print_intermediate ) {	

@@ -154,7 +154,7 @@ Socket::Socket( int socket_type ) : socket_type(socket_type) {
 
 Socket::Socket( int socket_type, Port port) : socket_type(socket_type), port(port) {
 	open();
-	bind();
+	bind(port);
 }
 
 

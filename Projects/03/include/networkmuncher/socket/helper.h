@@ -36,6 +36,29 @@ inline void close_socket(int socket_fd) {
 #endif
 }
 
+/*
+ * Runs a consumer and deletes it after completion.
+ *
+ * This is mainly a helper function that is meant to be passed into
+ * Socket#accept or Socket#connect
+ */
+inline void socket_thread_runner(int fd, boost::shared_ptr<Consumer> c) {
+	c->run(fd);
+#ifdef LOGGING
+	LOG(INFO) << "Thread finalizing";
+#endif
+
+	// release the Consumer 
+#ifdef LOGGING
+	LOG(INFO) << "Releasing resources";
+#endif
+	c.reset();
+
+#ifdef LOGGING
+	LOG(INFO) << "Thread released";
+#endif
+}
+
 inline bool check_allocated( void* data ) {
 	if( data == NULL ) {
 #ifdef LOGGING
