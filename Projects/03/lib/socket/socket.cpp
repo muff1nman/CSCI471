@@ -116,7 +116,7 @@ void Socket::set_timeout(size_t usec, size_t sec) {
 
 }
 
-Socket::Socket( int socket_type, Port port) : socket_type(socket_type), port(port) {
+void Socket::open() {
 	this->socket_fd = open_socket(socket_type);
 	if( this->socket_fd <  SUCCESS ) {
 #ifdef LOGGING
@@ -128,6 +128,10 @@ Socket::Socket( int socket_type, Port port) : socket_type(socket_type), port(por
 #ifdef LOGGING
 	LOG(INFO) << "Opened socket";
 #endif
+
+}
+
+void Socket::bind(Port port) {
 	int bind_result = bind_listening_socket_to_port( this->socket_fd, port );
 	if(bind_result < SUCCESS) {
 #ifdef LOGGING
@@ -142,6 +146,15 @@ Socket::Socket( int socket_type, Port port) : socket_type(socket_type), port(por
 	}
 #endif
 
+}
+
+Socket::Socket( int socket_type ) : socket_type(socket_type) {
+	open();
+}
+
+Socket::Socket( int socket_type, Port port) : socket_type(socket_type), port(port) {
+	open();
+	bind();
 }
 
 

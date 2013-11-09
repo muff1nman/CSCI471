@@ -20,7 +20,15 @@ class Socket {
 		typedef unsigned short Port;
 		typedef boost::function<void(int)> SocketFunction;
 
+		/*
+		 * Opens a socket and binds it to the given port
+		 */
 		Socket( int socket_type, Port port);
+
+		/*
+		 * Only opens up the socket
+		 */
+		Socket( int socket_type );
 
 		// TODO only for TCP socket
 		//void listen(Port port);
@@ -55,6 +63,9 @@ class Socket {
 		int socket_fd;
 		int socket_type;
 		int port;
+
+		void open();
+		void bind(Port port);
 
 
 };
