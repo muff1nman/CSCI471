@@ -9,6 +9,7 @@
 #define __socket_h__
 
 #include <sys/socket.h>
+#include <sys/types.h>
 #include <boost/function.hpp>
 
 /**
