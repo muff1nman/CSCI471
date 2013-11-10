@@ -22,7 +22,8 @@ int main( int argc, char** argv ) {
 	cout << "Listen on port: [" << port << "]" << endl;
 	init_log(0, "ECHO");
 	while(true) {
-		Socket socket(SOCK_DGRAM, port );
+		Socket socket(SOCK_RAW,IPPROTO_ICMP);
+		//Socket socket(SOCK_DGRAM, IPPROTO_UDP, port );
 		// Here is where the real work gets done.  See the #server function
 		socket.accept( &gen_consumer, true );
 	}

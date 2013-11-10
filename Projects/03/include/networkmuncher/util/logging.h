@@ -46,14 +46,7 @@ class Logging {
  * Needs to be called before any logging can be done. This function is a no-op
  * if logging is not defined.
  */
-inline void init_log(size_t log_level, const char* project_name) {
-#ifdef LOGGING
-	google::InitGoogleLogging(project_name);
-	FLAGS_minloglevel = log_level;
-	FLAGS_alsologtostderr = 1;
-	FLAGS_colorlogtostderr = 1;
-#endif
-}
+void init_log(size_t log_level, const char* project_name);
 
 #endif /* !__logging_h__ */
 

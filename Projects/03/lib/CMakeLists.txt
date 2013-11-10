@@ -1,10 +1,7 @@
 add_subdirectory(socket)
+add_subdirectory(logging)
 
-set(LINK_LIBRARIES muncher_socket)
-
-if(${LOGGING} STREQUAL "ON")
-	set(LINK_LIBRARIES_DNS ${LINK_LIBRARIES_DNS} glog)
-endif()
+set(LINK_LIBRARIES muncher_socket muncher_logging)
 
 add_executable(echo echo.cpp)
 

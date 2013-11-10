@@ -15,6 +15,11 @@ option(TEST "Turn testing on or off" OFF)
 option(DEBUG "Turn debuggin on or off" ON)
 option(LOGGING "Turn loggin on or off" OFF)
 
+set( LOG_LEVEL 1 )
+if(DEBUG)
+	set( LOG_LEVEL 0 )
+endif(DEBUG)
+
 if(DEBUG)
 	set( CMAKE_BUILD_TYPE debug)
 else()
@@ -23,6 +28,8 @@ endif(DEBUG)
 
 # profiling stuff
 if(CMAKE_COMPILER_IS_GNUCXX)
+	#message(STATUS "enabling c++ 11")
+	#add_definitions(-std=gnu++0x)
 	if(DEBUG)
 		message(STATUS "warnings on")
 		add_definitions(-Wall -Wextra -pedantic -ansi -Wno-unused-variable
@@ -46,9 +53,9 @@ include_directories( ${PROJECT_INCLUDE_DIR}
 FILE(GLOB_RECURSE INC_ALL ${CMAKE_SOURCE_DIR}/include/*.h)
 
 # Go do work CMake!
-#add_subdirectory( lib )
+add_subdirectory( lib )
 
-## if testing do some tests!
+# if testing do some tests!
 #if( ${TEST} STREQUAL "ON" )
 	#enable_testing()
 	#add_subdirectory( test )
