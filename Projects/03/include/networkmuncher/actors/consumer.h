@@ -10,6 +10,7 @@
 
 #include "networkmuncher/util/logging.h"
 #include "networkmuncher/config.h"
+#include "networkmuncher/socket/socket.h"
 
 #include <unistd.h>
 
@@ -24,7 +25,7 @@ class Consumer : public Logging {
 
 	public:
 
-		virtual void run(int socket_fd) {
+		virtual void run(Socket* socket) {
 #ifdef LOGGING
 			LOG(INFO) << "Doing operation with open socket";
 #endif

@@ -8,6 +8,7 @@
 
 #include "networkmuncher/config.h"
 #include "networkmuncher/socket/socket.h"
+#include "dns/actors/dns_producer.h"
 #include "networkmuncher/util/logging.h"
 
 #include "dns/config.h"
@@ -19,6 +20,10 @@
 
 using namespace std;
 namespace po = boost::program_options;
+
+boost::shared_ptr<Consumer> gen_server_handler() {
+	return boost::shared_ptr<Consumer>( new DnsProducer() );	
+}
 
 int main( int argc, char** argv ) {
 
@@ -88,7 +93,7 @@ int main( int argc, char** argv ) {
 		while(true) {
 			Socket socket(SOCK_DGRAM, configs[PORT_OPTION].as< size_t >());
 			// Here is where the real work gets done.  See the #server function
-			socket.accept( &server );
+			socket.accept( &gen_server_handler, true );
 		}
 	}
 

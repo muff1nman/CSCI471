@@ -14,8 +14,8 @@
 
 #include <iostream>
 
-void DNSResponseConsumer::run(int socket_fd) {
-	DNSConsumer::run(socket_fd);
+void DNSResponseConsumer::run(Socket* socket) {
+	DNSConsumer::run(socket);
 	if( this->result ) {
 		std::vector<std::string> records;
 #ifdef LOGGING

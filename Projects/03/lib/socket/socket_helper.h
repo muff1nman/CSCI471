@@ -16,10 +16,96 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
+#include <arpa/inet.h>
 #include <boost/shared_ptr.hpp>
 #include <cstdlib>
 
 const char* const ALLOCATE_ERROR = "Could not allocate buffer space";
+
+/**
+ * Binds to a socket to a given port
+ */
+int bind_listening_socket_to_port(int socket_fd, Socket::Port port_number) {
+	struct sockaddr_in bind_opts;
+
+	// clear out the structure just in case
+	memset(&bind_opts, 0, sizeof(bind_opts));
+
+	bind_opts.sin_family = AF_INET;
+	bind_opts.sin_addr.s_addr = htonl(INADDR_ANY);
+	bind_opts.sin_port = htons(port_number);
+
+	return bind(socket_fd, (struct sockaddr*) &bind_opts, sizeof(bind_opts));
+}
+
+/**
+ * Opens a socket and returns the file descriptor
+ */
+int open_socket(int type) {
+	return socket(AF_INET, type, 0);
+}
+
+int set_timeout_internal(int socket_fd, size_t timeout_in_usec, size_t timeout_in_sec ) {
+	struct timeval timeout;
+	timeout.tv_sec = timeout_in_sec;
+	timeout.tv_usec = timeout_in_usec;
+
+	return setsockopt(socket_fd, SOL_SOCKET, SO_RCVTIMEO, &timeout, sizeof(timeout));
+}
+
+inline void close_socket(int socket_fd) {
+	int close_status = close(socket_fd);
+	if( close_status < 0 ) {
+#ifdef LOGGING
+		// TODO put error code here
+		LOG(ERROR) << "Could not close socket: ";
+		// TODO do something better?
+#endif
+	}
+#ifdef LOGGING
+	else {
+		LOG(INFO) << "Closed socket";
+	}
+#endif
+}
+
+int connect_to_socket( int fd, const struct sockaddr* address, socklen_t address_len ) {
+	int result = connect( fd, address, address_len);
+	if (result != 0 ) {
+		do_error( ERROR_CONNECT );
+		return -1;
+	}
+
+	return fd;
+}
+
+int convert_server_info( const char* server, unsigned short port, sockaddr_in& address_info ) {
+	memset( &address_info, 0, sizeof(address_info) );
+
+	address_info.sin_family = AF_INET;
+	address_info.sin_port = htons(port);
+	int assign_addr_sucess = inet_aton( server, &(address_info.sin_addr) );
+	if( assign_addr_sucess < SUCCESS ) {
+		do_error( ERROR_IP_ADDR_CONVERT );
+		return -1;
+	}
+	return 0;
+
+}
+
+/**
+ * Connects to a socket
+ */
+int connect_to_socket(int fd, const char* server, unsigned short port) {
+	struct sockaddr_in address_info;
+ 	int convert_result = convert_server_info(server, port, address_info);
+	if( convert_result < SUCCESS ) {
+		return connect_to_socket( fd, (sockaddr*) &address_info, sizeof(address_info));
+	} else {
+		return -1;
+	}
+}
+
 
 /*
  * Runs a consumer and deletes it after completion.
@@ -27,8 +113,8 @@ const char* const ALLOCATE_ERROR = "Could not allocate buffer space";
  * This is mainly a helper function that is meant to be passed into
  * Socket#accept or Socket#connect
  */
-inline void socket_thread_runner(int fd, boost::shared_ptr<Consumer> c) {
-	c->run(fd);
+inline void socket_thread_runner(Socket* socket, boost::shared_ptr<Consumer> c) {
+	c->run(socket);
 #ifdef LOGGING
 	LOG(INFO) << "Thread finalizing";
 #endif

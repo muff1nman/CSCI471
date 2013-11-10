@@ -8,12 +8,15 @@
 #ifndef __socket_h__
 #define __socket_h__
 
-#include "networkmuncher/actors/consumer.h"
+#include "networkmuncher/util/byte/byte.h"
 
 #include <sys/socket.h>
 #include <sys/types.h>
+#include <netinet/in.h>
 #include <boost/function.hpp>
 #include <boost/shared_ptr.hpp>
+
+class Consumer;
 
 /**
  * Because Im tired of having to deal with sockets
@@ -26,13 +29,14 @@ class Socket {
 		 * Calls the given socket function with the underlying socket file
 		 * descriptor passed in.
 		 */
-		typedef boost::function<void(int)> SocketFunction;
+		typedef boost::function<void(Socket*)> SocketFunction;
 
+		typedef boost::shared_ptr<Consumer> ConsumerPtr;
 		/**
 		 * Calls this function to retrieve a Consumer and then uses the returned
 		 * Consumer's #run function as a SocketFunction
 		 */
-		typedef boost::function<boost::shared_ptr<Consumer>()> ConsumerProvider;
+		typedef boost::function<ConsumerPtr()> ConsumerProvider;
 
 		/*
 		 * Opens a socket and binds it to the given port
@@ -59,6 +63,21 @@ class Socket {
 		 * functions
 		 */
 		void accept( ConsumerProvider cp, bool discarded );
+		void accept( ConsumerPtr c );
+
+		/**
+		 * Similar to the first connect but provides a higher level abstraction of
+		 * specifying the remote server to connect to
+		 */
+		void connect(const struct sockaddr* addr, socklen_t len, SocketFunction f);
+
+		/*
+		 * Converts ConsumerProvider to a SocketFunction and then calls connect on
+		 * the SocketFunction. discarded is just to differeniate between overloaded
+		 * functions
+		 */
+		void connect(const struct sockaddr* addr, socklen_t len, ConsumerProvider cp, bool discarded);
+		void connect(const struct sockaddr* addr, socklen_t len, ConsumerPtr c);
 
 		/**
 		 * connects and runs the given socket function with the created socket file
@@ -72,11 +91,32 @@ class Socket {
 		 * functions
 		 */
 		void connect(const char* server, Port dest_port, ConsumerProvider cp, bool discarded);
+		void connect(const char* server, Port dest_port, ConsumerPtr c );
 
 		void set_timeout(size_t usec, size_t sec);
 
 		// TODO not implemented yet
 		//void handle_c( int sig );
+		
+		/**
+		 * Returns all data currently available on the given socket.  Blocks if
+		 * there is no data.  TODO Assumes that socket is bound 
+		 */
+		BytesContainer recv();
+
+		/**
+		 * Returns all data currently available on the given socket from the remote
+		 * server. Blocks if there is no data.
+		 */
+		BytesContainer recv_from(sockaddr_in& remote_info, socklen_t& remote_info_size);
+
+		/**
+		 * Returns all data currently available on the given socket from the remote
+		 * server. Blocks if there is no data. Use the given buffer size for
+		 * intermediate reading of data (the buffer does not limit the bytes read,
+		 * only dicates how many bytes are read at a time)
+		 */
+		BytesContainer recv_from(sockaddr_in& remote_info, socklen_t& remote_info_size, size_t buf_size );
 		
 		/**
 		 * Returns the internal socket fd.  It is okay to use this to close the
@@ -103,6 +143,8 @@ class Socket {
 		 */
 		void close();
 
+		// not to be used
+		Socket(const Socket& other) { }
 
 };
 

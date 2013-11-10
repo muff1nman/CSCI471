@@ -6,7 +6,6 @@
  */
 
 #include "networkmuncher/socket/socket.h"
-#include "networkmuncher/socket/helper.h"
 #include "networkmuncher/actors/echo_consumer.h"
 #include "networkmuncher/util/logging.h"
 

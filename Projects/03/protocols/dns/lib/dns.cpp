@@ -9,7 +9,6 @@
 #include "networkmuncher/util/logging.h"
 #include "networkmuncher/actors/data_producer.h"
 #include "networkmuncher/socket/socket.h"
-#include "networkmuncher/socket/helper.h"
 #include "networkmuncher/parse/ip.h"
 #include "networkmuncher/util/collection.h"
 
@@ -392,22 +391,15 @@ DnsMaybePtr query_once_and_then_try_recursive( const std::string& server, DnsPtr
 	return first_response;
 }
 
-void server(int socket) {
-	boost::shared_ptr<Consumer> handler( new DnsProducer() );	
-	socket_thread_runner(socket,handler);
-}
-
 DnsMaybePtr send_and_receive( const std::string& server, DnsPtr query, Socket& socket, bool print_intermediate ) {	
 	DnsMaybePtr result;
 	boost::shared_ptr<Convert> dns_data( new DNSConvert(query) );
 	boost::shared_ptr<Consumer> gen(new DataProducer(dns_data));
-	boost::function<void(int)> sfunc = boost::bind(&socket_thread_runner, _1, gen);
-	socket.connect(server.c_str(), DNS_PORT, sfunc);
+	socket.connect(server.c_str(), DNS_PORT, gen);
 
 	//boost::shared_ptr<Consumer> parse( new DNSResponseConsumer(result, query->get_questions().at(0)->get_type() ) );
 	boost::shared_ptr<Consumer> parse( new DNSConsumer(result) );
-	boost::function<void(int)> rfunc = boost::bind(&socket_thread_runner, _1, parse);
-	socket.accept( rfunc );
+	socket.accept( parse );
 
 	return result;
 
