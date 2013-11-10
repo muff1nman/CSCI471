@@ -35,7 +35,7 @@ namespace demaria_util {
 				}
 				ss << std::string(padding_front, ' ') <<  i  << " |";
 			}
-			ss << std::hex << std::setfill('0') << std::setw(2) << (unsigned int) (unsigned char) data[i];
+			ss << std::setfill('0') << std::setw(2) << std::hex << (unsigned int) (unsigned char) data[i];
 			if( i % group_space == 0 ) {
 				ss << " ";
 			}

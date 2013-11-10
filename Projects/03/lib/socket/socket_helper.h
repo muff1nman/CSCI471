@@ -41,8 +41,8 @@ int bind_listening_socket_to_port(int socket_fd, Socket::Port port_number) {
 /**
  * Opens a socket and returns the file descriptor
  */
-int open_socket(int type) {
-	return socket(AF_INET, type, 0);
+int open_socket(int type, int protocol) {
+	return socket(AF_INET, type, protocol);
 }
 
 int set_timeout_internal(int socket_fd, size_t timeout_in_usec, size_t timeout_in_sec ) {
@@ -166,7 +166,6 @@ inline BytesContainer all_data( int socket_fd, size_t buf_size, sockaddr_in& rem
 			if( (unsigned) read_status < buf_size ) {
 #ifdef LOGGING
 				LOG(INFO) << "No more bytes";
-				LOG(INFO) << std::endl << demaria_util::to_string(data, read_status, 4, 10 );
 #endif
 				break; // end of stream?
 			} else {

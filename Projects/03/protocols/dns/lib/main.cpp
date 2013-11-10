@@ -59,7 +59,7 @@ int main( int argc, char** argv ) {
 		boost::shared_ptr<DNS> to_send = b.build_ptr();
 
 		// Create a socket to use for the duration of this session
-		Socket socket(SOCK_DGRAM, DNSMUNCHER_SEND_PORT);
+		Socket socket(SOCK_DGRAM, IPPROTO_UDP, DNSMUNCHER_SEND_PORT);
 		socket.set_timeout(TIMEOUT_IN_USEC, TIMEOUT_IN_SEC);
 
 		// Do work!
@@ -91,7 +91,7 @@ int main( int argc, char** argv ) {
 		// We leave the socket stuff inside the while statement as it is not a big
 		// deal to open and tear down sockets for each new request
 		while(true) {
-			Socket socket(SOCK_DGRAM, configs[PORT_OPTION].as< size_t >());
+			Socket socket(SOCK_DGRAM, IPPROTO_UDP, configs[PORT_OPTION].as< size_t >());
 			// Here is where the real work gets done.  See the #server function
 			socket.accept( &gen_server_handler, true );
 		}

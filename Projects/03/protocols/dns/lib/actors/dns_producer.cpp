@@ -40,7 +40,7 @@ void DnsProducer::run(Socket* socket) {
 
 		DnsMaybePtr lookup;
 		{
-			Socket aux_socket(SOCK_DGRAM, DNSMUNCHER_SEND_PORT);
+			Socket aux_socket(SOCK_DGRAM, IPPROTO_UDP, DNSMUNCHER_SEND_PORT);
 			aux_socket.set_timeout( TIMEOUT_IN_USEC, TIMEOUT_IN_SEC );
 #ifdef LOGGING
 			LOG(INFO) << "Created auxilary socket";

@@ -27,6 +27,8 @@ class EchoConsumer : public Consumer {
 #ifndef LOGGING
 			std::cout << "Recieved bytes:" << std::endl;
 			std::cout << demaria_util::to_string(b) << std::endl;
+#else
+			LOG(INFO) << "Recieved bytes:" << "\n" << demaria_util::to_string(b);
 #endif
 		}
 

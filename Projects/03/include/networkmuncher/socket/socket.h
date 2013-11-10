@@ -41,12 +41,12 @@ class Socket {
 		/*
 		 * Opens a socket and binds it to the given port
 		 */
-		Socket( int socket_type, Port port);
+		Socket( int socket_type, int socket_protocol, Port port);
 
 		/*
 		 * Only opens up the socket
 		 */
-		Socket( int socket_type );
+		Socket( int socket_type, int socket_protocol);
 
 		// TODO only for TCP socket
 		//void listen(Port port);
@@ -132,6 +132,7 @@ class Socket {
 	private:
 		int socket_fd;
 		int socket_type;
+		int socket_protocol;
 		int port;
 
 		void open();
