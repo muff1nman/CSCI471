@@ -405,4 +405,29 @@ DnsMaybePtr send_and_receive( const std::string& server, DnsPtr query, Socket& s
 
 }
 
+MaybeNameOrIp dns_give_me_one_answer( const std::string& server, const std::string& query ) {
+	MaybeNameOrIp ip;
+	// Build a query
+	DNSBuilder b;
+	b
+		.is_query()
+		.add_question( Question(query, Type::A, NetClass::IN) )
+		.question_count(1)
+		.recursion_desired(true);
 
+	boost::shared_ptr<DNS> to_send = b.build_ptr();
+	// Create a socket to use for the duration of this session
+	Socket socket(SOCK_DGRAM, IPPROTO_UDP, DNSMUNCHER_SEND_PORT);
+	socket.set_timeout(TIMEOUT_IN_USEC, TIMEOUT_IN_SEC);
+
+	// Do work!
+	DnsMaybePtr result = query_once_and_then_try_recursive( server, to_send, socket,false);
+
+	// Now check the result
+	if( result && (*result)->response_code() == DNS::NO_ERROR ) {
+		ip = filter_first_ip( *result );
+	}
+
+	return ip;
+
+}
