@@ -228,5 +228,18 @@ inline BytesContainer all_data( int socket_fd ) {
 
 	return all_data( socket_fd, guess_buffer_size(socket_fd), discard, discard_len);
 }
+
+inline int send_data( int socket_fd, const BytesContainer& to_send ) {
+	int result = send(socket_fd, to_send.data(), to_send.size(), 0);
+#ifdef LOGGING
+	if( result < SUCCESS ) {
+		LOG(WARNING) << "Could not write to socket: " << strerror(errno);
+	} else {
+		LOG(INFO) << "[" << result << "] bytes written";
+	}
+#endif
+	return result;
+}
+
 #endif /* !__helper_h__ */
 

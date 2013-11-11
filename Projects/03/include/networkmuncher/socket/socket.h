@@ -117,6 +117,13 @@ class Socket {
 		 * only dicates how many bytes are read at a time)
 		 */
 		BytesContainer recv_from(sockaddr_in& remote_info, socklen_t& remote_info_size, size_t buf_size );
+
+		/**
+		 * Sends the given data.  Assumes that the socket is already connected.
+		 * The return result is the result of the send operation.
+		 */
+		int send(const BytesContainer& to_send);
+
 		
 		/**
 		 * Returns the internal socket fd.  It is okay to use this to close the

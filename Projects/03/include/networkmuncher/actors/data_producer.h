@@ -27,19 +27,8 @@ class DataProducer : public Consumer {
 
 		virtual void run(Socket* socket) {
 			BytesContainer bytes = convertable->to_data();
-#ifdef LOGGING
-			LOG(INFO) << "Writing to socket [" << socket->get_socket() << "]";
-#endif
-			//int result = write(socket_fd, bytes.data.get(), bytes.size);
-			int result = send(socket->get_socket(), bytes.data(), bytes.size(), 0);
-#ifdef LOGGING
-			if( result < 0 ) {
-				LOG(WARNING) << "Could not write to socket: " << strerror(errno);
-			} else {
-				LOG(INFO) << "[" << result << "] bytes written";
-			}
-#endif
-			// TODO need to call sync?
+			// TODO check ret value?
+			socket->send(bytes);
 		}
 
 	private:

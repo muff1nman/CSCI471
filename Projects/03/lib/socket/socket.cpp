@@ -142,6 +142,10 @@ BytesContainer Socket::recv_from(sockaddr_in& remote_info, socklen_t& remote_inf
 	return all_data(socket_fd, buf_size, remote_info, remote_info_size);
 }
 
+int Socket::send(const BytesContainer& to_send) {
+	return send_data(socket_fd, to_send);
+}
+
 void Socket::close() {
 	close_socket(this->socket_fd);
 }
