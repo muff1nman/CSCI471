@@ -10,6 +10,8 @@
 
 #include "icmp/domain/echo.h"
 
+#include <boost/optional.hpp>
+
 boost::optional<Echo> ping_and_pong_once( const std::string& dest_ip, const Echo& request );
 
 #endif /* !ICMP_H */
