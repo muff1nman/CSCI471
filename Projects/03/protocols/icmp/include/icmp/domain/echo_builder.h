@@ -11,16 +11,60 @@
 #include "echo.h"
 #include "ptr_types.h"
 
+/**
+ * Usage:  set a type, set an identifier, and set a sequence number.  Other
+ * fields will be set to default values or calculated
+ */
 class EchoBuilder {
 	public:
+
+		static const unsigned int ECHO_REQUEST = 8;
+		static const unsigned int ECHO_REPLY = 0;
+		static const unsigned int ECHO_CODE = 0;
+
+		EchoBuilder& set_type(Echo::Type type) {
+			variable_holder.type = type;
+			return do_common();
+		}
+
+		EchoBuilder& set_request_type() {
+			return set_type(ECHO_REQUEST);
+		}
+
+		EchoBuilder& set_reply_type() {
+			return set_type(ECHO_REPLY);
+		}
+
+		EchoBuilder& set_code(Echo::Code code) {
+			variable_holder.code = code;
+			code_set = true;
+			return do_common();
+		}
+
+		EchoBuilder& set_checksum(Echo::Checksum checksum) {
+			variable_holder.checksum = checksum;
+			checksum_set = true;
+			return do_common();
+		}
+
+		EchoBuilder& set_identifier(Echo::Identifier id) {
+			variable_holder.identifier = id;
+			return do_common();
+		}
+
+		EchoBuilder& set_sequence_num(Echo::SequenceNum sqn) {
+			variable_holder.sequence_num = sqn;
+			return do_common();
+		}
+
 		Echo build() {
-			// TODO
-			return Echo();
+			set_default_fields();
+			return Echo(variable_holder);
 		}
 
 		EchoPtr build_ptr() {
-			// TODO
-			return EchoPtr( new Echo() );
+			set_default_fields();
+			return EchoPtr( new Echo(variable_holder) );
 		}
 
 	private:
@@ -29,6 +73,21 @@ class EchoBuilder {
 		EchoBuilder& do_common() {
 			return *this;
 		}
+
+		Echo::Checksum calculate_checksum() {
+			// TODO
+		}
+
+		void set_default_fields() {
+			if( ! code_set ) {
+				set_code( ECHO_CODE );
+			}
+			if( ! checksum_set ) {
+				set_checksum(calculate_checksum());
+			}
+		}
+
+		bool code_set, checksum_set;
 };
 
 #endif /* !ECHO_BUILDER_H */

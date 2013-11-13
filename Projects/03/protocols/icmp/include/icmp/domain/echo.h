@@ -18,12 +18,20 @@ struct Echo {
 		static const size_t IDENTIFIER_LENGTH   = 16;
 		static const size_t SEQUENCE_NUM_LENGTH = 16;
 
-		std::bitset<TYPE_LENGTH>           type;
-		std::bitset<CODE_LENGTH>           code;
-		std::bitset<CHECKSUM_LENGTH>       checksum;
-		std::bitset<IDENTIFIER_LENGTH>     identifier;
-		std::bitset<SEQUENCE_NUM_LENGTH>   sequence_num;
-		BytesContainer                     data;
+		typedef std::bitset<TYPE_LENGTH>           Type;
+		typedef std::bitset<CODE_LENGTH>           Code;
+		typedef std::bitset<CHECKSUM_LENGTH>       Checksum;
+		typedef std::bitset<IDENTIFIER_LENGTH>     Identifier;
+		typedef std::bitset<SEQUENCE_NUM_LENGTH>   SequenceNum;
+		typedef BytesContainer                     Data;
+
+		Type          type;
+		Code          code;
+		Checksum      checksum;
+		Identifier    identifier;
+		SequenceNum   sequence_num;
+		Data          data;
+
 		friend class EchoBuilder;
 
 	protected:
