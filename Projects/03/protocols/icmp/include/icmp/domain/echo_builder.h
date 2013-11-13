@@ -25,6 +25,10 @@ class EchoBuilder {
 
 	private:
 		Echo variable_holder;
+
+		EchoBuilder& do_common() {
+			return *this;
+		}
 };
 
 #endif /* !ECHO_BUILDER_H */

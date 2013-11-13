@@ -19,7 +19,8 @@ const size_t BITS_PER_BYTE = 8;
 typedef unsigned char Byte;
 typedef std::vector<Byte> BytesContainer;
 
-typedef unsigned int generic_number;
+typedef unsigned int generic_positive_number;
+typedef int generic_number;
 typedef unsigned short opcode_number;
 typedef unsigned int ttl_number;
 typedef unsigned int rdata_length_number;

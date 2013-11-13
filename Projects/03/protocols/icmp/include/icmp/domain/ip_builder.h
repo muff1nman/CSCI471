@@ -10,9 +10,17 @@
 
 #include "ip.h"
 #include "ptr_types.h"
+#include "networkmuncher/util/byte/byte.h"
 
 class IpBuilder {
 	public:
+
+		IpBuilder& set_version(generic_positive_number version) {
+			variable_holder.version = Ip::Version(version);
+			return do_common();
+		}
+
+
 		Ip build() {
 			// TODO
 			return Ip();
@@ -25,6 +33,10 @@ class IpBuilder {
 
 	private:
 		Ip variable_holder;
+
+		IpBuilder& do_common() {
+			return *this;
+		}
 };
 
 #endif /* !IP_BUILDER_H */
