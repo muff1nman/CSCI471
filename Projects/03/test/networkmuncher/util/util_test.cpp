@@ -114,6 +114,15 @@ TEST(Join, Simple) {
 	EXPECT_EQ( expected, join( first, second ));
 }
 
+TEST(Join, WithFirstAsEmpty) {
+	std::vector<int> first;
+	std::vector<int> second = boost::assign::list_of(3)(4);
+
+	std::vector<int> expected = second;
+
+	EXPECT_EQ( expected, join(first, second));
+}
+
 // TODO test Join optional
 
 TEST(SplitName, Empty) {

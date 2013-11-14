@@ -18,6 +18,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <sstream>
+#include <ostream>
 
 #define sep " "
 #define list_sep ", "
@@ -37,6 +38,10 @@ class Logging {
 
 		virtual std::string to_string() const { return std::string(nested_start) + stringify_object() + std::string(nested_finish); }
 		virtual std::string stringify_object() const { return std::string("UNKNOWN"); }
+		friend std::ostream& operator<<(std::ostream& os, const Logging& object) {
+			os << object.to_string() << std::endl;
+			return os;
+		}
 	protected:
 		virtual ~Logging() { }
 

@@ -14,6 +14,7 @@
 #include "ip_convert.h"
 #include "echo_convert.h"
 #include "networkmuncher/util/join.h"
+#include "networkmuncher/util/logging.h"
 
 class ICMPConvert : public Convert {
 	public:

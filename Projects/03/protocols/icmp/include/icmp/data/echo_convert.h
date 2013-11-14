@@ -21,27 +21,27 @@ class EchoConvert : public Convert {
 		virtual BytesContainer to_data() const {
 			BytesContainer bytes;
 
-			join(bytes, convert_big_endian
+			bytes = join(bytes, convert_big_endian
 					<Echo::TYPE_LENGTH / BITS_PER_BYTE>
 					(echo->type));
 
-			join(bytes, convert_big_endian
+			bytes = join(bytes, convert_big_endian
 					<Echo::CODE_LENGTH / BITS_PER_BYTE>
 					(echo->code));
 
-			join(bytes, convert_big_endian
+			bytes = join(bytes, convert_big_endian
 					<Echo::CHECKSUM_LENGTH / BITS_PER_BYTE>
 					(echo->checksum));
 
-			join(bytes, convert_big_endian
+			bytes = join(bytes, convert_big_endian
 					<Echo::IDENTIFIER_LENGTH / BITS_PER_BYTE>
 					(echo->identifier));
 
-			join(bytes, convert_big_endian
+			bytes = join(bytes, convert_big_endian
 					<Echo::SEQUENCE_NUM_LENGTH / BITS_PER_BYTE>
 					(echo->sequence_num));
 
-			join(bytes, echo->data);
+			bytes = join(bytes, echo->data);
 
 			return bytes;
 

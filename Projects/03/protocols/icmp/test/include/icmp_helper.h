@@ -32,6 +32,7 @@ EchoPtr google_echo_request_echo_part() {
 
 IpPtr google_echo_request_ip_part() {
 	return IpBuilder()
+		.set_total_length(84)
 		.set_id(20409)
 		.set_dont_fragment()
 		.set_ttl(64)
@@ -66,6 +67,7 @@ EchoPtr google_echo_reply_echo_part() {
 
 IpPtr google_echo_reply_ip_part() {
 	return IpBuilder()
+		.set_total_length(84)
 		.set_id(37189)
 		.set_ttl(56)
 		.set_protocol(1)

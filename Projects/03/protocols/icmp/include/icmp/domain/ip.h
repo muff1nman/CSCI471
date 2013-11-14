@@ -10,8 +10,10 @@
 
 #include <bitset>
 #include "networkmuncher/util/byte/byte.h"
+#include "networkmuncher/util/logging.h"
+#include "networkmuncher/parse/ip.h"
 
-struct Ip {
+struct Ip : public Logging {
 	public:
 
 		/**
@@ -71,6 +73,43 @@ struct Ip {
 		Options        options;
 
 		friend class IpBuilder;
+
+		std::string stringify_object() const {
+			std::stringstream object;
+			object << "version: " << version.to_ulong() << list_sep;
+			object << "header len: " << header_length.to_ulong() << list_sep;
+			object << "tos: " << tos.to_ulong() << list_sep;
+			object << "total length: " << total_length.to_ulong() << list_sep;
+			object << "id: " << id.to_ulong() << list_sep;
+			object << "flags: " << flags.to_string() << list_sep;
+			object << "frag offset: " << frag_offset.to_ulong() << list_sep;
+			object << "ttl: " << ttl.to_ulong() << list_sep;
+			object << "protocol: " << protocol.to_ulong() << list_sep;
+			object << "checksum: " << checksum.to_string() << list_sep;
+			object << "source addr: " << ip_from_data(source_addr) << list_sep;
+			object << "dest addr: " << ip_from_data(dest_addr) << list_sep;
+			object << "options: " << "NOT SHOWN" << sep;
+
+			return object.str();
+		}
+
+		bool operator==( const Ip& other ) {
+			return
+				version       == other.version       &&
+				header_length == other.header_length &&
+				tos           == other.tos           &&
+				total_length  == other.total_length  &&
+				id            == other.id            &&
+				flags         == other.flags         &&
+				frag_offset   == other.frag_offset   &&
+				ttl           == other.ttl           &&
+				protocol      == other.protocol      &&
+				checksum      == other.checksum      &&
+				source_addr   == other.source_addr   &&
+				dest_addr     == other.dest_addr     &&
+				options       == other.options       &&
+				true;
+		}
 
 	protected:
 		Ip() {}
