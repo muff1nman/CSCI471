@@ -11,7 +11,7 @@
 #include <bitset>
 #include "networkmuncher/util/byte/byte.h"
 #include "networkmuncher/util/logging.h"
-#include "networkmuncher/parse/ip.h"
+#include "networkmuncher/parse/ip_addr.h"
 
 struct Ip : public Logging {
 	public:

@@ -9,7 +9,7 @@
 #include "file_ops.h"
 #include "file_names.h"
 
-#include "networkmuncher/parse/ip.h"
+#include "networkmuncher/parse/ip_addr.h"
 
 #include <boost/assign/list_of.hpp>
 

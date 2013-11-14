@@ -9,7 +9,7 @@
 #include "networkmuncher/util/logging.h"
 #include "networkmuncher/actors/data_producer.h"
 #include "networkmuncher/socket/socket.h"
-#include "networkmuncher/parse/ip.h"
+#include "networkmuncher/parse/ip_addr.h"
 #include "networkmuncher/util/collection.h"
 
 #include "dns/config.h"

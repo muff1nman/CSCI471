@@ -14,6 +14,8 @@
 #include "networkmuncher/util/byte/byte.h"
 #include "networkmuncher/util/index.h"
 
+#include "networkmuncher/data/ip_addr_convert.h"
+
 #include <stdlib.h>
 #include <time.h>
 
@@ -126,11 +128,21 @@ class IpBuilder {
 			return do_common();
 		}
 
+		IpBuilder& set_source_addr(const IpAddr& ip_addr) {
+			return set_source_addr(IpAddrConvert(ip_addr).to_bitset());
+		}
+
 		IpBuilder& set_dest_addr(Ip::DestAddr addr) {
 			variable_holder.dest_addr = addr;
 			dest_addr_set = true;
 			return do_common();
 		}
+
+		IpBuilder& set_dest_addr(const IpAddr& ip_addr) {
+			return set_dest_addr(IpAddrConvert(ip_addr).to_bitset());
+		}
+
+
 
 		// No options for you!
 		// IpBuilder& set_options() ---
