@@ -10,6 +10,7 @@
 
 #include "echo.h"
 #include "ptr_types.h"
+#include "networkmuncher/util/logging.h"
 
 /**
  * Usage:  set a type, set an identifier, and set a sequence number.  Other
@@ -57,6 +58,11 @@ class EchoBuilder {
 			return do_common();
 		}
 
+		EchoBuilder& set_data(Echo::Data data) {
+			variable_holder.data = data;
+			return do_common();
+		}
+
 		Echo build() {
 			set_default_fields();
 			return Echo(variable_holder);
@@ -76,6 +82,9 @@ class EchoBuilder {
 
 		Echo::Checksum calculate_checksum() {
 			// TODO
+#ifdef LOGGING
+			LOG(ERROR) << "Not yet implemented";
+#endif
 		}
 
 		void set_default_fields() {

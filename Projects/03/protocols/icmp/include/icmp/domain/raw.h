@@ -11,6 +11,7 @@
 #include "ptr_types.h"
 
 struct Raw {
+	Raw(IpPtr ip, EchoPtr echo) : ip(ip), echo(echo) { }
 	IpPtr ip;
 	EchoPtr echo;
 };

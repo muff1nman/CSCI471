@@ -12,6 +12,7 @@
 #include "icmp/domain/domain.h"
 #include "file_ops.h"
 #include "file_names.h"
+#include <boost/assign/list_of.hpp>
 
 #ifdef LOGGING
 #include <glog/logging.h>

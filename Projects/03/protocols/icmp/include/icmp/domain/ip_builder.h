@@ -49,7 +49,7 @@ class IpBuilder {
 
 	public:
 		static const unsigned int IPV4 = 4;
-		static const unsigned int HEADER_LENGTH_WITHOUT_OPTIONS = 5;
+		static const unsigned int HEADER_LENGTH_WITHOUT_OPTIONS = 20;
 
 		IpBuilder& set_version(Ip::Version version) {
 			variable_holder.version = version;
@@ -86,7 +86,7 @@ class IpBuilder {
 		IpBuilder& set_dont_fragment(bool value = true) {
 			set_with_reverse_index( 
 					variable_holder.flags,
-					Ip::DONT_FRAGMENT_POS_FROM_LEFT, 
+					+Ip::DONT_FRAGMENT_POS_FROM_LEFT, 
 					value );
 			return do_common();
 		}
@@ -94,8 +94,13 @@ class IpBuilder {
 		IpBuilder& set_more_fragments(bool value = true ) {
 			set_with_reverse_index(
 				variable_holder.flags,
-				Ip::MORE_FRAGMENTS_POS_FROM_LEFT,
+				+Ip::MORE_FRAGMENTS_POS_FROM_LEFT,
 				value);
+			return do_common();
+		}
+
+		IpBuilder& set_fragment_offset(Ip::FragOffset fo) {
+			variable_holder.frag_offset = fo;
 			return do_common();
 		}
 
