@@ -21,7 +21,7 @@ static BytesContainer bytes_from_file(char const* filename) {
 	std::ifstream input_stream( filename, std::ios::binary|std::ios::ate );
 	if( !input_stream ) {
 #ifdef LOGGING
-		LOG(ERROR) << "Could not read from file";
+		LOG(ERROR) << "Could not read from file [" << filename << "]";
 		return BytesContainer();
 #endif
 	}

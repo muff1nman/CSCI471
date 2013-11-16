@@ -8,6 +8,4 @@
 
 #define IDENTIFER 19023
 
-#define RANDOM_DATA "010100010010101010100101010011111110100101"
-
 #endif /* !__icmp_config_h__ */

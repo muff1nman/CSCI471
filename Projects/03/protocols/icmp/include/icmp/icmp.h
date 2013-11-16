@@ -8,11 +8,9 @@
 #ifndef ICMP_H
 #define ICMP_H
 
-#include "icmp/domain/echo.h"
+#include "icmp/domain/domain.h"
 
-#include <boost/optional.hpp>
-
-boost::optional<Echo> ping_and_pong_once( const std::string& dest_ip, const Echo& request );
+EchoMaybePtr ping_and_pong_once( const std::string& dest_ip );
 
 #endif /* !ICMP_H */
 

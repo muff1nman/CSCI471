@@ -6,22 +6,41 @@
  */
 
 #include "icmp/icmp.h"
-
+#include "icmp/config.h"
 #include "icmp/domain/domain.h"
+#include "icmp/data/data.h"
+#include "networkmuncher/actors/actors.h"
+#include "networkmuncher/socket/socket.h"
 
-boost::optional<Echo> ping_and_pong_once( const std::string& dest_ip, EchoPtr request ) {
-	boost::optional<Echo> to_return;
+#include <boost/assign.hpp>
 
+EchoMaybePtr ping_and_pong_once( const std::string& dest_ip, EchoPtr request ) {
+	EchoMaybePtr to_return;
+	
+	Socket socket(SOCK_RAW, IPPROTO_ICMP);
+
+	boost::shared_ptr<Consumer> send_icmp( new DataProducer ( boost::shared_ptr<Convert>( new EchoConvert( request ) )));
+	socket.connect(dest_ip.c_str(), 0, send_icmp);
+	
 	// TODO
-
-	//EchoPtr echo_request = EchoBuilder()
-		//.set_request_type()
-		//.set_identifier(IDENTIFER)
-		//.set_sequence_num(1)
-		//.set_data(Echo::Data(RANDOM_DATA))
-		//.build_ptr();
-
 	return to_return;
+}
+
+EchoMaybePtr ping_and_pong_once( const std::string& dest_ip ) {
+
+	BytesContainer random_data = boost::assign::list_of
+		('\x12') ('\x3f') ('\x97') ('\xf6') ('\xab') ('\xa0')
+		;
+
+	EchoPtr echo_request = EchoBuilder()
+		.set_request_type()
+		.set_identifier(IDENTIFER)
+		.set_checksum(Echo::Checksum(std::string("1001111001110100")))
+		.set_sequence_num(1)
+		.set_data(Echo::Data(random_data))
+		.build_ptr();
+
+	return ping_and_pong_once( dest_ip, echo_request );
 }
 
 

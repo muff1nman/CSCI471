@@ -17,7 +17,7 @@
 #include <sstream>
 #include <bitset>
 
-IpAddr ip_from_data( const BytesContainer& data ) {
+inline IpAddr ip_from_data( const BytesContainer& data ) {
 	std::stringstream joined;
 
 	for( size_t i = 0; i < IP_ADDR::BYTE_LENGTH; ++i ) {
@@ -37,7 +37,7 @@ IpAddr ip_from_data( const BytesContainer& data ) {
 
 }
 
-IpAddr ip_from_data( const std::bitset<IP_ADDR::BYTE_LENGTH * BITS_PER_BYTE>& data ) {
+inline IpAddr ip_from_data( const std::bitset<IP_ADDR::BYTE_LENGTH * BITS_PER_BYTE>& data ) {
 	return ip_from_data( convert_big_endian<IP_ADDR::BYTE_LENGTH>(data));
 }
 

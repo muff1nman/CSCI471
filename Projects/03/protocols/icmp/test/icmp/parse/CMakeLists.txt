@@ -4,10 +4,7 @@ set( SRCS
 )
 
 #set(LINK_LIBRARIES gtest gtest_main)
-set(LINK_LIBRARIES gtest)
-if(${LOGGING} STREQUAL "ON")
-	set(LINK_LIBRARIES ${LINK_LIBRARIES} glog)
-endif()
+set(LINK_LIBRARIES gtest muncher_icmp_parse)
 
 add_executable( "Test${TESTNAME}" ${SRCS})
 target_link_libraries( "Test${TESTNAME}" ${LINK_LIBRARIES})

@@ -93,7 +93,7 @@ struct Ip : public Logging {
 			return object.str();
 		}
 
-		bool operator==( const Ip& other ) {
+		bool operator==( const Ip& other ) const {
 			return
 				version       == other.version       &&
 				header_length == other.header_length &&

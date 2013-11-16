@@ -10,6 +10,7 @@
 #include "networkmuncher/util/byte/byte.h"
 #include "networkmuncher/util/byte/convert.h"
 #include "networkmuncher/util/byte/copy.h"
+#include "networkmuncher/util/byte/operations.h"
 #include "networkmuncher/util/split.h"
 #include "networkmuncher/util/join.h"
 
@@ -88,6 +89,28 @@ TEST(CopyInto, TooLarge) {
 	std::bitset<5> smaller_result(std::string("10111"));
 
 	EXPECT_EQ( smaller_result, (copy_into<5,10>(empty, large_src))) << "Test with larger src";
+}
+
+TEST(OnesComplementSum, Simple) {
+	BytesContainer test = boost::assign::list_of
+		('\x23') ('\x1f')
+		('\x5a') ('\xc4');
+	//expected: "7d e3" == 32227 base 10
+	std::bitset<16> expected(32227);
+
+	EXPECT_EQ( expected, ones_complement_sum<2>(test));
+}
+
+TEST(OnesComplementSum, Empty) {
+	// TODO
+}
+
+TEST(OnesComplementSum, NonMatchingNumberOfBytes) {
+	// TODO
+}
+
+TEST(OnesComplementSum, Overflow) {
+	// TODO
 }
 
 /*

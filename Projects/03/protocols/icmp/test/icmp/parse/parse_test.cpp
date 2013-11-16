@@ -6,8 +6,11 @@
  */
 
 #include "test_helper.h"
+#include "icmp_helper.h"
 
-#include <boost/assign/list_of.hpp>
+#include "icmp/parse/echo.h"
+#include "icmp/parse/ip.h"
+#include "icmp/parse/raw.h"
 
 TEST(ParseBytesFile, Helper) {
 	const BytesContainer test = boost::assign::list_of 
@@ -24,6 +27,24 @@ TEST(ParseBytesFile, Helper) {
 
 	EXPECT_EQ( 84, bytes_from_file(GOOGLE_ECHO_REQUEST).size());
 	EXPECT_EQ( test, bytes_from_file(GOOGLE_ECHO_REQUEST));
+}
+
+TEST(ParseEcho, GoogleEchoRequest) {
+	EchoMaybe echo = ECHO::from_data(bytes_from_file(GOOGLE_ECHO_REQUEST_ICMP_ONLY));
+	ASSERT_TRUE(echo);
+	EXPECT_EQ(*(google_echo_request()->echo), *echo);
+}
+
+TEST(ParseIp, GoogleIpRequest) {
+	IpMaybe ip = IP::from_data(bytes_from_file(GOOGLE_ECHO_REQUEST_IP_ONLY));
+	ASSERT_TRUE(ip);
+	EXPECT_EQ(*(google_echo_request()->ip), *ip);
+}
+
+TEST(ParseRaw, FullGoogleEchoRequest) {
+	RawMaybe raw = RAW::from_data(bytes_from_file(GOOGLE_ECHO_REQUEST));
+	ASSERT_TRUE(raw);
+	EXPECT_EQ(*google_echo_request(), *raw);
 }
 
 

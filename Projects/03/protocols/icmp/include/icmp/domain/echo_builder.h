@@ -11,6 +11,8 @@
 #include "echo.h"
 #include "ptr_types.h"
 #include "networkmuncher/util/logging.h"
+#include "icmp/data/echo_convert.h"
+#include "networkmuncher/util/byte/operations.h"
 
 /**
  * Usage:  set a type, set an identifier, and set a sequence number.  Other
@@ -81,7 +83,21 @@ class EchoBuilder {
 		}
 
 		Echo::Checksum calculate_checksum() {
-			// TODO
+
+			// ensure checksum is empty
+			if( variable_holder.checksum.to_ulong() != 0 ) {
+#ifdef LOGGING
+				LOG(WARNING) << "Checksum is being overwritten";
+#endif
+				variable_holder.checksum.reset();
+			}
+
+			// build and convert to bytes
+			BytesContainer data = EchoConvert(build_ptr()).to_data();
+
+			// calculate ones complement
+			return ones_complement_sum<Echo::CHECKSUM_LENGTH / BITS_PER_BYTE>( data );
+
 #ifdef LOGGING
 			LOG(ERROR) << "Not yet implemented";
 #endif

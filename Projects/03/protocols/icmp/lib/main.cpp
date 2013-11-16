@@ -12,6 +12,8 @@
 #include "networkmuncher/config.h"
 #include "networkmuncher/util/logging.h"
 
+#include "icmp/icmp.h"
+
 #include <iostream>
 #include <string>
 #include <cstdlib>
@@ -49,6 +51,8 @@ int main(int argc, char** argv) {
 	} 
 
 	cout << "Pinging [" << *host_ip << "]" << endl;
+
+	ping_and_pong_once( *host_ip );
 }
 
 
