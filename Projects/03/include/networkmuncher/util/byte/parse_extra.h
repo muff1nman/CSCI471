@@ -18,21 +18,26 @@ inline size_t current_index( ParseContext& context ) {
 	return std::distance( context.start, context.current );
 }
 
-inline bool context_has_bytes_left( const ParseContext& context, size_t bytes ) {
-	return std::distance(context.current, context.finish) >= (int) bytes;
+template <class ForwardIterator>
+inline bool context_has_bytes_left( const ForwardIterator& start, const ForwardIterator& end, size_t bytes ) {
+	return std::distance(start, end) >= (int) bytes;
 }
 
-template <size_t bytes>
-inline boost::optional<std::bitset<bytes * BITS_PER_BYTE> > parse_bitset( ParseContext& context ) {
+inline bool context_has_bytes_left( const ParseContext& context, size_t bytes ) {
+	return context_has_bytes_left(context.current, context.finish, bytes);
+}
+
+template <class ForwardIterator, size_t bytes>
+inline boost::optional<std::bitset<bytes * BITS_PER_BYTE> > parse_bitset( ForwardIterator& start, const ForwardIterator& end ) {
 	boost::optional<std::bitset<bytes * BITS_PER_BYTE> > bytes_to_return;
-	if( context_has_bytes_left( context, bytes ) ) {
+	if( context_has_bytes_left( start, end, bytes)) {
 		std::bitset<BITS_PER_BYTE> cache;
 		std::bitset<bytes * BITS_PER_BYTE> temp;
 		for( size_t i = 0; i < bytes; ++i ) {
-			cache = *(context.current);
-			temp =  temp << BITS_PER_BYTE;
+			cache = *(start);
+			temp = temp << BITS_PER_BYTE;
 			copy_into(temp, cache);
-			std::advance( context.current, 1);
+			std::advance( start, 1);
 		}
 
 		bytes_to_return = temp;
@@ -45,6 +50,11 @@ inline boost::optional<std::bitset<bytes * BITS_PER_BYTE> > parse_bitset( ParseC
 
 	return bytes_to_return;
 
+}
+
+template <size_t bytes>
+inline boost::optional<std::bitset<bytes * BITS_PER_BYTE> > parse_bitset( ParseContext& context ) {
+	return parse_bitset<ParseContext::ConstIterator, bytes>(context.current, context.finish);
 }
 
 // N is the number of bytes

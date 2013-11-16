@@ -9,17 +9,46 @@
 #define UTIL_BYTE_OPERATIONS_H
 
 #include "byte.h"
+#include "parse_extra.h"
+#include <cmath>
+#include "networkmuncher/util/logging.h"
+
+template <size_t bytes>
+
+void add_to_sum(std::bitset<bytes * BITS_PER_BYTE>& sum, const std::bitset<bytes * BITS_PER_BYTE>& to_add) {
+	unsigned long result = sum.to_ulong() + to_add.to_ulong();
+	unsigned long carry = pow(2, bytes * BITS_PER_BYTE);
+	if( result >= carry ) {
+		result += (1 - carry);
+	}
+	sum = std::bitset<bytes * BITS_PER_BYTE>(result);
+}
 
 template <size_t bytes>
 std::bitset<bytes * BITS_PER_BYTE> ones_complement_sum( const BytesContainer& list_of_bytes ) {
-	// TODO
-}
+	typedef std::bitset<bytes*BITS_PER_BYTE> RowOfBytes;
+	boost::optional< RowOfBytes > current_row;
 
-// This sucks and really should use iterators instead, but to avoid premature
-// optimization it is what it is for now.
-template <size_t bytes>
-std::bitset<bytes * BITS_PER_BYTE> ones_complement_sum( const std::vector<std::bitset<bytes * BITS_PER_BYTE> >& list_of_segments ) {
-	// TODO
+	RowOfBytes result(0);
+
+	BytesContainer::const_iterator current = list_of_bytes.begin();
+	BytesContainer::const_iterator end = list_of_bytes.end();
+
+
+	while( current_row = parse_bitset<BytesContainer::const_iterator, bytes>(current, end) ) {
+#ifdef LOGGING
+		LOG(INFO) << "current bytes to be added: " << current_row->to_string();
+#endif
+		add_to_sum<bytes>(result, *current_row );
+	}
+
+	// check iterators match up
+	if( current != end ) {
+		throw "There were some bytes left over";
+	}
+
+	return result;
+
 }
 
 #endif /* !UTIL_BYTE_OPERATIONS_H */
