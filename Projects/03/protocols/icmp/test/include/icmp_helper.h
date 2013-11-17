@@ -23,7 +23,7 @@ EchoPtr google_echo_request_echo_part() {
 
 	return EchoBuilder()
 		.set_request_type()
-		.set_checksum(checksum)
+		.set_checksum(checksum) // TODO test to catch not flipping of the bits
 		.set_identifier(823)
 		.set_sequence_num(1)
 		.set_data(data)

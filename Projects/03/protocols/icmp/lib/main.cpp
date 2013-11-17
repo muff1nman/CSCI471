@@ -52,7 +52,12 @@ int main(int argc, char** argv) {
 
 	cout << "Pinging [" << *host_ip << "]" << endl;
 
-	ping_and_pong_once( *host_ip );
+	EchoMaybePtr echo = ping_and_pong_once( *host_ip );
+	if(echo) {
+		cout << (*echo)->to_string() << endl;
+	} else {
+		cout << "No response" << endl;
+	}
 }
 
 

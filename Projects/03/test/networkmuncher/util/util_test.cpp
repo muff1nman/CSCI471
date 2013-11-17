@@ -110,10 +110,13 @@ TEST(OnesComplementSum, Empty) {
 }
 
 TEST(OnesComplementSum, NonMatchingNumberOfBytes) {
-	// TODO
 	BytesContainer test = boost::assign::list_of
 		('\x80') ('\x00')
 		('\x80');
+
+	std::bitset<16> expected(1);
+	EXPECT_EQ( expected, ones_complement_sum<2>(test));
+
 }
 
 TEST(OnesComplementSum, Overflow) {

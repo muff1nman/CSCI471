@@ -44,7 +44,10 @@ std::bitset<bytes * BITS_PER_BYTE> ones_complement_sum( const BytesContainer& li
 
 	// check iterators match up
 	if( current != end ) {
-		throw "There were some bytes left over";
+		// read extra bytes, padded with zeros to fill the rest of the bitset
+		current_row = parse_bitset_with_missing_as_zeros<BytesContainer::const_iterator, bytes>(current,end);
+		add_to_sum<bytes>(result, *current_row);
+
 	}
 
 	return result;

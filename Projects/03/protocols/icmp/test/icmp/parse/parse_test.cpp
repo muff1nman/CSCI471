@@ -30,9 +30,10 @@ TEST(ParseBytesFile, Helper) {
 }
 
 TEST(ParseEcho, GoogleEchoRequest) {
-	EchoMaybe echo = ECHO::from_data(bytes_from_file(GOOGLE_ECHO_REQUEST_ICMP_ONLY));
-	ASSERT_TRUE(echo);
-	EXPECT_EQ(*(google_echo_request()->echo), *echo);
+	EchoMaybe echomaybe = ECHO::from_data(bytes_from_file(GOOGLE_ECHO_REQUEST_ICMP_ONLY));
+	EchoPtr expected = google_echo_request_echo_part();
+	ASSERT_TRUE(echomaybe);
+	EXPECT_EQ(*expected, *echomaybe);
 }
 
 TEST(ParseIp, GoogleIpRequest) {

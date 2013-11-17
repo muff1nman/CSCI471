@@ -9,6 +9,7 @@
 #define DOMAIN_ECHO_H
 
 #include "networkmuncher/util/byte/byte.h"
+#include "networkmuncher/util/byte/print.h"
 #include "networkmuncher/util/logging.h"
 
 struct Echo : public Logging {
@@ -38,11 +39,11 @@ struct Echo : public Logging {
 		std::string stringify_object() const {
 			std::stringstream object;
 			object << "type: " << type.to_ulong() << list_sep;
-			object << "code: " << type.to_ulong() << list_sep;
-			object << "checksum: " << type.to_ulong() << list_sep;
-			object << "identifier: " << type.to_ulong() << list_sep;
-			object << "seq num: " << type.to_ulong() << list_sep;
-			object << "data: " << type.to_string() << sep;
+			object << "code: " << code.to_ulong() << list_sep;
+			object << "checksum: " << checksum.to_ulong() << list_sep;
+			object << "identifier: " << identifier.to_ulong() << list_sep;
+			object << "seq num: " << sequence_num.to_ulong() << list_sep;
+			object << "data:\n" << demaria_util::to_string(data) << "\n";
 			return object.str();
 		}
 
@@ -58,7 +59,15 @@ struct Echo : public Logging {
 		}
 
 	protected:
-		Echo() { }
+		// zerod out
+		Echo() {
+			type = Type(0);
+			code = Code(0);
+			checksum = Checksum(0);
+			identifier = Identifier(0);
+			sequence_num = SequenceNum(0);
+			data = Data();
+		}
 
 };
 

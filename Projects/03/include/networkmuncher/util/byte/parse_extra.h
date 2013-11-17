@@ -27,6 +27,11 @@ inline bool context_has_bytes_left( const ParseContext& context, size_t bytes ) 
 	return context_has_bytes_left(context.current, context.finish, bytes);
 }
 
+/**
+ *  Returns a bitset from the given iterators to bytes.  Only if there are
+ *  enough bytes in the byte list, will a valid bitset be returned and the start
+ *  iterator advanced accordingly.
+ */
 template <class ForwardIterator, size_t bytes>
 inline boost::optional<std::bitset<bytes * BITS_PER_BYTE> > parse_bitset( ForwardIterator& start, const ForwardIterator& end ) {
 	boost::optional<std::bitset<bytes * BITS_PER_BYTE> > bytes_to_return;
@@ -51,6 +56,30 @@ inline boost::optional<std::bitset<bytes * BITS_PER_BYTE> > parse_bitset( Forwar
 	return bytes_to_return;
 
 }
+
+/**
+ *  Returns a bitset from the given iterators to bytes, filling in missing bits
+ *  with zeros if the supplied byte list is not large enough. On return, the
+ *  start iterator is advanced for however many bytes are read. In the case of
+ *  not enough bytes, start will equal end.
+ */
+template <class ForwardIterator, size_t bytes>
+inline std::bitset<bytes * BITS_PER_BYTE> parse_bitset_with_missing_as_zeros( ForwardIterator& start, const ForwardIterator& end ) {
+	std::bitset<BITS_PER_BYTE> cache;
+	std::bitset<bytes * BITS_PER_BYTE> temp;
+	for( size_t i = 0; i < bytes; ++i ) {
+		if( context_has_bytes_left( start, end, 1 ) ) {
+			cache = *(start);
+			std::advance( start, 1);
+		} else {
+			cache = std::bitset<BITS_PER_BYTE>(0);
+		}
+		temp = temp << BITS_PER_BYTE;
+		copy_into(temp, cache);
+	}
+	return temp;
+}
+
 
 template <size_t bytes>
 inline boost::optional<std::bitset<bytes * BITS_PER_BYTE> > parse_bitset( ParseContext& context ) {

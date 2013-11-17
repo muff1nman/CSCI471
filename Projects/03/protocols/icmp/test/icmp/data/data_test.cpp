@@ -8,11 +8,18 @@
 #include "test_helper.h"
 #include "icmp_helper.h"
 #include "icmp/data/icmp_convert.h"
+#include "networkmuncher/util/byte/print.h"
 
 #include <string>
 
 TEST(ICMPConvert, SimpleEchoRequest) {
 	EXPECT_EQ(bytes_from_file( GOOGLE_ECHO_REQUEST ), ICMPConvert(google_echo_request()).to_data());
+}
+
+TEST(ICMPConvert, SimpleEchoRequestICMPPart) {
+	BytesContainer expected = bytes_from_file( GOOGLE_ECHO_REQUEST_ICMP_ONLY );
+	BytesContainer actual = EchoConvert(google_echo_request_echo_part()).to_data();
+	EXPECT_EQ(expected,actual);
 }
 
 TEST(ICMPConvert, SimpleEchoReply) {

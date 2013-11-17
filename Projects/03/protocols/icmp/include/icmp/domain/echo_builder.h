@@ -25,6 +25,10 @@ class EchoBuilder {
 		static const unsigned int ECHO_REPLY = 0;
 		static const unsigned int ECHO_CODE = 0;
 
+		EchoBuilder() {
+			variable_holder = Echo();
+		}
+
 		EchoBuilder& set_type(Echo::Type type) {
 			variable_holder.type = type;
 			return do_common();
@@ -93,14 +97,11 @@ class EchoBuilder {
 			}
 
 			// build and convert to bytes
-			BytesContainer data = EchoConvert(build_ptr()).to_data();
+			BytesContainer data = EchoConvert(EchoPtr( new Echo(variable_holder))).to_data();
 
 			// calculate ones complement
-			return ones_complement_sum<Echo::CHECKSUM_LENGTH / BITS_PER_BYTE>( data );
+			return ones_complement_sum<Echo::CHECKSUM_LENGTH / BITS_PER_BYTE>( data ).flip();
 
-#ifdef LOGGING
-			LOG(ERROR) << "Not yet implemented";
-#endif
 		}
 
 		void set_default_fields() {
