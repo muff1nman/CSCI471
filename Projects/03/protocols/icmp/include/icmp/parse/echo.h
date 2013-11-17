@@ -16,12 +16,12 @@ namespace ECHO {
  * Parses the given stream of bytes into an Echo object.  If there was an issue,
  * the return value will not be instaniated.
  */
-EchoMaybe from_data( const BytesContainer& raw );
+EchoMaybe from_data( ParseContext& parse_context );
 
 /**
  * Do the same as #from_data but return a shared_ptr instead
  */
-EchoMaybePtr from_data_as_ptr( const BytesContainer& raw );
+EchoMaybePtr from_data_as_ptr( ParseContext& parse_context );
 
 }
 

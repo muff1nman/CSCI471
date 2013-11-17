@@ -69,16 +69,12 @@ bool from_data_internal( EchoParseContext& context ) {
 	return true;
 }
 
-bool from_data_internal( const BytesContainer raw, boost::shared_ptr<EchoBuilder> b ) {
-	EchoParseContext context(raw, raw.begin(), raw.end(), raw.begin(), b);
-	return from_data_internal( context );
-}
-
-EchoMaybe ECHO::from_data( const BytesContainer& raw ) {
+EchoMaybe ECHO::from_data( ParseContext& parse_context ) {
 	boost::shared_ptr<EchoBuilder> b( new EchoBuilder() );
 	EchoMaybe to_return;
+  EchoParseContext context( parse_context, b );
 
-	bool valid = from_data_internal( raw, b );
+	bool valid = from_data_internal( context );
 	if( valid ) {
 		to_return = b->build();
 	}
@@ -86,11 +82,12 @@ EchoMaybe ECHO::from_data( const BytesContainer& raw ) {
 	return to_return;
 }
 
-EchoMaybePtr ECHO::from_data_as_ptr( const BytesContainer& raw ) {
+EchoMaybePtr ECHO::from_data_as_ptr( ParseContext& parse_context ) {
 	boost::shared_ptr<EchoBuilder> b( new EchoBuilder() );
 	EchoMaybePtr to_return;
+  EchoParseContext context( parse_context, b );
 
-	bool valid = from_data_internal( raw, b );
+	bool valid = from_data_internal( context );
 	if( valid ) {
 		to_return = b->build_ptr();
 	}

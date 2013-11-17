@@ -20,12 +20,39 @@
 #include <vector>
 #include <numeric>
 #include <algorithm>
+#include <sys/time.h>
+
 
 #include <boost/optional.hpp>
 #include <boost/regex.hpp>
-#include <boost/timer.hpp>
 
 using namespace std;
+
+void ms_ping_time( const string& host_ip, EchoMaybePtr& response, boost::optional<double>& elaspsed ) {
+
+  struct timeval initial_time;
+  struct timeval current_time;
+  int time_ret_val;
+
+  time_ret_val = gettimeofday(&initial_time, NULL);
+  if(time_ret_val != 0 ) {
+    perror("Could not get time");
+    exit(1);
+  }
+
+	cout << "Pinging [" << host_ip << "]" << endl;
+
+  response = ping_and_pong_once( host_ip );
+  if(response) {
+    time_ret_val = gettimeofday(&current_time, NULL);
+    if(time_ret_val != 0 ) {
+      perror("Could not get time");
+      exit(1);
+    }
+    elaspsed = (double)(current_time.tv_sec - initial_time.tv_sec) * (1000) + (double)(current_time.tv_usec - initial_time.tv_usec) / (1000);
+  }
+
+}
 
 bool is_ip(const string& str) {
 	boost::regex ip_addr_regex("\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}");
@@ -36,7 +63,9 @@ bool is_ip(const string& str) {
 }
 
 double average(const std::vector<double>& nums) {
-	return std::accumulate(nums.begin(), nums.end(), 0.0) / (double) nums.size();
+	double sum = std::accumulate(nums.begin(), nums.end(), 0.0);
+  cout << "sum is: " << sum << endl;
+  return sum / (double) nums.size();
 }
 
 int main(int argc, char** argv) {
@@ -63,17 +92,17 @@ int main(int argc, char** argv) {
 		exit(ERROR_RESOLVE_HOSTNAME);
 	} 
 
-	cout << "Pinging [" << *host_ip << "]" << endl;
 
 	size_t i(ATTEMPTS);
 	std::vector<double> times;
 
-	boost::timer stopwatch;
-	for(;i > 0; --i) {
-		stopwatch.restart();
-		EchoMaybePtr echo = ping_and_pong_once( *host_ip );
-		if(echo) {
-			times.push_back(stopwatch.elapsed());
+  for(;i > 0; --i) {
+    boost::optional<double> elaspsed;
+    EchoMaybePtr echo;
+    ms_ping_time(*host_ip, echo, elaspsed);
+    if(elaspsed) {
+      cout << *elaspsed << endl;
+			times.push_back(*elaspsed);
 			cout << (*echo)->to_string() << endl;
 		} else {
 			cout << "No response" << endl;
@@ -81,9 +110,9 @@ int main(int argc, char** argv) {
 	}
 
 	if( !times.empty() ) {
-		cout << "Average: " << average(times) << endl;
-		cout << "Min:     " << *min_element(times.begin(), times.end()) << endl;
-		cout << "Max:     " << *max_element(times.begin(), times.end()) << endl;
+		cout << "Average: " << average(times) << " ms" << endl;
+		cout << "Min:     " << *min_element(times.begin(), times.end()) << " ms" << endl;
+		cout << "Max:     " << *max_element(times.begin(), times.end()) << " ms" << endl;
 	}
 
 }

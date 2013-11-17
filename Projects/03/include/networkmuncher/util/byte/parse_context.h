@@ -31,9 +31,6 @@ class ParseContext {
 			current = other.raw_data.begin() + offset_from_start;
 		}
 
-	protected:
-		ParseContext( const ParseContext& other );
-
 };
 
 #endif /* !__util_parse_context_h__ */

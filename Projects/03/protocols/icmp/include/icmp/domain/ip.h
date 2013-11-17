@@ -111,7 +111,8 @@ struct Ip : public Logging {
 				true;
 		}
 
-	protected:
+    // TODO make protected
+    //	protected:
 		Ip() {}
 
 
