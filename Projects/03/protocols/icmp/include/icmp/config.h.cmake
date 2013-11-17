@@ -8,4 +8,8 @@
 
 #define IDENTIFER 19023
 
+#define TIMEOUT_IN_SECONDS 15
+
+#define ATTEMPTS 5
+
 #endif /* !__icmp_config_h__ */
