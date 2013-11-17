@@ -9,6 +9,7 @@ all: cp_execute
 
 cp_execute: build
 	cp build/protocols/dns/lib/dug .
+	cp build/protocols/icmp/lib/pong .
 
 .PHONY: build
 
