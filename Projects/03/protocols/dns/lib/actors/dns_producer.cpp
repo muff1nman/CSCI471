@@ -25,8 +25,11 @@ void DnsProducer::run(Socket* socket) {
 #ifdef LOGGING
 	LOG(INFO) << "Starting new read";
 #endif
-	BytesContainer raw_data = socket->recv_from( remote_info, remote_info_size, 1200 );
-	DnsMaybePtr parsed_query = from_data_as_ptr( raw_data );
+	boost::optional<BytesContainer> raw_data = socket->recv_from( remote_info, remote_info_size, 1200 );
+	if(!raw_data) {
+		return;
+	}
+	DnsMaybePtr parsed_query = from_data_as_ptr( *raw_data );
 	if( parsed_query ) {
 #ifdef LOGGING
 		LOG(INFO) << "receieved: " << (*parsed_query)->to_string();

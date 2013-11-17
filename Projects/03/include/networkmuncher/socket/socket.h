@@ -15,6 +15,7 @@
 #include <netinet/in.h>
 #include <boost/function.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/optional.hpp>
 
 class Consumer;
 
@@ -102,13 +103,13 @@ class Socket {
 		 * Returns all data currently available on the given socket.  Blocks if
 		 * there is no data.  TODO Assumes that socket is bound 
 		 */
-		BytesContainer recv();
+		boost::optional<BytesContainer> recv();
 
 		/**
 		 * Returns all data currently available on the given socket from the remote
 		 * server. Blocks if there is no data.
 		 */
-		BytesContainer recv_from(sockaddr_in& remote_info, socklen_t& remote_info_size);
+		boost::optional<BytesContainer> recv_from(sockaddr_in& remote_info, socklen_t& remote_info_size);
 
 		/**
 		 * Returns all data currently available on the given socket from the remote
@@ -116,7 +117,7 @@ class Socket {
 		 * intermediate reading of data (the buffer does not limit the bytes read,
 		 * only dicates how many bytes are read at a time)
 		 */
-		BytesContainer recv_from(sockaddr_in& remote_info, socklen_t& remote_info_size, size_t buf_size );
+		boost::optional<BytesContainer> recv_from(sockaddr_in& remote_info, socklen_t& remote_info_size, size_t buf_size );
 
 		/**
 		 * Sends the given data.  Assumes that the socket is already connected.

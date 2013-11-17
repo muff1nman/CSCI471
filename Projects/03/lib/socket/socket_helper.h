@@ -18,6 +18,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <boost/shared_ptr.hpp>
+#include <boost/optional.hpp>
 #include <cstdlib>
 
 const char* const ALLOCATE_ERROR = "Could not allocate buffer space";
@@ -142,15 +143,15 @@ inline bool check_allocated( void* data ) {
 	return true;
 }
 
-inline BytesContainer all_data( int socket_fd, size_t buf_size, sockaddr_in& remote_info, socklen_t& remote_info_size ) {
+inline boost::optional<BytesContainer> all_data( int socket_fd, size_t buf_size, sockaddr_in& remote_info, socklen_t& remote_info_size ) {
 #ifdef LOGGING
 	LOG(INFO) << "Buffer size set to [" << buf_size << "]";
 #endif
-	BytesContainer empty;
+	boost::optional<BytesContainer> optional_bytes;
 
 	Byte* data = (Byte*) malloc(buf_size); 
 	if( !check_allocated(data) ) {
-		return empty;
+		return optional_bytes;
 	}
 
 	size_t bytes_read = 0;
@@ -179,7 +180,7 @@ inline BytesContainer all_data( int socket_fd, size_t buf_size, sockaddr_in& rem
 #endif
 				data = (Byte*) realloc(data, bytes_read + 1 + buf_size);
 				if( !check_allocated(data) ) {
-					return empty;
+					return optional_bytes;
 				}
 			}
 		} else if(read_status == 0 ) {
@@ -195,9 +196,11 @@ inline BytesContainer all_data( int socket_fd, size_t buf_size, sockaddr_in& rem
 		}
 	}
 	
-	BytesContainer packaged_data( data, data + bytes_read);
+	if(bytes_read > 0 ) {
+		optional_bytes = BytesContainer( data, data + bytes_read);
+	}
 	free(data);
-	return packaged_data;
+	return optional_bytes;
 }
 
 inline size_t guess_buffer_size(int socket_fd) {
@@ -215,14 +218,14 @@ inline size_t guess_buffer_size(int socket_fd) {
  * Acts like the kernel call recvfrom and can be used on either a bound or
  * unbound socket
  */
-inline BytesContainer all_data( int socket_fd, sockaddr_in& remote_info, socklen_t& remote_info_size ) {
+inline boost::optional<BytesContainer> all_data( int socket_fd, sockaddr_in& remote_info, socklen_t& remote_info_size ) {
 	return all_data( socket_fd, guess_buffer_size(socket_fd), remote_info, remote_info_size);
 }
 
 /*
  * Acts like the kernel call recv and should be used on a bound socket
  */
-inline BytesContainer all_data( int socket_fd ) {
+inline boost::optional<BytesContainer> all_data( int socket_fd ) {
 	socklen_t discard_len;
 	sockaddr_in discard;
 

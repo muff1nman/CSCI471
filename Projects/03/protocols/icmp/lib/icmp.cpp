@@ -25,6 +25,7 @@ EchoMaybePtr ping_and_pong_once( const std::string& dest_ip, EchoPtr request ) {
 
 	// TODO filter other raw stuffs
 	boost::shared_ptr<Consumer> receive_icmp( new IcmpEchoConsumer(to_return));
+	socket.set_timeout(0,TIMEOUT_IN_SECONDS);
 	socket.accept(receive_icmp);
 	
 	return to_return;

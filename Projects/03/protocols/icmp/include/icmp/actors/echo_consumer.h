@@ -17,8 +17,10 @@ class IcmpEchoConsumer : public Consumer {
 	public:
 		IcmpEchoConsumer( EchoMaybePtr& result ) : result(result) { }
 		virtual void run(Socket* socket) {
-			BytesContainer raw_data = socket->recv();
-			result = ECHO::from_data_as_ptr( raw_data );
+			boost::optional<BytesContainer> raw_data = socket->recv();
+			if(raw_data) {
+				result = ECHO::from_data_as_ptr( *raw_data );
+			}
 		}
 
 	protected:

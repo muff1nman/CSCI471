@@ -17,13 +17,26 @@
 #include <iostream>
 #include <string>
 #include <cstdlib>
+#include <vector>
+#include <numeric>
+#include <algorithm>
+
 #include <boost/optional.hpp>
+#include <boost/regex.hpp>
+#include <boost/timer.hpp>
 
 using namespace std;
 
 bool is_ip(const string& str) {
-	// TODO
+	boost::regex ip_addr_regex("\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}");
+	if(boost::regex_match(str, ip_addr_regex)) {
+		return true;
+	}
 	return false;
+}
+
+double average(const std::vector<double>& nums) {
+	return std::accumulate(nums.begin(), nums.end(), 0.0) / (double) nums.size();
 }
 
 int main(int argc, char** argv) {
@@ -52,12 +65,27 @@ int main(int argc, char** argv) {
 
 	cout << "Pinging [" << *host_ip << "]" << endl;
 
-	EchoMaybePtr echo = ping_and_pong_once( *host_ip );
-	if(echo) {
-		cout << (*echo)->to_string() << endl;
-	} else {
-		cout << "No response" << endl;
+	size_t i(ATTEMPTS);
+	std::vector<double> times;
+
+	boost::timer stopwatch;
+	for(;i > 0; --i) {
+		stopwatch.restart();
+		EchoMaybePtr echo = ping_and_pong_once( *host_ip );
+		if(echo) {
+			times.push_back(stopwatch.elapsed());
+			cout << (*echo)->to_string() << endl;
+		} else {
+			cout << "No response" << endl;
+		}
 	}
+
+	if( !times.empty() ) {
+		cout << "Average: " << average(times) << endl;
+		cout << "Min:     " << *min_element(times.begin(), times.end()) << endl;
+		cout << "Max:     " << *max_element(times.begin(), times.end()) << endl;
+	}
+
 }
 
 

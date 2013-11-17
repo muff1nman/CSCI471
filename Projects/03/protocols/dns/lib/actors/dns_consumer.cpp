@@ -9,8 +9,10 @@
 #include "dns/parse/dns.h"
 
 void DNSConsumer::run(Socket* socket) {
-	BytesContainer raw_data = socket->recv();
-	result = from_data_as_ptr( raw_data );
+	boost::optional<BytesContainer> raw_data = socket->recv();
+	if( raw_data ) {
+		result = from_data_as_ptr( *raw_data );
+	}
 }
 
 

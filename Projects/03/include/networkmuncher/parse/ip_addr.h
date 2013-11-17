@@ -16,6 +16,7 @@
 #include <string>
 #include <sstream>
 #include <bitset>
+#include <boost/optional.hpp>
 
 inline IpAddr ip_from_data( const BytesContainer& data ) {
 	std::stringstream joined;

@@ -130,15 +130,15 @@ void Socket::bind(Port port) {
 
 }
 
-BytesContainer Socket::recv() {
+boost::optional<BytesContainer> Socket::recv() {
 	return all_data(socket_fd);
 }
 
-BytesContainer Socket::recv_from(sockaddr_in& remote_info, socklen_t& remote_info_size) {
+boost::optional<BytesContainer> Socket::recv_from(sockaddr_in& remote_info, socklen_t& remote_info_size) {
 	return all_data(socket_fd, remote_info, remote_info_size);
 }
 
-BytesContainer Socket::recv_from(sockaddr_in& remote_info, socklen_t& remote_info_size, size_t buf_size ) {
+boost::optional<BytesContainer> Socket::recv_from(sockaddr_in& remote_info, socklen_t& remote_info_size, size_t buf_size ) {
 	return all_data(socket_fd, buf_size, remote_info, remote_info_size);
 }
 

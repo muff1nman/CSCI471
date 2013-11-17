@@ -23,13 +23,15 @@ class EchoConsumer : public Consumer {
 	public:
 
 		virtual void run(Socket* socket) {
-			BytesContainer b = socket->recv();
+			boost::optional<BytesContainer> b = socket->recv();
+			if(b) {
 #ifndef LOGGING
-			std::cout << "Recieved bytes:" << std::endl;
-			std::cout << demaria_util::to_string(b) << std::endl;
+				std::cout << "Recieved bytes:" << std::endl;
+				std::cout << demaria_util::to_string(*b) << std::endl;
 #else
-			LOG(INFO) << "Recieved bytes:" << "\n" << demaria_util::to_string(b);
+				LOG(INFO) << "Recieved bytes:" << "\n" << demaria_util::to_string(*b);
 #endif
+			}
 		}
 
 };
