@@ -12,6 +12,12 @@
 #include "networkmuncher/util/logging.h"
 
 bool from_data_internal( EchoParseContext& context ) {
+
+#ifdef LOGGING
+	BytesContainer copy(context.current, context.finish);
+	LOG(INFO) << "Parsing these bytes for context: " << demaria_util::to_string(copy);
+#endif
+
 	boost::optional<Echo::Type> type = parse_bitset<Echo::TYPE_LENGTH / BITS_PER_BYTE>(context);
 	if(type) {
 		context.b->set_type(*type);
@@ -72,7 +78,7 @@ bool from_data_internal( EchoParseContext& context ) {
 EchoMaybe ECHO::from_data( ParseContext& parse_context ) {
 	boost::shared_ptr<EchoBuilder> b( new EchoBuilder() );
 	EchoMaybe to_return;
-  EchoParseContext context( parse_context, b );
+	EchoParseContext context( parse_context, b );
 
 	bool valid = from_data_internal( context );
 	if( valid ) {
@@ -82,10 +88,15 @@ EchoMaybe ECHO::from_data( ParseContext& parse_context ) {
 	return to_return;
 }
 
+EchoMaybe ECHO::from_data( const BytesContainer& bytes ) {
+	ParseContext parse_context(bytes, bytes.begin(), bytes.end(), bytes.begin());
+	return ECHO::from_data(parse_context);
+}
+
 EchoMaybePtr ECHO::from_data_as_ptr( ParseContext& parse_context ) {
 	boost::shared_ptr<EchoBuilder> b( new EchoBuilder() );
 	EchoMaybePtr to_return;
-  EchoParseContext context( parse_context, b );
+	EchoParseContext context( parse_context, b );
 
 	bool valid = from_data_internal( context );
 	if( valid ) {
@@ -95,3 +106,7 @@ EchoMaybePtr ECHO::from_data_as_ptr( ParseContext& parse_context ) {
 	return to_return;
 }
 
+EchoMaybePtr ECHO::from_data_as_ptr( const BytesContainer& bytes ) {
+	ParseContext parse_context(bytes, bytes.begin(), bytes.end(), bytes.begin());
+	return ECHO::from_data_as_ptr(parse_context);
+}

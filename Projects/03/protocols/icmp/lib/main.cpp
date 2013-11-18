@@ -30,27 +30,27 @@ using namespace std;
 
 void ms_ping_time( const string& host_ip, EchoMaybePtr& response, boost::optional<double>& elaspsed ) {
 
-  struct timeval initial_time;
-  struct timeval current_time;
-  int time_ret_val;
+	struct timeval initial_time;
+	struct timeval current_time;
+	int time_ret_val;
 
-  time_ret_val = gettimeofday(&initial_time, NULL);
-  if(time_ret_val != 0 ) {
-    perror("Could not get time");
-    exit(1);
-  }
+	time_ret_val = gettimeofday(&initial_time, NULL);
+	if(time_ret_val != 0 ) {
+		perror("Could not get time");
+		exit(1);
+	}
 
 	cout << "Pinging [" << host_ip << "]" << endl;
 
-  response = ping_and_pong_once( host_ip );
-  if(response) {
-    time_ret_val = gettimeofday(&current_time, NULL);
-    if(time_ret_val != 0 ) {
-      perror("Could not get time");
-      exit(1);
-    }
-    elaspsed = (double)(current_time.tv_sec - initial_time.tv_sec) * (1000) + (double)(current_time.tv_usec - initial_time.tv_usec) / (1000);
-  }
+	response = ping_and_pong_once( host_ip );
+	if(response) {
+		time_ret_val = gettimeofday(&current_time, NULL);
+		if(time_ret_val != 0 ) {
+			perror("Could not get time");
+			exit(1);
+		}
+		elaspsed = (double)(current_time.tv_sec - initial_time.tv_sec) * (1000) + (double)(current_time.tv_usec - initial_time.tv_usec) / (1000);
+	}
 
 }
 
@@ -64,8 +64,7 @@ bool is_ip(const string& str) {
 
 double average(const std::vector<double>& nums) {
 	double sum = std::accumulate(nums.begin(), nums.end(), 0.0);
-  cout << "sum is: " << sum << endl;
-  return sum / (double) nums.size();
+	return sum / (double) nums.size();
 }
 
 int main(int argc, char** argv) {
@@ -78,15 +77,13 @@ int main(int argc, char** argv) {
 
 	string host_name(argv[1]);
 
-	cout << host_name << endl;
-
 	boost::optional<string> host_ip;
 	if( is_ip(host_name) ) {
 		host_ip = host_name;
 	} else {
 		host_ip = dns_give_me_one_answer("8.8.8.8", host_name);
 	}
-	
+
 	if(!host_ip) {
 		cerr << "Could not resolve hostname" << endl;
 		exit(ERROR_RESOLVE_HOSTNAME);
@@ -96,14 +93,12 @@ int main(int argc, char** argv) {
 	size_t i(ATTEMPTS);
 	std::vector<double> times;
 
-  for(;i > 0; --i) {
-    boost::optional<double> elaspsed;
-    EchoMaybePtr echo;
-    ms_ping_time(*host_ip, echo, elaspsed);
-    if(elaspsed) {
-      cout << *elaspsed << endl;
+	for(;i > 0; --i) {
+		boost::optional<double> elaspsed;
+		EchoMaybePtr echo;
+		ms_ping_time(*host_ip, echo, elaspsed);
+		if(elaspsed) {
 			times.push_back(*elaspsed);
-			cout << (*echo)->to_string() << endl;
 		} else {
 			cout << "No response" << endl;
 		}
@@ -113,6 +108,8 @@ int main(int argc, char** argv) {
 		cout << "Average: " << average(times) << " ms" << endl;
 		cout << "Min:     " << *min_element(times.begin(), times.end()) << " ms" << endl;
 		cout << "Max:     " << *max_element(times.begin(), times.end()) << " ms" << endl;
+	} else {
+		cout << "No respones" << endl;
 	}
 
 }

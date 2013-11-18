@@ -18,25 +18,14 @@ namespace IP {
  * Parses the given stream of bytes into an Ip object.  If there was an issue,
  * the return value will not be instaniated.
  */
-IpMaybe from_data( ParseContext& parse_context ) {
-	/*TODO*/ 
-  IpMaybe to_return;
-  std::advance(parse_context.current, 20);
-  to_return = Ip();
-	return to_return;
-}
+IpMaybe from_data( ParseContext& parse_context );
+IpMaybe from_data( const BytesContainer& bytes );
 
 /**
  * Do the same as #from_data but return a shared_ptr instead
  */
-IpMaybePtr from_data_as_ptr( ParseContext& parse_context ) {
-	/*TODO*/ 
-  IpMaybePtr to_return;
-  std::advance(parse_context.current, 20);
-  to_return = IpPtr( new Ip());
-  
-	return IpMaybePtr();
-}
+IpMaybePtr from_data_as_ptr( ParseContext& parse_context );
+IpMaybePtr from_data_as_ptr( const BytesContainer& bytes );
 
 }
 
