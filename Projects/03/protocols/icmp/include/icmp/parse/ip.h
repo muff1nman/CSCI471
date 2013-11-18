@@ -9,6 +9,8 @@
 #define ICMP_PARSE_IP_H
 
 #include "icmp/domain/domain.h"
+#include "networkmuncher/util/byte/parse_context.h"
+#include "networkmuncher/util/byte/parse_extra.h"
 
 namespace IP {
 
@@ -16,18 +18,14 @@ namespace IP {
  * Parses the given stream of bytes into an Ip object.  If there was an issue,
  * the return value will not be instaniated.
  */
-IpMaybe from_data( const BytesContainer& raw ) {
-	// TODO
-	return IpMaybe();
-}
+IpMaybe from_data( ParseContext& parse_context );
+IpMaybe from_data( const BytesContainer& bytes );
 
 /**
  * Do the same as #from_data but return a shared_ptr instead
  */
-IpMaybePtr from_data_as_ptr( const BytesContainer& raw ) {
-	/*TODO*/ 
-	return IpMaybePtr();
-}
+IpMaybePtr from_data_as_ptr( ParseContext& parse_context );
+IpMaybePtr from_data_as_ptr( const BytesContainer& bytes );
 
 }
 

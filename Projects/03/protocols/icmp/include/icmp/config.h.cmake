@@ -10,6 +10,8 @@
 
 #define TIMEOUT_IN_SECONDS 15
 
+#define MINIMUM_SOCKET_TIME 1.0
+
 #define ATTEMPTS 5
 
 #endif /* !__icmp_config_h__ */

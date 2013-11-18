@@ -19,6 +19,8 @@ class EchoParseContext : public ParseContext {
 				current, boost::shared_ptr<EchoBuilder> b) : 
 			ParseContext(raw_data,start,finish,current), b(b) { }
 
+    EchoParseContext( const ParseContext& other, boost::shared_ptr<EchoBuilder> b ) : ParseContext(other), b(b) { }
+
 		boost::shared_ptr<EchoBuilder> b;
 
 		EchoParseContext( const EchoParseContext& other, size_t offset_from_start) :

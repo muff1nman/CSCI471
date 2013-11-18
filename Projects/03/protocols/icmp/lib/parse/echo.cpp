@@ -12,6 +12,12 @@
 #include "networkmuncher/util/logging.h"
 
 bool from_data_internal( EchoParseContext& context ) {
+
+#ifdef LOGGING
+	BytesContainer copy(context.current, context.finish);
+	LOG(INFO) << "Parsing these bytes for context: " << demaria_util::to_string(copy);
+#endif
+
 	boost::optional<Echo::Type> type = parse_bitset<Echo::TYPE_LENGTH / BITS_PER_BYTE>(context);
 	if(type) {
 		context.b->set_type(*type);
@@ -69,16 +75,12 @@ bool from_data_internal( EchoParseContext& context ) {
 	return true;
 }
 
-bool from_data_internal( const BytesContainer raw, boost::shared_ptr<EchoBuilder> b ) {
-	EchoParseContext context(raw, raw.begin(), raw.end(), raw.begin(), b);
-	return from_data_internal( context );
-}
-
-EchoMaybe ECHO::from_data( const BytesContainer& raw ) {
+EchoMaybe ECHO::from_data( ParseContext& parse_context ) {
 	boost::shared_ptr<EchoBuilder> b( new EchoBuilder() );
 	EchoMaybe to_return;
+	EchoParseContext context( parse_context, b );
 
-	bool valid = from_data_internal( raw, b );
+	bool valid = from_data_internal( context );
 	if( valid ) {
 		to_return = b->build();
 	}
@@ -86,11 +88,17 @@ EchoMaybe ECHO::from_data( const BytesContainer& raw ) {
 	return to_return;
 }
 
-EchoMaybePtr ECHO::from_data_as_ptr( const BytesContainer& raw ) {
+EchoMaybe ECHO::from_data( const BytesContainer& bytes ) {
+	ParseContext parse_context(bytes, bytes.begin(), bytes.end(), bytes.begin());
+	return ECHO::from_data(parse_context);
+}
+
+EchoMaybePtr ECHO::from_data_as_ptr( ParseContext& parse_context ) {
 	boost::shared_ptr<EchoBuilder> b( new EchoBuilder() );
 	EchoMaybePtr to_return;
+	EchoParseContext context( parse_context, b );
 
-	bool valid = from_data_internal( raw, b );
+	bool valid = from_data_internal( context );
 	if( valid ) {
 		to_return = b->build_ptr();
 	}
@@ -98,3 +106,7 @@ EchoMaybePtr ECHO::from_data_as_ptr( const BytesContainer& raw ) {
 	return to_return;
 }
 
+EchoMaybePtr ECHO::from_data_as_ptr( const BytesContainer& bytes ) {
+	ParseContext parse_context(bytes, bytes.begin(), bytes.end(), bytes.begin());
+	return ECHO::from_data_as_ptr(parse_context);
+}
