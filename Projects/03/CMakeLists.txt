@@ -75,4 +75,7 @@ if( ${TEST} STREQUAL "ON" )
 	add_subdirectory( test )
 endif()
 
-add_subdirectory( protocols )
+set(PROTOCOL_DIR "protocols")
+set(PROTOCOL_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/${PROTOCOL_DIR}")
+
+add_subdirectory( ${PROTOCOL_DIR} )

@@ -13,8 +13,14 @@
 #include <boost/algorithm/string.hpp>
 #include "networkmuncher/util/logging.h"
 #include <algorithm>
+#include <boost/lexical_cast.hpp>
 
-
+/**
+ * Split a given string on the delimiter. If a delimiter is found on the end of
+ * the string, drop it instead of adding an empty string to the list.  This may
+ * not be the case for a delimiter found at the beginning of the string. In
+ * addition, delimiters cannot be adjacent. On error return an empty list.
+ */
 inline std::vector<std::string> split_name( std::string name, std::string delimiter = "." ) {
 #ifdef LOGGING
 	LOG(INFO) << "Spliting: " << name;
@@ -48,6 +54,25 @@ inline std::vector<std::string> split_name( std::string name, std::string delimi
 
 inline std::vector<std::string> split_name( const char* c_str ) {
 	return split_name( std::string(c_str) );
+}
+
+/**
+ * A specialization of split_name designed for spliting groups of numerics.  If
+ * conversion fails, return an empty list
+ */
+template <class Numeric>
+inline std::vector<Numeric> split_numerics( std::string str, std::string delimiter ) {
+	std::vector<std::string> raw_numbers = split_name(str, delimiter);
+	std::vector<Numeric> numbers;
+
+	for(size_t i = 0; i < raw_numbers.size(); ++i ) {
+		std::string raw_number = raw_numbers.at(i);
+		// TODO try catch here?
+		Numeric number = boost::lexical_cast<Numeric>(raw_number);
+		numbers.push_back(number);
+	}
+
+	return numbers;
 }
 
 #endif /* !__split_h__ */

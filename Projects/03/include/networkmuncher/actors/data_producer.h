@@ -25,21 +25,10 @@ class DataProducer : public Consumer {
 	public:
 		DataProducer( boost::shared_ptr<Convert> obj_ptr) : convertable(obj_ptr) { }
 
-		virtual void run(int socket_fd) {
+		virtual void run(Socket* socket) {
 			BytesContainer bytes = convertable->to_data();
-#ifdef LOGGING
-			LOG(INFO) << "Writing to socket [" << socket_fd << "]";
-#endif
-			//int result = write(socket_fd, bytes.data.get(), bytes.size);
-			int result = send(socket_fd, bytes.data(), bytes.size(), 0);
-#ifdef LOGGING
-			if( result < 0 ) {
-				LOG(WARNING) << "Could not write to socket: " << strerror(errno);
-			} else {
-				LOG(INFO) << "[" << result << "] bytes written";
-			}
-#endif
-			// TODO need to call sync?
+			// TODO check ret value?
+			socket->send(bytes);
 		}
 
 	private:

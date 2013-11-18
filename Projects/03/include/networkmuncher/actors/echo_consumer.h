@@ -10,17 +10,28 @@
 
 #include "consumer.h"
 #include "networkmuncher/util/byte/print.h"
-#include "networkmuncher/socket/helper.h"
 
 #include <stdio.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 
+#ifndef LOGGING
+#include <iostream>
+#endif
+
 class EchoConsumer : public Consumer {
 	public:
 
-		virtual void run(int socket_fd) {
-			BytesContainer b = all_data(socket_fd);
+		virtual void run(Socket* socket) {
+			boost::optional<BytesContainer> b = socket->recv();
+			if(b) {
+#ifndef LOGGING
+				std::cout << "Recieved bytes:" << std::endl;
+				std::cout << demaria_util::to_string(*b) << std::endl;
+#else
+				LOG(INFO) << "Recieved bytes:" << "\n" << demaria_util::to_string(*b);
+#endif
+			}
 		}
 
 };

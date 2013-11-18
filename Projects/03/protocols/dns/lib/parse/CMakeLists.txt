@@ -1,6 +1,6 @@
 set(SRCS
 	dns.cpp
-	parse_context.h
+	dns_parse_context.h
 )
 
 add_library(muncher_dns_parse ${SRCS})

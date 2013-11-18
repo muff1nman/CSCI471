@@ -4,7 +4,8 @@
  *
  * All Rights Reserved.
  */
-#include "parse_context.h"
+#include "dns_parse_context.h"
+#include "networkmuncher/util/byte/parse_extra.h"
 
 #include "dns/parse/dns.h"
 #include "dns/domain/dns_builder.h"
@@ -14,6 +15,7 @@
 #include "networkmuncher/util/logging.h"
 #include "networkmuncher/util/byte/copy.h"
 #include "networkmuncher/util/join.h"
+#include "networkmuncher/util/iterator.h"
 
 #ifdef LOGGING
 #include "networkmuncher/util/byte/print.h"
@@ -38,45 +40,6 @@ void set_fields( DNSBuilder* builder, unsigned long num ) {
 	builder->return_code( dissect<DNS::GENERIC_HEADER_FIELD_LENGTH,DNS::RCODE_FIELD_LENGTH>(fields, DNS::RCODE_OFFSET) );
 }
 
-size_t current_index( ParseContext& context ) {
-	return std::distance( context.start, context.current );
-}
-
-bool context_has_bytes_left( const ParseContext& context, size_t bytes ) {
-#ifdef LOGGING
-	LOG(INFO) << std::distance( context.current, context.finish ) << " bytes left";
-#endif
-	return std::distance(context.current, context.finish) >= (int) bytes;
-}
-
-template <class ForwardIterator, class Distance>
-ForwardIterator next(ForwardIterator it, Distance d) {
-	ForwardIterator i = it;
-	std::advance(i, d);
-	return i;
-}
-
-template <class T, size_t N>
-boost::optional<T> parse_number( ParseContext& context ) {
-	boost::optional<T> data;
-#ifdef LOGGING
-	LOG(INFO) << "Parsing number of " << N << " bytes";
-#endif
-
-	if( context_has_bytes_left( context, N ) ) {
-		std::bitset<N * BITS_PER_BYTE> bytes;
-		std::bitset<BITS_PER_BYTE> cache;
-		for( size_t i = 0; i < N; ++i ) {
-			cache = std::bitset<BITS_PER_BYTE>( *context.current );
-			bytes = bytes << BITS_PER_BYTE;
-			copy_into(bytes, cache);
-			std::advance( context.current, 1);
-		}
-		data = bytes.to_ulong();
-	}
-
-	return data;
-}
 
 void loop_over_and_print( BytesContainer::const_iterator start, BytesContainer::const_iterator end ) {
 #ifdef LOGGING
@@ -127,10 +90,6 @@ boost::optional<std::string> parse_string_part( ParseContext& context ) {
 	return to_return;
 }
 
-bool is_zero_byte( ParseContext& context ) {
-	return context_has_bytes_left( context, 1 )  && *(context.current) == (Byte) 0;
-}
-
 bool is_pointer( ParseContext& context ) {
 	if( !context_has_bytes_left( context, 2 ) ) {
 		return false;
@@ -141,14 +100,6 @@ bool is_pointer( ParseContext& context ) {
 	return pointer.test(BITS_PER_BYTE - 1) && pointer.test(BITS_PER_BYTE - 2);
 }
 
-
-bool parse_zero_byte( ParseContext& context ) {
-	if( is_zero_byte( context ) ) {
-		std::advance( context.current, 1 );
-		return true;
-	}
-	return false;
-}
 
 boost::optional<std::vector<std::string> > parse_labels( ParseContext& context, bool& pointer_next ) {
 	boost::optional<std::vector<std::string> > n;
@@ -243,26 +194,6 @@ boost::optional<Name> parse_name( ParseContext& context ) {
 		n = Name(*name_parts);
 	}
 	return n;
-}
-
-boost::optional<BytesContainer> parse_data( ParseContext& context, size_t length ) {
-#ifdef LOGGING
-	LOG(INFO) << "#parse_data called with length " << length;
-#endif
-	boost::optional<BytesContainer> c;
-	if( context_has_bytes_left( context, length ) ) {
-		BytesContainer::const_iterator end_of_rdata = next(context.current,length);
-		c = BytesContainer(context.current, end_of_rdata);
-		context.current = end_of_rdata;
-	} 
-#ifdef LOGGING
-	else {
-		LOG(WARNING) << "Not enough bytes left";
-	}
-#endif
-
-	return c;
-
 }
 
 DNS::ResourcePtr create_specific_resource( const DNS::ResourcePtr& resource, ParseContext& context ) {
@@ -404,7 +335,7 @@ boost::optional<DNS::QuestionPtr> parse_question( ParseContext& context ) {
 	return q;
 }
 
-bool parse_header( ParseContext& context, size_t& question_count, size_t& answer_count, size_t& ns_count, size_t& ar_count) {
+bool parse_header( DNSParseContext& context, size_t& question_count, size_t& answer_count, size_t& ns_count, size_t& ar_count) {
 
 	// TODO check dereferences on optionals
 	typedef boost::optional<size_t>	maybe_num;
@@ -461,7 +392,7 @@ bool from_data_interntal( const BytesContainer raw, boost::shared_ptr<DNSBuilder
 	BytesContainer::const_iterator start = raw.begin();
 	BytesContainer::const_iterator finish = raw.end();
 
-	ParseContext context(raw, raw.begin(), raw.end(), raw.begin(), b);
+	DNSParseContext context(raw, raw.begin(), raw.end(), raw.begin(), b);
 #ifdef LOGGING
 	LOG(INFO) << "Context at: " << current_index(context);
 	LOG(INFO) << "Bytes remaining?" << context_has_bytes_left(context, 3);

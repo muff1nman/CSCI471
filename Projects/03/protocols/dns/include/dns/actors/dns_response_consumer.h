@@ -19,7 +19,7 @@
 class DNSResponseConsumer: public DNSConsumer {
 	public:
 		DNSResponseConsumer( DnsMaybePtr& result, Type t = Type::A ) : DNSConsumer(result), t(t) { }
-		virtual void run(int socket_fd);
+		virtual void run(Socket* socket);
 
 	protected:
 		Type t;

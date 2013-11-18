@@ -59,12 +59,7 @@ DnsMaybePtr recursive_send_and_recieve        ( const std::string& server, DnsPt
  */
 DnsMaybePtr query_once_and_then_try_recursive ( const std::string& server, DnsPtr query, Socket& socket, bool print_intermediate = false );
 
-/**
- * This function enables logic for running a dns server. This function should
- * really be run in a loop with a fresh socket each time. // TODO fix socket
- * closing.
- */
-void server(int socket);
+MaybeNameOrIp dns_give_me_one_answer          ( const std::string& server, const std::string& query );
 
 #endif /* !__dns_h__ */
 

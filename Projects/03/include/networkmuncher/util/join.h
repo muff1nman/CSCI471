@@ -19,7 +19,7 @@ typedef boost::optional< definite_container > maybe_container;
  * Join two containers.
  */
 template <class T>
-std::vector<T> join( const std::vector<T> first, const std::vector<T> second ) {
+std::vector<T> join( const std::vector<T>& first, const std::vector<T>& second ) {
 	std::vector<T> joined;
 	joined.reserve( first.size() + second.size() );
 	joined.insert( joined.end(), first.begin(), first.end() );

@@ -10,6 +10,7 @@
 #include "networkmuncher/util/byte/byte.h"
 #include "networkmuncher/util/byte/convert.h"
 #include "networkmuncher/util/byte/copy.h"
+#include "networkmuncher/util/byte/operations.h"
 #include "networkmuncher/util/split.h"
 #include "networkmuncher/util/join.h"
 
@@ -90,6 +91,42 @@ TEST(CopyInto, TooLarge) {
 	EXPECT_EQ( smaller_result, (copy_into<5,10>(empty, large_src))) << "Test with larger src";
 }
 
+TEST(OnesComplementSum, Simple) {
+	BytesContainer test = boost::assign::list_of
+		('\x23') ('\x1f')
+		('\x5a') ('\xc4');
+	//expected: "7d e3" == 32227 base 10
+	std::bitset<16> expected(32227);
+
+	EXPECT_EQ( expected, ones_complement_sum<2>(test));
+}
+
+TEST(OnesComplementSum, Empty) {
+	BytesContainer test;
+
+	std::bitset<16> expected(0);
+	EXPECT_EQ( expected, ones_complement_sum<2>(test));
+
+}
+
+TEST(OnesComplementSum, NonMatchingNumberOfBytes) {
+	BytesContainer test = boost::assign::list_of
+		('\x80') ('\x00')
+		('\x80');
+
+	std::bitset<16> expected(1);
+	EXPECT_EQ( expected, ones_complement_sum<2>(test));
+
+}
+
+TEST(OnesComplementSum, Overflow) {
+	BytesContainer test = boost::assign::list_of
+		('\x80') ('\x00')
+		('\x80') ('\x00');
+	std::bitset<16> expected(1);
+	EXPECT_EQ( expected, ones_complement_sum<2>(test));
+}
+
 /*
  *TEST(CopyInto, WithExistingContent) {
  *  // TODO
@@ -112,6 +149,15 @@ TEST(Join, Simple) {
 	std::vector<int> expected = boost::assign::list_of(3)(4)(1)(-4)(-7);
 
 	EXPECT_EQ( expected, join( first, second ));
+}
+
+TEST(Join, WithFirstAsEmpty) {
+	std::vector<int> first;
+	std::vector<int> second = boost::assign::list_of(3)(4);
+
+	std::vector<int> expected = second;
+
+	EXPECT_EQ( expected, join(first, second));
 }
 
 // TODO test Join optional

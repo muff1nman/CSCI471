@@ -9,7 +9,7 @@
 #include "networkmuncher/util/logging.h"
 #include "networkmuncher/actors/data_producer.h"
 #include "networkmuncher/socket/socket.h"
-#include "networkmuncher/parse/ip.h"
+#include "networkmuncher/parse/ip_addr.h"
 #include "networkmuncher/util/collection.h"
 
 #include "dns/config.h"
@@ -28,24 +28,6 @@
 #include <string>
 #include <iostream>
 
-// Runs a consumer and deletes it after completion.
-void socket_thread_runner(int fd, boost::shared_ptr<Consumer> c) {
-	c->run(fd);
-#ifdef LOGGING
-	LOG(INFO) << "Thread finalizing";
-#endif
-
-#ifdef LOGGING
-	LOG(INFO) << "Releasing resources";
-#endif
-	c.reset();
-
-	// No need to close socket with new Socket class
-	//close_socket(fd);
-#ifdef LOGGING
-	LOG(INFO) << "Thread released";
-#endif
-}
 
 typedef boost::function< boost::optional<std::string> ( DNS::ResourcePtr ) > FilterFunction;
 
@@ -409,25 +391,43 @@ DnsMaybePtr query_once_and_then_try_recursive( const std::string& server, DnsPtr
 	return first_response;
 }
 
-void server(int socket) {
-	boost::shared_ptr<Consumer> handler( new DnsProducer() );	
-	handler->run( socket );
-}
-
 DnsMaybePtr send_and_receive( const std::string& server, DnsPtr query, Socket& socket, bool print_intermediate ) {	
 	DnsMaybePtr result;
 	boost::shared_ptr<Convert> dns_data( new DNSConvert(query) );
 	boost::shared_ptr<Consumer> gen(new DataProducer(dns_data));
-	boost::function<void(int)> sfunc = boost::bind(&socket_thread_runner, _1, gen);
-	socket.connect(server.c_str(), DNS_PORT, sfunc);
+	socket.connect(server.c_str(), DNS_PORT, gen);
 
 	//boost::shared_ptr<Consumer> parse( new DNSResponseConsumer(result, query->get_questions().at(0)->get_type() ) );
 	boost::shared_ptr<Consumer> parse( new DNSConsumer(result) );
-	boost::function<void(int)> rfunc = boost::bind(&socket_thread_runner, _1, parse);
-	socket.accept( rfunc );
+	socket.accept( parse );
 
 	return result;
 
 }
 
+MaybeNameOrIp dns_give_me_one_answer( const std::string& server, const std::string& query ) {
+	MaybeNameOrIp ip;
+	// Build a query
+	DNSBuilder b;
+	b
+		.is_query()
+		.add_question( Question(query, Type::A, NetClass::IN) )
+		.question_count(1)
+		.recursion_desired(true);
 
+	boost::shared_ptr<DNS> to_send = b.build_ptr();
+	// Create a socket to use for the duration of this session
+	Socket socket(SOCK_DGRAM, IPPROTO_UDP, DNSMUNCHER_SEND_PORT);
+	socket.set_timeout(TIMEOUT_IN_USEC, TIMEOUT_IN_SEC);
+
+	// Do work!
+	DnsMaybePtr result = query_once_and_then_try_recursive( server, to_send, socket,false);
+
+	// Now check the result
+	if( result && (*result)->response_code() == DNS::NO_ERROR ) {
+		ip = filter_first_ip( *result );
+	}
+
+	return ip;
+
+}

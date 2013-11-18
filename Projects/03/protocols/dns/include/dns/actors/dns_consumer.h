@@ -21,7 +21,7 @@
 class DNSConsumer: public EchoConsumer {
 	public:
 		DNSConsumer( DnsMaybePtr& result ) : result(result) { }
-		virtual void run(int socket_fd);
+		virtual void run(Socket* socket);
 
 	protected:
 		DnsMaybePtr& result;

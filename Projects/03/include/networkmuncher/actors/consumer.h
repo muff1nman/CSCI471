@@ -10,12 +10,9 @@
 
 #include "networkmuncher/util/logging.h"
 #include "networkmuncher/config.h"
+#include "networkmuncher/socket/socket.h"
 
 #include <unistd.h>
-
-#ifdef DEBUG
-#include <iostream>
-#endif
 
 /**
  * The consumer class of classes are used for doing some action with a given
@@ -28,7 +25,7 @@ class Consumer : public Logging {
 
 	public:
 
-		virtual void run(int socket_fd) {
+		virtual void run(Socket* socket) {
 #ifdef LOGGING
 			LOG(INFO) << "Doing operation with open socket";
 #endif

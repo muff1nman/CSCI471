@@ -18,6 +18,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <sstream>
+#include <ostream>
 
 #define sep " "
 #define list_sep ", "
@@ -37,11 +38,20 @@ class Logging {
 
 		virtual std::string to_string() const { return std::string(nested_start) + stringify_object() + std::string(nested_finish); }
 		virtual std::string stringify_object() const { return std::string("UNKNOWN"); }
+		friend std::ostream& operator<<(std::ostream& os, const Logging& object) {
+			os << object.to_string() << std::endl;
+			return os;
+		}
 	protected:
 		virtual ~Logging() { }
 
 };
 
+/**
+ * Needs to be called before any logging can be done. This function is a no-op
+ * if logging is not defined.
+ */
+void init_log(size_t log_level, const char* project_name);
 
 #endif /* !__logging_h__ */
 

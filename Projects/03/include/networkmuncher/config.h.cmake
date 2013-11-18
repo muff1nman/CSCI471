@@ -10,4 +10,6 @@
 
 #cmakedefine PROJECT_NAME "${CMAKE_PROJECT_NAME}"
 
+#define TEST_LOG_LEVEL 0
+
 #endif /* !__config_h__ */

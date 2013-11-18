@@ -8,11 +8,11 @@
 #include "dns/actors/dns_consumer.h"
 #include "dns/parse/dns.h"
 
-#include "networkmuncher/socket/helper.h"
-
-void DNSConsumer::run(int socket_fd) {
-	BytesContainer raw_data = all_data(socket_fd);
-	result = from_data_as_ptr( raw_data );
+void DNSConsumer::run(Socket* socket) {
+	boost::optional<BytesContainer> raw_data = socket->recv();
+	if( raw_data ) {
+		result = from_data_as_ptr( *raw_data );
+	}
 }
 
 

@@ -3,6 +3,8 @@
 
 #cmakedefine DAEMON_DEBUG 
 
+#cmakedefine PROJECT_NAME "${CMAKE_PROJECT_NAME}"
+
 #define LISTEN_PORT 16318
 
 // LS stands for Long and Short
@@ -22,8 +24,6 @@
 #define LOG_LEVEL_OPTION_LS "log-level,l"
 #define DEBUG_OPTION "debug"
 #define DEBUG_OPTION_LS "debug,d"
-
-#define TEST_LOG_LEVEL 0
 
 #define TIMEOUT_IN_USEC 100
 #define TIMEOUT_IN_SEC 3

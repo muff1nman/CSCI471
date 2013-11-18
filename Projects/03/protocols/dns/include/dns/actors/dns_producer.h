@@ -21,7 +21,7 @@ class DnsProducer : public Consumer {
 	public:
 		DnsProducer() { }
 
-		virtual void run(int socket_fd);
+		virtual void run(Socket* socket);
 
 		virtual ~DnsProducer() { }
 };
