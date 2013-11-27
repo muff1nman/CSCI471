@@ -102,7 +102,7 @@ void DnsProducer::run(Socket* socket) {
 		// Send back the answer
 		////////////////////////////////////////////////
 		boost::shared_ptr<Convert> dns_data( new DNSConvert(to_send_back) );
-		boost::shared_ptr<Consumer> gen(new DataProducer(dns_data));
+		boost::shared_ptr<SocketConsumer> gen(new SocketDataProducer(dns_data));
 
 		socket->connect((sockaddr*) &remote_info, remote_info_size, gen);
 

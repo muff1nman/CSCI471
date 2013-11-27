@@ -11,6 +11,7 @@
 #include "networkmuncher/util/logging.h"
 #include "networkmuncher/config.h"
 #include "networkmuncher/socket/socket.h"
+#include "networkmuncher/util/byte/parse_context.h"
 
 #include <unistd.h>
 
@@ -24,12 +25,7 @@
 class Consumer : public Logging {
 
 	public:
-
-		virtual void run(Socket* socket) {
-#ifdef LOGGING
-			LOG(INFO) << "Doing operation with open socket";
-#endif
-		}
+		virtual void consume( ParseContextPtr parse ) { }
 
 		virtual ~Consumer() { }
 

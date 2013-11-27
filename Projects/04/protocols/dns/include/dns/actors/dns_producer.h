@@ -8,7 +8,7 @@
 #ifndef __dns_producer_h__
 #define __dns_producer_h__
 
-#include "networkmuncher/actors/consumer.h"
+#include "networkmuncher/actors/socket_consumer.h"
 
 /**
  * Main intent is to be used for the server/daemon feature.  It will parse a
@@ -17,7 +17,7 @@
  * inherited from DnsConsumer, there were some incompatabilities that I hope to
  * resolve in the future \\TODO
  */
-class DnsProducer : public Consumer {
+class DnsProducer : public SocketConsumer {
 	public:
 		DnsProducer() { }
 

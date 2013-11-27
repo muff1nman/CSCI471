@@ -10,6 +10,7 @@
 
 #include "data_producer.h"
 #include "echo_consumer.h"
+#include "socket_consumer.h"
 
 #endif /* !ACTORS_H */
 

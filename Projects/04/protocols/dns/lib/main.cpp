@@ -21,8 +21,8 @@
 using namespace std;
 namespace po = boost::program_options;
 
-boost::shared_ptr<Consumer> gen_server_handler() {
-	return boost::shared_ptr<Consumer>( new DnsProducer() );	
+boost::shared_ptr<SocketConsumer> gen_server_handler() {
+	return boost::shared_ptr<SocketConsumer>( new DnsProducer() );	
 }
 
 int main( int argc, char** argv ) {

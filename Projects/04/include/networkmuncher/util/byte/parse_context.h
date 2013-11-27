@@ -15,6 +15,12 @@
 class ParseContext {
 	public:
 		typedef BytesContainer::const_iterator ConstIterator;
+		ParseContext(const BytesContainer& raw_data) : raw_data(raw_data), start(raw_data.begin()), finish(raw_data.end()), current(raw_data.begin()) {
+			//start = raw_data.begin();
+			//finish = raw_data.end();
+			//current = start;
+		}
+
 		ParseContext(
 				const BytesContainer& raw_data,
 				const ConstIterator& start,
@@ -23,8 +29,8 @@ class ParseContext {
 			raw_data(raw_data), start(start), finish(finish), current(current) { }
 
 		const BytesContainer& raw_data;
-		const ConstIterator& start;
-		const ConstIterator& finish;
+		const ConstIterator start;
+		const ConstIterator finish;
 		ConstIterator current;
 
 		ParseContext( const ParseContext& other, size_t offset_from_start ) : raw_data(other.raw_data), start(other.start), finish(other.finish) {
@@ -32,6 +38,8 @@ class ParseContext {
 		}
 
 };
+
+typedef boost::shared_ptr<ParseContext> ParseContextPtr;
 
 #endif /* !__util_parse_context_h__ */
 

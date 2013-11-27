@@ -8,7 +8,7 @@
 #ifndef __echo_consumer_h__
 #define __echo_consumer_h__
 
-#include "consumer.h"
+#include "socket_consumer.h"
 #include "networkmuncher/util/byte/print.h"
 
 #include <stdio.h>
@@ -19,19 +19,16 @@
 #include <iostream>
 #endif
 
-class EchoConsumer : public Consumer {
+class EchoConsumer : public SocketConsumer {
 	public:
-
-		virtual void run(Socket* socket) {
-			boost::optional<BytesContainer> b = socket->recv();
-			if(b) {
+		
+		virtual void consumer(ParseContextPtr parse) {
 #ifndef LOGGING
-				std::cout << "Recieved bytes:" << std::endl;
-				std::cout << demaria_util::to_string(*b) << std::endl;
+			std::cout << "Recieved bytes:" << std::endl;
+			std::cout << demaria_util::to_string(*parse) << std::endl;
 #else
-				LOG(INFO) << "Recieved bytes:" << "\n" << demaria_util::to_string(*b);
+			LOG(INFO) << "Recieved bytes:" << "\n" << demaria_util::to_string(*parse);
 #endif
-			}
 		}
 
 };

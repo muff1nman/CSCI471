@@ -394,11 +394,11 @@ DnsMaybePtr query_once_and_then_try_recursive( const std::string& server, DnsPtr
 DnsMaybePtr send_and_receive( const std::string& server, DnsPtr query, Socket& socket, bool print_intermediate ) {	
 	DnsMaybePtr result;
 	boost::shared_ptr<Convert> dns_data( new DNSConvert(query) );
-	boost::shared_ptr<Consumer> gen(new DataProducer(dns_data));
+	boost::shared_ptr<SocketConsumer> gen(new SocketDataProducer(dns_data));
 	socket.connect(server.c_str(), DNS_PORT, gen);
 
 	//boost::shared_ptr<Consumer> parse( new DNSResponseConsumer(result, query->get_questions().at(0)->get_type() ) );
-	boost::shared_ptr<Consumer> parse( new DNSConsumer(result) );
+	boost::shared_ptr<SocketConsumer> parse( new DNSConsumer(result) );
 	socket.accept( parse );
 
 	return result;

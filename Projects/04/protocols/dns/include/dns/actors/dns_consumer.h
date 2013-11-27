@@ -12,13 +12,13 @@
 #include "dns/domain/dns.h"
 #include "dns/dns.h"
 
-#include "networkmuncher/actors/echo_consumer.h"
+#include "networkmuncher/actors/socket_consumer.h"
 #include "networkmuncher/config.h"
 
 #include <boost/optional.hpp>
 #include <boost/shared_ptr.hpp>
 
-class DNSConsumer: public EchoConsumer {
+class DNSConsumer: public SocketConsumer {
 	public:
 		DNSConsumer( DnsMaybePtr& result ) : result(result) { }
 		virtual void run(Socket* socket);

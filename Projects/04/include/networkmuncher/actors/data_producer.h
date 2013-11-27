@@ -5,12 +5,13 @@
  * All Rights Reserved.
  */
 
-#ifndef __data_producer_h__
-#define __data_producer_h__
+#ifndef __socket_data_producer_h__
+#define __socket_data_producer_h__
 
-#include "consumer.h"
+#include "socket_consumer.h"
 #include "networkmuncher/data/convert.h"
 #include "networkmuncher/util/byte/byte.h"
+
 #include <unistd.h>
 #ifdef LOGGING
 #include <glog/logging.h>
@@ -21,9 +22,9 @@
 #include <sys/types.h>
 #include <boost/shared_ptr.hpp>
 
-class DataProducer : public Consumer {
+class SocketDataProducer : public SocketConsumer {
 	public:
-		DataProducer( boost::shared_ptr<Convert> obj_ptr) : convertable(obj_ptr) { }
+		SocketDataProducer( boost::shared_ptr<Convert> obj_ptr) : convertable(obj_ptr) { }
 
 		virtual void run(Socket* socket) {
 			BytesContainer bytes = convertable->to_data();

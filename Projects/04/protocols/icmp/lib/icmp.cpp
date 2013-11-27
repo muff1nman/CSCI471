@@ -47,7 +47,7 @@ void receive_and_validate( Socket& socket, const EchoPtr& matching_request, int 
 	remaining_time.tv_usec = 0;
 
 	do {
-		boost::shared_ptr<Consumer> receive_icmp( new RawConsumer(ret));
+		boost::shared_ptr<SocketConsumer> receive_icmp( new RawConsumer(ret));
 #ifdef LOGGING
 		LOG(INFO) << "Set remaining time as: " << convert_to_seconds(remaining_time);;
 #endif
@@ -69,7 +69,7 @@ EchoMaybePtr ping_and_pong_once( const std::string& dest_ip, EchoPtr request ) {
 
 	Socket socket(SOCK_RAW, IPPROTO_ICMP);
 
-	boost::shared_ptr<Consumer> send_icmp( new DataProducer ( boost::shared_ptr<Convert>( new EchoConvert( request ) )));
+	boost::shared_ptr<SocketConsumer> send_icmp( new SocketDataProducer ( boost::shared_ptr<Convert>( new EchoConvert( request ) )));
 	socket.connect(dest_ip.c_str(), 0, send_icmp);
 
 	receive_and_validate(socket, request, TIMEOUT_IN_SECONDS, raw_ptr);

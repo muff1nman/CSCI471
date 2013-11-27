@@ -378,25 +378,12 @@ bool parse_header( DNSParseContext& context, size_t& question_count, size_t& ans
 
 }
 
-bool from_data_interntal( const BytesContainer raw, boost::shared_ptr<DNSBuilder> b ) {
+bool from_data_internal( DNSParseContext& context ) {
 	// data holders
 	size_t question_count;
 	size_t answer_count;
 	size_t ns_count;
 	size_t ar_count;
-
-#ifdef LOGGING
-	LOG(INFO) << "Bytes" << std::endl << demaria_util::to_string( raw );
-#endif
-
-	BytesContainer::const_iterator start = raw.begin();
-	BytesContainer::const_iterator finish = raw.end();
-
-	DNSParseContext context(raw, raw.begin(), raw.end(), raw.begin(), b);
-#ifdef LOGGING
-	LOG(INFO) << "Context at: " << current_index(context);
-	LOG(INFO) << "Bytes remaining?" << context_has_bytes_left(context, 3);
-#endif
 
 	bool good_header = parse_header( context, question_count, answer_count, ns_count, ar_count );
 	if( !good_header ) {
@@ -406,10 +393,10 @@ bool from_data_interntal( const BytesContainer raw, boost::shared_ptr<DNSBuilder
 	LOG(INFO) << "Context at: " << current_index(context);
 #endif
 
-	b->question_count( question_count );
-	b->answer_count( answer_count );
-	b->nameserver_count( ns_count );
-	b->additional_count( ar_count );
+	context.b->question_count( question_count );
+	context.b->answer_count( answer_count );
+	context.b->nameserver_count( ns_count );
+	context.b->additional_count( ar_count );
 
 	for( size_t i = 0; i < question_count; ++i ) {
 #ifdef LOGGING
@@ -421,7 +408,7 @@ bool from_data_interntal( const BytesContainer raw, boost::shared_ptr<DNSBuilder
 
 		boost::optional<DNS::QuestionPtr> q = parse_question(context);
 		if ( q ) {
-			b->add_question( *q );
+			context.b->add_question( *q );
 		} else {	
 			return false;
 		} 
@@ -433,7 +420,7 @@ bool from_data_interntal( const BytesContainer raw, boost::shared_ptr<DNSBuilder
 #endif
 		boost::optional<DNS::ResourcePtr> r = parse_other_record(context);
 		if ( r ) {
-			b->add_resource( *r );
+			context.b->add_resource( *r );
 		} else {
 			return false;
 		}
@@ -441,31 +428,46 @@ bool from_data_interntal( const BytesContainer raw, boost::shared_ptr<DNSBuilder
 	return true;
 }
 
-boost::optional<DNS> from_data( const BytesContainer raw ) {
-
+boost::optional<DNS> from_data( ParseContext& parse_context ) {
 	boost::shared_ptr<DNSBuilder> b( new DNSBuilder() );
 	boost::optional<DNS> to_return;
-
-	bool valid = from_data_interntal( raw, b );
-	if( valid ) { 
+	DNSParseContext context( parse_context, b );
+	bool valid = from_data_internal( context );
+	if( valid ) {
 		to_return = b->build();
+#ifdef LOGGING
+	} else {
+		LOG(WARNING) << "Invalid built dns";
+#endif
 	}
 
 	return to_return;
 }
 
-DnsMaybePtr from_data_as_ptr( const BytesContainer raw ) {
-
+DnsMaybePtr from_data_as_ptr( ParseContext& parse_context ) {
 	boost::shared_ptr<DNSBuilder> b( new DNSBuilder() );
 	DnsMaybePtr to_return;
-
-	bool valid = from_data_interntal( raw, b );
-	if( valid ) { 
+	DNSParseContext context( parse_context, b );
+	bool valid = from_data_internal( context );
+	if( valid ) {
 		to_return = b->build_ptr();
+#ifdef LOGGING
+	} else {
+		LOG(WARNING) << "Invalid built dns";
+#endif
 	}
 
 	return to_return;
+}
 
+boost::optional<DNS> from_data( const BytesContainer raw ) {
+	ParseContext p(raw);
+	return from_data(p);
+}
+
+DnsMaybePtr from_data_as_ptr( const BytesContainer raw ) {
+	ParseContext p(raw);
+	return from_data_as_ptr(p);
 }
 
 

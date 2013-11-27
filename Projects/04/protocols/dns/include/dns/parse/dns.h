@@ -19,11 +19,13 @@
  * the return value will not be instaniated.
  */
 boost::optional<DNS> from_data( const BytesContainer raw );
+boost::optional<DNS> from_data( ParseContext& context );
 
 /**
  * Do the same as #from_data but return a shared_ptr instead
  */
 DnsMaybePtr from_data_as_ptr( const BytesContainer raw );
+DnsMaybePtr from_data_as_ptr( ParseContext& context );
 
 #endif /* !__dns_h__ */
 

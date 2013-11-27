@@ -11,8 +11,8 @@
 
 #include <iostream>
 
-boost::shared_ptr<Consumer> gen_consumer() {
-	return boost::shared_ptr<Consumer>(new EchoConsumer());
+boost::shared_ptr<SocketConsumer> gen_consumer() {
+	return boost::shared_ptr<SocketConsumer>(new EchoConsumer());
 }
 
 using namespace std;

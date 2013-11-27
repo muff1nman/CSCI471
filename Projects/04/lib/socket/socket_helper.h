@@ -11,7 +11,7 @@
 #include "networkmuncher/util/logging.h"
 #include "networkmuncher/util/byte/byte.h"
 #include "networkmuncher/util/byte/print.h"
-#include "networkmuncher/actors/consumer.h"
+#include "networkmuncher/actors/socket_consumer.h"
 
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -114,7 +114,7 @@ int connect_to_socket(int fd, const char* server, unsigned short port) {
  * This is mainly a helper function that is meant to be passed into
  * Socket#accept or Socket#connect
  */
-inline void socket_thread_runner(Socket* socket, boost::shared_ptr<Consumer> c) {
+inline void socket_thread_runner(Socket* socket, boost::shared_ptr<SocketConsumer> c) {
 	c->run(socket);
 #ifdef LOGGING
 	LOG(INFO) << "Thread finalizing";

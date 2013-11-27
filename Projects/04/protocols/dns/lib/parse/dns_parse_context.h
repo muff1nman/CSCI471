@@ -19,6 +19,8 @@ class DNSParseContext : public ParseContext {
 				current, boost::shared_ptr<DNSBuilder> b) :
 			ParseContext(raw_data,start,finish,current), b(b) { }
 
+		DNSParseContext( ParseContext& parse_context, boost::shared_ptr<DNSBuilder> b ) : ParseContext(parse_context), b(b) { }
+
 		boost::shared_ptr<DNSBuilder> b;
 
 		DNSParseContext( const DNSParseContext& other, size_t offset_from_start) :

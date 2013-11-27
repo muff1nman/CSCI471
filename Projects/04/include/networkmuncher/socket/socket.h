@@ -17,7 +17,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/optional.hpp>
 
-class Consumer;
+class SocketConsumer;
 
 /**
  * Because Im tired of having to deal with sockets
@@ -32,7 +32,7 @@ class Socket {
 		 */
 		typedef boost::function<void(Socket*)> SocketFunction;
 
-		typedef boost::shared_ptr<Consumer> ConsumerPtr;
+		typedef boost::shared_ptr<SocketConsumer> ConsumerPtr;
 		/**
 		 * Calls this function to retrieve a Consumer and then uses the returned
 		 * Consumer's #run function as a SocketFunction
