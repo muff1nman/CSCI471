@@ -1,5 +1,6 @@
 add_subdirectory(socket)
 add_subdirectory(logging)
+add_subdirectory(analyzer)
 
 set(LINK_LIBRARIES muncher_socket muncher_logging)
 
