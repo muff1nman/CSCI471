@@ -8,20 +8,75 @@
 #include "ethernet/domain/domain.h"
 #include "ethernet/parse/ethernet.h"
 #include "networkmuncher/util/logging.h"
+#include "ethernet_parse_context.h"
+#include "networkmuncher/util/byte/parse_extra.h"
+
+bool parse_internal( EthernetParseContext& parse_context, bool ethernetv2or8023 ) {
+	boost::optional<MacAddr> dest = parse_bitset<MAC_ADDR_LENGTH / BITS_PER_BYTE>(parse_context);
+	if(dest) {
+		parse_context.b->set_dest_addr(*dest);
+	} else {
+#ifdef LOGGING
+		LOG(ERROR) << "Could not parse dest";
+#endif
+		return false;
+	}
+
+	boost::optional<MacAddr> src = parse_bitset<MAC_ADDR_LENGTH / BITS_PER_BYTE>(parse_context);
+	if(src) {
+		parse_context.b->set_source_addr(*src);
+	} else {
+#ifdef LOGGING
+		LOG(ERROR) << "Could not parse src";
+#endif
+		return false;
+	}
+
+	boost::optional<Ethernet::Extra> extra = parse_bitset<Ethernet::EXTRA_LENGTH / BITS_PER_BYTE>(parse_context);
+	if(extra) {
+		parse_context.b->set_extra(*extra);
+		if( ethernetv2or8023 ) {
+			// ethernet2: parse as type
+			if(extra->to_ulong() < 1536 ) {
+#ifdef LOGGING
+				LOG(WARNING) << "Extra could not be interpretted as type (Ethernet II)";
+#endif
+				return false;
+			}
+		} else {
+			// ethernet 802.3: parse as length
+			if(extra->to_ulong() > 1500 ) {
+#ifdef LOGGING
+				LOG(WARNING) << "Extra could not be interpretted as length (802.3)";
+#endif
+				return false;
+			}
+		}
+	} else {
+#ifdef LOGGING
+		LOG(ERROR) << "Could not parse extra";
+#endif
+		return false;
+	}
+
+	return true;
+}
 
 namespace ETHERNETV2 {
 
-	/**
-	 * Parses the given stream of bytes into an Ethernet object.  If there was an issue,
-	 * the return value will not be instaniated.
-	 */
 	EthernetMaybe from_data( ParseContext& parse_context ) {
-		/*TODO*/ 
 		EthernetMaybe to_return;
+		boost::shared_ptr<EthernetBuilder> b( new Ethernetv2Builder());
+		EthernetParseContext context(parse_context,b);
 
-		EthernetBuilder b;
+		if(parse_internal(context, true)) {
+			to_return = context.b->build();
+#ifdef LOGGING
+		} else {
+			LOG(WARNING) << "Could not parse an ethernet II packet";
+#endif
+		}
 
-		to_return = b.build();
 		return to_return;
 	}
 
@@ -30,16 +85,19 @@ namespace ETHERNETV2 {
 		return from_data( parse_context );
 	}
 
-	/**
-	 * Do the same as #from_data but return a shared_ptr instead
-	 */
 	LinkLayerProtocolMaybePtr from_data_as_ptr( ParseContext& parse_context ) {
-		/*TODO*/ 
 		LinkLayerProtocolMaybePtr to_return;
+		boost::shared_ptr<EthernetBuilder> b( new Ethernetv2Builder());
+		EthernetParseContext context(parse_context,b);
 
-		EthernetBuilder b;
-
-		to_return = boost::dynamic_pointer_cast<LinkLayerProtocol>(b.build_ptr());
+		if(parse_internal(context, true)) {
+			to_return = boost::dynamic_pointer_cast<LinkLayerProtocol>(context.b->build_ptr());
+#ifdef LOGGING
+			LOG(INFO) << "What type? " << (*to_return)->what_type();
+		} else {
+			LOG(WARNING) << "Could not parse an ethernet II packet";
+#endif
+		}
 
 		return to_return;
 	}
@@ -54,17 +112,19 @@ namespace ETHERNETV2 {
 
 namespace ETHERNET8023 {
 
-	/**
-	 * Parses the given stream of bytes into an Ethernet object.  If there was an issue,
-	 * the return value will not be instaniated.
-	 */
 	EthernetMaybe from_data( ParseContext& parse_context ) {
-		/*TODO*/ 
 		EthernetMaybe to_return;
+		boost::shared_ptr<EthernetBuilder> b( new Ethernet8023Builder());
+		EthernetParseContext context(parse_context,b);
 
-		EthernetBuilder b;
+		if(parse_internal(context, false)) {
+			to_return = context.b->build();
+#ifdef LOGGING
+		} else {
+			LOG(WARNING) << "Could not parse an ethernet 802.3 packet";
+#endif
+		}
 
-		to_return = b.build();
 		return to_return;
 	}
 
@@ -73,16 +133,18 @@ namespace ETHERNET8023 {
 		return from_data( parse_context );
 	}
 
-	/**
-	 * Do the same as #from_data but return a shared_ptr instead
-	 */
 	LinkLayerProtocolMaybePtr from_data_as_ptr( ParseContext& parse_context ) {
-		/*TODO*/ 
 		LinkLayerProtocolMaybePtr to_return;
+		boost::shared_ptr<EthernetBuilder> b( new Ethernet8023Builder());
+		EthernetParseContext context(parse_context,b);
 
-		EthernetBuilder b;
-
-		to_return = boost::dynamic_pointer_cast<LinkLayerProtocol>(b.build_ptr());
+		if(parse_internal(context, false)) {
+			to_return = boost::dynamic_pointer_cast<LinkLayerProtocol>(context.b->build_ptr());
+#ifdef LOGGING
+		} else {
+			LOG(WARNING) << "Could not parse an ethernet 802.3 packet";
+#endif
+		}
 
 		return to_return;
 	}

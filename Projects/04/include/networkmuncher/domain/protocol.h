@@ -8,13 +8,12 @@
 #ifndef PROTOCOL_H
 #define PROTOCOL_H
 
+#include "protocol_types.h"
+
 class Protocol {
 	public:
-		const static int UNKNOWN_PROTOCOL = 0;
 
-		virtual int what_type() const {
-			return UNKNOWN_PROTOCOL;
-		}
+		virtual int what_type() const = 0;
 
 };
 

@@ -55,8 +55,8 @@ FILE(GLOB_RECURSE INC_ALL ${CMAKE_SOURCE_DIR}/include/*.h)
 # Go do work CMake!
 add_subdirectory( lib )
 
-## if testing do some tests!
-#if( ${TEST} STREQUAL "ON" )
-	#enable_testing()
-	#add_subdirectory( test )
-#endif()
+# if testing do some tests!
+if( ${TEST} STREQUAL "ON" )
+	enable_testing()
+	add_subdirectory( test )
+endif()

@@ -12,10 +12,9 @@
 
 class NetworkLayerProtocol : public Protocol {
 	public:
-		static const int UNKNOWN_NETWORK_LAYER_PROTOCOL = 200;
 
-		virtual int what_type() {
-			return UNKNOWN_NETWORK_LAYER_PROTOCOL;
+		virtual int what_type() const {
+			return PType::NETWORK;
 		}
 
 };

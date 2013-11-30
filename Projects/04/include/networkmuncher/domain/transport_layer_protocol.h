@@ -12,10 +12,9 @@
 
 class TransportLayerProtocol : public Protocol {
 	public:
-		static const int UNKNOWN_TRANSPORT_LAYER_PROTOCOL = 300;
 
-		virtual int what_type() {
-			return UNKNOWN_TRANSPORT_LAYER_PROTOCOL;
+		virtual int what_type() const {
+			return PType::TRANSPORT;
 		}
 
 };

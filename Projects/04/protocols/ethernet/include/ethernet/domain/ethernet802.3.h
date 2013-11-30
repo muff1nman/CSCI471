@@ -18,13 +18,21 @@ struct Ethernet8023 : public Ethernet {
 	
 		friend class EthernetBuilder;
 
+		virtual int what_type() const { return PType::Link::ETHERNET_8023; }
+
 		std::string stringify_object() const {
 			std::stringstream object;
-			object << "length: " << length.to_ulong() << list_sep;
+			object << "length: " << extra.to_ulong() << list_sep;
 			object << "dest: " << dest.to_string() << list_sep;
 			object << "src: " << dest.to_string() << sep;
 			return object.str();
 		}
+
+		Ethernet8023(
+				const Ethernet::Extra& extra, 
+				const MacAddr& dest,
+				const MacAddr& src
+				) : Ethernet(extra, dest, src ) {}
 
 };
 

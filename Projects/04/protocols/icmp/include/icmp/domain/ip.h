@@ -17,6 +17,8 @@
 struct Ip : public Logging, public NetworkLayerProtocol {
 	public:
 
+		static const size_t EXPECTED_VERSION = 69;
+
 		/**
 		 * Lengths for bitsets
 		 */

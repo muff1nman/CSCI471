@@ -16,6 +16,9 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/optional.hpp>
 
+typedef boost::shared_ptr<Protocol> ProtocolPtr;
+typedef boost::optional<ProtocolPtr> ProtocolMaybePtr;
+
 typedef boost::shared_ptr<ApplicationLayerProtocol> ApplicationLayerProtocolPtr;
 typedef boost::optional<ApplicationLayerProtocolPtr> ApplicationLayerProtocolMaybePtr;
 

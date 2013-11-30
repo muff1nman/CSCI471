@@ -11,9 +11,10 @@
 #include <bitset>
 #include "networkmuncher/util/byte/byte.h"
 #include "networkmuncher/util/logging.h"
+#include "networkmuncher/domain/link_layer_protocol.h"
 #include "mac_addr.h"
 
-struct Ethernet : public Logging {
+struct Ethernet : public LinkLayerProtocol, public Logging {
 	public:
 
 		static const size_t EXTRA_LENGTH = 16;
@@ -25,6 +26,8 @@ struct Ethernet : public Logging {
 
 		friend class EthernetBuilder;
 
+		virtual int what_type() const { return PType::Link::ETHERNET_UNKNOWN; }
+
 		virtual std::string stringify_object() const {
 			std::stringstream object;
 			object << "extra: " << extra.to_ulong() << list_sep;
@@ -35,11 +38,21 @@ struct Ethernet : public Logging {
 
 		bool operator==( const Ethernet& other ) const {
 			return
-				extra   ==   other.extra   &&
-				dest   ==   other.dest   &&
-				src    ==   other.src    &&
+				extra == other.extra &&
+				dest == other.dest &&
+				src == other.src &&
 				true;
 		}
+
+		Ethernet(
+				const Extra& extra, 
+				const MacAddr& dest,
+				const MacAddr& src
+				) : 
+					extra(extra),
+					dest(dest),
+					src(src) 
+				{}
 
 	protected:
 		Ethernet() {}

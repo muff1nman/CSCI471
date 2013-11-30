@@ -12,10 +12,9 @@
 
 class LinkLayerProtocol : public Protocol {
 	public:
-		static const int UNKNOWN_LINK_LAYER_PROTOCOL = 100;
 
-		virtual int what_type() {
-			return UNKNOWN_LINK_LAYER_PROTOCOL;
+		virtual int what_type() const {
+			return PType::LINK;
 		}
 
 };

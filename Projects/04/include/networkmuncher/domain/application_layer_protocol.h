@@ -12,10 +12,9 @@
 
 class ApplicationLayerProtocol : public Protocol {
 	public:
-		static const int UNKNOWN_APPLICATION_LAYER_PROTOCOL = 400;
 
-		virtual int what_type() {
-			return UNKNOWN_APPLICATION_LAYER_PROTOCOL;
+		virtual int what_type() const {
+			return PType::APPLICATION;
 		}
 
 };

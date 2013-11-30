@@ -5,11 +5,11 @@
  * All Rights Reserved.
  */
 
-#ifndef __test_helper_h__
-#define __test_helper_h__
+#ifndef __ethernet_test_helper_h__
+#define __ethernet_test_helper_h__
 
-#include "icmp/config.h"
-#include "icmp/domain/domain.h"
+#include "ethernet/config.h"
+#include "ethernet/domain/domain.h"
 #include "file_ops.h"
 #include "file_names.h"
 #include <boost/assign/list_of.hpp>
@@ -20,5 +20,5 @@
 
 #include "gtest/gtest.h"
 
-#endif /* !__test_helper_h__ */
+#endif /* !__ethernet_test_helper_h__ */
 

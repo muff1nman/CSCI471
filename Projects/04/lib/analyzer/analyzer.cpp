@@ -61,10 +61,7 @@ void pk_processor(u_char *user, const struct pcap_pkthdr *pkthdr, const u_char *
 	LinkLayerProtocolMaybePtr link = parse_layer<LinkLayerProtocolMaybePtr,LinkParser>(link_parsers,parse);
 
 	if(link) {
-		// TODO count link
-#ifdef LOGGING
-		LOG(INFO) << "Successfully parsed link layer";		
-#endif
+		results->count(*link);
 	} else {
 #ifdef LOGGING
 		LOG(INFO) << "could not parse link layer";

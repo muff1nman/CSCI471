@@ -18,20 +18,20 @@ class EthernetBuilder {
 
 		static const long TYPE_IP = 2048;
 
-		EthernetBuilder& set_type(Ethernet::Extra extra_field) {
-			variable_holder.extra = extra_field;
+		EthernetBuilder& set_extra(Ethernet::Extra extra_field) {
+			extra = extra_field;
 			extra_set = true;
 			return do_common();
 		}
 
 		EthernetBuilder& set_source_addr(MacAddr addr) {
-			variable_holder.src = addr;
+			src = addr;
 			source_addr_set = true;
 			return do_common();
 		}
 
 		EthernetBuilder& set_dest_addr(MacAddr addr) {
-			variable_holder.dest = addr;
+			dest = addr;
 			dest_addr_set = true;
 			return do_common();
 		}
@@ -45,18 +45,20 @@ class EthernetBuilder {
 				true; // why? cause I wanted the three lines above nice and symmetric :)
 		}
 
-		Ethernet build() {
+		virtual Ethernet build() {
 			set_default_fields();
-			return Ethernet(variable_holder);
+			return Ethernet(extra, dest, src);
 		}
 
-		EthernetPtr build_ptr() {
+		virtual EthernetPtr build_ptr() {
 			set_default_fields();
-			return EthernetPtr( new Ethernet(variable_holder) );
+			return EthernetPtr( new Ethernet(extra, dest, src) );
 		}
 
-	private:
-		Ethernet variable_holder;
+	protected:
+		Ethernet::Extra extra;
+		MacAddr dest;
+		MacAddr src;
 
 		EthernetBuilder& do_common() {
 			return *this;
