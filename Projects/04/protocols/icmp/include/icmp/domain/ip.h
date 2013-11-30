@@ -12,8 +12,9 @@
 #include "networkmuncher/util/byte/byte.h"
 #include "networkmuncher/util/logging.h"
 #include "networkmuncher/parse/ip_addr.h"
+#include "networkmuncher/domain/network_layer_protocol.h"
 
-struct Ip : public Logging {
+struct Ip : public Logging, public NetworkLayerProtocol {
 	public:
 
 		/**

@@ -5,8 +5,8 @@
  * All Rights Reserved.
  */
 
-#ifndef PTR_TYPES_H
-#define PTR_TYPES_H
+#ifndef ICMP_PTR_TYPES_H
+#define ICMP_PTR_TYPES_H
 
 #include <boost/shared_ptr.hpp>
 
@@ -18,5 +18,5 @@ typedef boost::shared_ptr<Raw> RawPtr;
 typedef boost::shared_ptr<Echo> EchoPtr;
 typedef boost::shared_ptr<Ip> IpPtr;
 
-#endif /* !PTR_TYPES_H */
+#endif /* !ICMP_PTR_TYPES_H */
 

@@ -11,6 +11,7 @@
 #include "icmp/domain/domain.h"
 #include "networkmuncher/util/byte/parse_context.h"
 #include "networkmuncher/util/byte/parse_extra.h"
+#include "networkmuncher/domain/all.h"
 
 namespace IP {
 
@@ -24,8 +25,8 @@ IpMaybe from_data( const BytesContainer& bytes );
 /**
  * Do the same as #from_data but return a shared_ptr instead
  */
-IpMaybePtr from_data_as_ptr( ParseContext& parse_context );
-IpMaybePtr from_data_as_ptr( const BytesContainer& bytes );
+NetworkLayerProtocolMaybePtr from_data_as_ptr( ParseContext& parse_context );
+NetworkLayerProtocolMaybePtr from_data_as_ptr( const BytesContainer& bytes );
 
 }
 

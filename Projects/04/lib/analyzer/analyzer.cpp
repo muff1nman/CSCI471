@@ -11,11 +11,37 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include "networkmuncher/domain/all.h"
 #include "networkmuncher/util/byte/byte.h"
 #include "networkmuncher/util/byte/print.h"
-
+#include "networkmuncher/util/byte/parse_context.h"
 #include "networkmuncher/util/logging.h"
+#include "networkmuncher/parse/parsers.h"
+#include "networkmuncher/parse/parser_types.h"
 
+template <class ProtocolPtr, class ParserType>
+ProtocolPtr parse_layer(std::vector<ParserType> parsers, ParseContext& context) {
+	ProtocolPtr to_return;
+	for( size_t i = 0; i < parsers.size(); ++i ) {
+		// save context's spot
+		ParseContext::ConstIterator saved_spot = context.current;
+
+		// Attempt parse
+		ParserType current = parsers.at(i);
+		to_return = current(context);
+
+		// Check if successful
+		if( to_return ) {
+			return to_return;
+		} else {
+			// reset parse context
+			context.current = saved_spot;
+		}
+	}
+
+	// unsuccessful
+	return to_return;
+}
 
 // ****************************************************************************
 // * pk_processor()
@@ -30,8 +56,24 @@ void pk_processor(u_char *user, const struct pcap_pkthdr *pkthdr, const u_char *
 
 	BytesContainer bytes_from_packet( packet, packet + pkthdr->caplen );
 
+	ParseContext parse( bytes_from_packet );
+
+	LinkLayerProtocolMaybePtr link = parse_layer<LinkLayerProtocolMaybePtr,LinkParser>(link_parsers,parse);
+
+	if(link) {
+		// TODO count link
 #ifdef LOGGING
-	LOG(WARNING) << demaria_util::to_string(bytes_from_packet);
+		LOG(INFO) << "Successfully parsed link layer";		
+#endif
+	} else {
+#ifdef LOGGING
+		LOG(INFO) << "could not parse link layer";
+#endif
+		return;
+	}
+
+#ifdef LOGGING
+	LOG(WARNING) << demaria_util::to_string(parse);
 #endif
 
   return;

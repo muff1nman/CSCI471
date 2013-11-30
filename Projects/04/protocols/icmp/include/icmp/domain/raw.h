@@ -10,6 +10,7 @@
 
 #include "ptr_types.h"
 #include "networkmuncher/util/logging.h"
+#include "ip.h"
 
 struct Raw : public Logging {
 	Raw(IpPtr ip, EchoPtr echo) : ip(ip), echo(echo) { }

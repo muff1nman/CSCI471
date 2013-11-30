@@ -40,9 +40,9 @@ namespace IP {
 	/**
 	 * Do the same as #from_data but return a shared_ptr instead
 	 */
-	IpMaybePtr from_data_as_ptr( ParseContext& parse_context ) {
+	NetworkLayerProtocolMaybePtr from_data_as_ptr( ParseContext& parse_context ) {
 		/*TODO*/ 
-		IpMaybePtr to_return;
+		NetworkLayerProtocolMaybePtr to_return;
 		ParseContext::ConstIterator end_of_ip = next(parse_context.current, 20);
 
 #ifdef LOGGING
@@ -53,13 +53,13 @@ namespace IP {
 
 		parse_context.current = end_of_ip;
 
-		to_return = IpPtr( new Ip());
+		to_return = NetworkLayerProtocolPtr( new Ip());
 
 		return to_return;
 	}
 
 
-	IpMaybePtr from_data_as_ptr( const BytesContainer& bytes ) {
+	NetworkLayerProtocolMaybePtr from_data_as_ptr( const BytesContainer& bytes ) {
 		ParseContext parse_context(bytes, bytes.begin(), bytes.end(), bytes.begin());
 		return from_data_as_ptr( parse_context );
 	}
