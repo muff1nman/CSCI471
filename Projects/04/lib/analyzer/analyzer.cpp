@@ -19,29 +19,38 @@
 #include "networkmuncher/parse/parsers.h"
 #include "networkmuncher/parse/parser_types.h"
 
-template <class ProtocolPtr, class ParserType>
-ProtocolPtr parse_layer(std::vector<ParserType> parsers, ParseContext& context) {
-	ProtocolPtr to_return;
-	for( size_t i = 0; i < parsers.size(); ++i ) {
-		// save context's spot
-		size_t saved_spot = context.get_current_index();
+template <class ProtoPtr, class ParserType>
+ProtoPtr parse_layer_with_parser( ParserType parser, ParseContext& context ) {
+	ProtoPtr to_return = parser(context);
+	size_t saved_spot = context.get_current_index();
+	if( !to_return ) {
 
-		// Attempt parse
-		ParserType current = parsers.at(i);
-		to_return = current(context);
-
-		// Check if successful
-		if( to_return ) {
-			return to_return;
-		} else {
 #ifdef LOGGING
-			LOG(WARNING) << "Reseting parse context";
+		LOG(WARNING) << "Reseting parse context";
 #endif
-			// reset parse context
-			context.set_to_index(saved_spot);
-		}
+		// reset parse context
+		context.set_to_index(saved_spot);
 	}
 
+	return to_return;
+}
+
+template <class ProtoPtr, class ParserType>
+ProtoPtr parse_layer(std::map<int, ParserType> parsers, ParseContext& context, ParseHint hint) {
+	ProtoPtr to_return;
+	if( hint.get_suggested_protocol() != PType::UNKNOWN ) {
+		to_return = parse_layer_with_parser<ProtoPtr,ParserType>(parsers[hint.get_suggested_protocol()],context);
+	} else {
+		typedef typename std::map<int, ParserType>::const_iterator ParserIterator;
+		ParserIterator i = parsers.begin();
+		for(; i != parsers.end(); ++i ) {
+			// Attempt parse
+			ParserType current = i->second;
+			to_return = parse_layer_with_parser<ProtoPtr,ParserType>(i->second,context);
+			if(to_return)
+				break;
+		}
+	}
 	// unsuccessful
 	return to_return;
 }
@@ -54,6 +63,8 @@ ProtocolPtr parse_layer(std::vector<ParserType> parsers, ParseContext& context) 
 // ****************************************************************************
 void pk_processor(u_char *user, const struct pcap_pkthdr *pkthdr, const u_char *packet) {
 
+	ParseHint hint(true);
+
   resultsC* results = (resultsC*)user;
   results->incrementPacketCount();
 
@@ -65,34 +76,53 @@ void pk_processor(u_char *user, const struct pcap_pkthdr *pkthdr, const u_char *
 	LOG(INFO) << "\n" << demaria_util::to_string(parse);
 #endif
 
-	LinkLayerProtocolMaybePtr link = parse_layer<LinkLayerProtocolMaybePtr,LinkParser>(link_parsers,parse);
+	LinkLayerProtocolMaybePtr link = parse_layer<LinkLayerProtocolMaybePtr,LinkParser>(link_parsers,parse,false);
 
 #ifdef LOGGING
 	LOG(INFO) << "Offset after parsing link: " << parse.get_current_index();
 #endif
 
 	if(link) {
-		results->count(*link);
+		hint = results->process(*link);
 	} else {
+		hint = results->process(LinkLayerProtocolPtr(new LinkLayerProtocol()));
 #ifdef LOGGING
 		LOG(WARNING) << "could not parse link layer";
 #endif
-		return;
 	}
 
-	NetworkLayerProtocolMaybePtr net = parse_layer<NetworkLayerProtocolMaybePtr,NetworkParser>(network_parsers,parse);
+	if( !hint.get_should_parse() ) {return;}
+
+	NetworkLayerProtocolMaybePtr net = parse_layer<NetworkLayerProtocolMaybePtr,NetworkParser>(network_parsers,parse,hint);
 
 #ifdef LOGGING
 	LOG(INFO) << "Offset after parsing network: " << parse.get_current_index();
 #endif
 
 	if(net) {
-		results->count(*net);
+		hint = results->process(*net);
 	} else {
+		hint = results->process(NetworkLayerProtocolPtr(new NetworkLayerProtocol()));
 #ifdef LOGGING
 		LOG(WARNING) << "Could not parse network layer";
 #endif
-		return;
+	}
+
+	if( !hint.get_should_parse() ) {return;}
+
+	TransportLayerProtocolMaybePtr trans = parse_layer<TransportLayerProtocolMaybePtr,TransportParser>(transport_parsers,parse, hint);
+
+#ifdef LOGGING
+	LOG(INFO) << "Offset after parsing transport: " << parse.get_current_index();
+#endif
+
+	if(trans) {
+		hint = results->process(*trans);
+	} else {
+		hint = results->process(TransportLayerProtocolPtr(new TransportLayerProtocol()));
+#ifdef LOGGING
+		LOG(WARNING) << "Could not parse transport layer";
+#endif
 	}
 
   return;

@@ -27,6 +27,10 @@ void resultsC::displayResults() {
 	if(ip_min_size) {
 		std::cout << "Min Ip size: " << *ip_min_size << std::endl;
 	}
+	std::cout << "Icmp echo packets: " << icmp_echo_count << std::endl;
+	std::cout << "Unrecognized link layer packets: " << other_link_count << std::endl;
+	std::cout << "Unrecognized network layer packets: " << other_network_count << std::endl;
+	std::cout << "Unrecognized transport layer packets: " << other_transport_count << std::endl;
 }
 
 template <class C>
@@ -40,20 +44,41 @@ void register_size( boost::optional<C>& current_max, boost::optional<C>& current
 	}
 }
 
-void resultsC::count_protocol(const Ip& ip) {
+ParseHint map_ip_proto_to_hint(size_t proto) {
+	switch(proto) {
+		case 1:
+			return ParseHint(true, PType::Transport::ICMP_ECHO);
+		default:
+			return false;
+	}
+}
+
+ParseHint resultsC::process_protocol(const Ip& ip) {
 	ip_count++;
 	register_size(ip_max_size, ip_min_size, ip.size());
+	ParseHint hint = map_ip_proto_to_hint(ip.protocol.to_ulong());
+	if(hint.get_should_parse() == false ) {
+		other_transport_count++;
+	}
+	return hint;
 }
 
-void resultsC::count_protocol(const Ethernetv2& ether) {
+ParseHint resultsC::process_protocol(const Ethernetv2& ether) {
 	this->ethernet_v2_count++;
+	return true;
 }
 
-void resultsC::count_protocol(const Ethernet8023& ether) {
+ParseHint resultsC::process_protocol(const Ethernet8023& ether) {
 	this->ethernet_8023++;
+	return true;
 }
 
-void resultsC::count(const ProtocolPtr proto) {
+ParseHint resultsC::process_protocol(const Echo& echo) {
+	this->icmp_echo_count++;
+	return false;
+}
+
+ParseHint resultsC::process(const ProtocolPtr proto) {
 	switch(proto->what_type()) {
 
 		///////////////////////////////////////////////////////
@@ -64,17 +89,24 @@ void resultsC::count(const ProtocolPtr proto) {
 #ifdef LOGGING
 			LOG(INFO) << "Uknown application protocol";
 #endif
-			break;
+			return false;
 
 		///////////////////////////////////////////////////////
 		// Transport Layer
 		///////////////////////////////////////////////////////
 
 		case PType::TRANSPORT:
+			other_transport_count++;
 #ifdef LOGGING
 			LOG(INFO) << "Uknown transport protocol";
 #endif
-			break;
+			return false;
+
+		case PType::Transport::ICMP_ECHO:
+#ifdef LOGGING
+			LOG(INFO) << "Parsed icmp echo";
+#endif
+			return process_protocol(*boost::dynamic_pointer_cast<Echo>(proto));
 
 		///////////////////////////////////////////////////////
 		// Network Layer
@@ -84,44 +116,44 @@ void resultsC::count(const ProtocolPtr proto) {
 #ifdef LOGGING
 			LOG(INFO) << "Uknown network protocol";
 #endif
-			break;
+			other_network_count++;
+			return false;
 
 		case PType::Network::IPV4:
-			count_protocol(*boost::dynamic_pointer_cast<Ip>(proto));
 #ifdef LOGGING
 			LOG(INFO) << "Ipv4 parsed";
 #endif
-			break;
+			return process_protocol(*boost::dynamic_pointer_cast<Ip>(proto));
 
 		///////////////////////////////////////////////////////
 		// Link Layer
 		///////////////////////////////////////////////////////
 
 		case PType::LINK:
+			other_link_count++;
 #ifdef LOGGING
 			LOG(INFO) << "Uknown link protocol";
 #endif
-			break;
+			return false;
 
 		case PType::Link::ETHERNET_UNKNOWN:
+			other_link_count++;
 #ifdef LOGGING
 			LOG(WARNING) << "Ethernet found, but type unknown: not counted";
 #endif
-			break;
+			return false;
 
 		case PType::Link::ETHERNET_8023:
-			count_protocol(*boost::dynamic_pointer_cast<Ethernet8023>(proto));
 #ifdef LOGGING
 			LOG(INFO) << "Ethernet 802.3 protocol parsed";
 #endif
-			break;
+			return process_protocol(*boost::dynamic_pointer_cast<Ethernet8023>(proto));
 
 		case PType::Link::ETHERNET_V2:
-			count_protocol(*boost::dynamic_pointer_cast<Ethernetv2>(proto));
 #ifdef LOGGING
 			LOG(INFO) << "Ethernet II protocol parsed";
 #endif
-			break;
+			return process_protocol(*boost::dynamic_pointer_cast<Ethernetv2>(proto));
 
 		///////////////////////////////////////////////////////
 		// Unknown Layer
@@ -131,10 +163,11 @@ void resultsC::count(const ProtocolPtr proto) {
 #ifdef LOGGING
 			LOG(FATAL) << "No label for protocol with num: " << proto->what_type();
 #endif
+			// flow over on purpose here
 		case PType::UNKNOWN:
 #ifdef LOGGING
 			LOG(WARNING) << "Unknown protocol";
 #endif
-			break;
+			return false;
 	}
 }

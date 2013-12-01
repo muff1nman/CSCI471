@@ -13,19 +13,26 @@
 #include "ethernet/domain/domain.h"
 #include "icmp/domain/domain.h"
 #include <boost/optional.hpp>
+#include "parse_hint.h"
 
 class resultsC {
   protected:
 		size_t totalPacketCount;
 		size_t ethernet_v2_count;
 		size_t ethernet_8023;
+		size_t other_link_count;
+
+		size_t icmp_echo_count;
 		size_t other_network_count;
+
+		size_t other_transport_count;
 		size_t ip_count;
 		boost::optional<size_t> ip_max_size;
 		boost::optional<size_t> ip_min_size;
-		void count_protocol(const Ethernetv2& ether);
-		void count_protocol(const Ethernet8023& ether);
-		void count_protocol(const Ip& ip);
+		ParseHint process_protocol(const Ethernetv2& ether);
+		ParseHint process_protocol(const Ethernet8023& ether);
+		ParseHint process_protocol(const Ip& ip);
+		ParseHint process_protocol(const Echo& echo);
 
   public:
    //resultsC() : 
@@ -34,7 +41,8 @@ class resultsC {
 		 //ethernet_8023(0) {}
    void incrementPacketCount() { totalPacketCount++; };
    void displayResults();
-	 void count(const ProtocolPtr proto);
+	 // returns true if we should continue parsing
+	 ParseHint process(const ProtocolPtr proto);
 };
 
 #endif

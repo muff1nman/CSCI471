@@ -11,9 +11,12 @@
 #include "networkmuncher/util/byte/byte.h"
 #include "networkmuncher/util/byte/print.h"
 #include "networkmuncher/util/logging.h"
+#include "networkmuncher/domain/all.h"
 
-struct Echo : public Logging {
+struct Echo : public TransportLayerProtocol, public Logging {
 	public:
+
+		virtual int what_type() const { return PType::Transport::ICMP_ECHO; }
 		static const size_t TYPE_LENGTH         = 8;
 		static const size_t CODE_LENGTH         = 8;
 		static const size_t CHECKSUM_LENGTH     = 16;

@@ -88,20 +88,20 @@ EchoMaybe ECHO::from_data( const BytesContainer& bytes ) {
 	return ECHO::from_data(parse_context);
 }
 
-EchoMaybePtr ECHO::from_data_as_ptr( ParseContext& parse_context ) {
+TransportLayerProtocolMaybePtr ECHO::from_data_as_ptr( ParseContext& parse_context ) {
 	boost::shared_ptr<EchoBuilder> b( new EchoBuilder() );
-	EchoMaybePtr to_return;
+	TransportLayerProtocolMaybePtr to_return;
 	EchoParseContext context( parse_context, b );
 
 	bool valid = from_data_internal( context );
 	if( valid ) {
-		to_return = b->build_ptr();
+		to_return = boost::dynamic_pointer_cast<TransportLayerProtocol>(b->build_ptr());
 	}
 
 	return to_return;
 }
 
-EchoMaybePtr ECHO::from_data_as_ptr( const BytesContainer& bytes ) {
+TransportLayerProtocolMaybePtr ECHO::from_data_as_ptr( const BytesContainer& bytes ) {
 	ParseContext parse_context(bytes, bytes.begin(), bytes.end(), bytes.begin());
 	return ECHO::from_data_as_ptr(parse_context);
 }

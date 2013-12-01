@@ -8,22 +8,30 @@
 #ifndef PARSERS_H
 #define PARSERS_H
 
-#include <set>
+#include <map>
 
 #include "ethernet/parse/ethernet.h"
 #include "icmp/parse/ip.h"
+#include "icmp/parse/echo.h"
 #include "parser_types.h"
+#include "networkmuncher/domain/protocol_types.h"
 
 NetworkParseFunction ip_parser = &IP::from_data_as_ptr;
 
-std::vector<NetworkParser> network_parsers = boost::assign::list_of
-(ip_parser);
+std::map<int, NetworkParser> network_parsers = boost::assign::map_list_of
+(PType::Network::IPV4, ip_parser);
 
 LinkParseFunction ethernet_v2 = &ETHERNETV2::from_data_as_ptr;
 LinkParseFunction ethernet_8023 = &ETHERNET8023::from_data_as_ptr;
 
-std::vector<LinkParser> link_parsers = boost::assign::list_of
-(ethernet_v2)(ethernet_8023);
+std::map<int,LinkParser> link_parsers = boost::assign::map_list_of
+(PType::Link::ETHERNET_V2, ethernet_v2)
+(PType::Link::ETHERNET_8023, ethernet_8023);
+
+TransportParseFunction icmp = &ECHO::from_data_as_ptr;
+
+std::map<int,TransportParser> transport_parsers = boost::assign::map_list_of
+(PType::Transport::ICMP_ECHO,icmp);
 
 #endif /* !PARSERS_H */
 

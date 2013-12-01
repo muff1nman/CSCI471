@@ -24,9 +24,9 @@ namespace RAW {
 		LOG(INFO) << "Bytes off wire:\n" <<  demaria_util::to_string( parse_context.raw_data );
 #endif
 		NetworkLayerProtocolMaybePtr ip = IP::from_data_as_ptr( parse_context );
-		EchoMaybePtr echo = ECHO::from_data_as_ptr( parse_context );
+		TransportLayerProtocolMaybePtr echo = ECHO::from_data_as_ptr( parse_context );
 		if( ip && echo ) {
-			raw = Raw(boost::dynamic_pointer_cast<Ip>(*ip), *echo);
+			raw = Raw(boost::dynamic_pointer_cast<Ip>(*ip), boost::dynamic_pointer_cast<Echo>(*echo));
 		}
 		return raw;
 	}
@@ -45,12 +45,12 @@ namespace RAW {
 		LOG(INFO) << "Bytes off wire:\n" <<  demaria_util::to_string( parse_context.raw_data );
 #endif
 		NetworkLayerProtocolMaybePtr ip = IP::from_data_as_ptr( parse_context );
-		EchoMaybePtr echo = ECHO::from_data_as_ptr( parse_context );
+		TransportLayerProtocolMaybePtr echo = ECHO::from_data_as_ptr( parse_context );
 		if( ip && echo ) {
 #ifdef LOGGING
 			LOG(INFO) << "Valid ip and echo";
 #endif
-			raw = RawPtr( new Raw(boost::dynamic_pointer_cast<Ip>(*ip), *echo));
+			raw = RawPtr( new Raw(boost::dynamic_pointer_cast<Ip>(*ip), boost::dynamic_pointer_cast<Echo>(*echo)));
 
 		}
 #ifdef LOGGING

@@ -20,7 +20,11 @@ class IcmpEchoConsumer : public SocketConsumer {
 		IcmpEchoConsumer( EchoMaybePtr& result ) : result(result) { }
 
 		virtual void consume( ParseContextPtr context ) {
-			result = ECHO::from_data_as_ptr( *context );
+			// TODO change pointer types so this crazyness isnt necesary
+			TransportLayerProtocolMaybePtr temp = ECHO::from_data_as_ptr( *context );
+			if( temp ) {
+				result = boost::dynamic_pointer_cast<Echo>(*temp);
+			}
 		}
 
 	protected:

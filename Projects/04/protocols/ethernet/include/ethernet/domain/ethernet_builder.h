@@ -5,8 +5,8 @@
  * All Rights Reserved.
  */
 
-#ifndef IP_BUILDER_H
-#define IP_BUILDER_H
+#ifndef ETHERNET_BUILDER_H
+#define ETHERNET_BUILDER_H
 
 #include "ethernet.h"
 #include "ptr_types.h"
@@ -76,5 +76,5 @@ class EthernetBuilder {
 
 };
 
-#endif /* !IP_BUILDER_H */
+#endif /* !ETHERNET_BUILDER_H */
 
