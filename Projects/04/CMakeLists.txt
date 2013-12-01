@@ -69,6 +69,7 @@ include_directories(
 	${PROTOCOL_INCLUDE_DIR}/ethernet/include
 	${PROTOCOL_INCLUDE_DIR}/dns/include
 	${PROTOCOL_INCLUDE_DIR}/udp/include
+	${PROTOCOL_INCLUDE_DIR}/dns/include
 	)
 
 # Go do work CMake!

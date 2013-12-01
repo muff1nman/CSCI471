@@ -39,6 +39,9 @@ void resultsC::displayResults() {
 	std::cout << "Network Layer Statistics" << std::endl << separator << std::endl;
 	std::cout << "Upd packets: " << udp_count << std::endl;
 
+	std::cout << "Application Layer Statistics" << std::endl << separator << std::endl;
+	std::cout << "Dns packets: " << dns_count << std::endl;
+
 	std::cout << "Misc" << std::endl << separator << std::endl;
 	std::cout << "Unrecognized link layer packets: " << other_link_count << std::endl;
 	std::cout << "Unrecognized network layer packets: " << other_network_count << std::endl;
@@ -97,6 +100,11 @@ ParseHint resultsC::process_protocol(const Udp& echo) {
 	return true;
 }
 
+ParseHint resultsC::process_protocol(const DNS& echo) {
+	this->dns_count++;
+	return false;
+}
+
 ParseHint resultsC::process(const ProtocolPtr proto) {
 	switch(proto->what_type()) {
 
@@ -108,7 +116,14 @@ ParseHint resultsC::process(const ProtocolPtr proto) {
 #ifdef LOGGING
 			LOG(INFO) << "Uknown application protocol";
 #endif
+			other_application_count++;
 			return false;
+
+		case PType::Application::DNS:
+#ifdef LOGGING
+			LOG(INFO) << "Parsed dns";
+#endif
+			return process_protocol(*boost::dynamic_pointer_cast<DNS>(proto));
 
 		///////////////////////////////////////////////////////
 		// Transport Layer

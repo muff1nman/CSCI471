@@ -444,13 +444,13 @@ boost::optional<DNS> from_data( ParseContext& parse_context ) {
 	return to_return;
 }
 
-DnsMaybePtr from_data_as_ptr( ParseContext& parse_context ) {
+DNS::InheritedProtocolMaybePtr from_data_as_ptr( ParseContext& parse_context ) {
 	boost::shared_ptr<DNSBuilder> b( new DNSBuilder() );
-	DnsMaybePtr to_return;
+	DNS::InheritedProtocolMaybePtr to_return;
 	DNSParseContext context( parse_context, b );
 	bool valid = from_data_internal( context );
 	if( valid ) {
-		to_return = b->build_ptr();
+		to_return = boost::dynamic_pointer_cast<DNS::InheritedProtocol>(b->build_ptr());
 #ifdef LOGGING
 	} else {
 		LOG(WARNING) << "Invalid built dns";
@@ -465,7 +465,7 @@ boost::optional<DNS> from_data( const BytesContainer raw ) {
 	return from_data(p);
 }
 
-DnsMaybePtr from_data_as_ptr( const BytesContainer raw ) {
+DNS::InheritedProtocolMaybePtr from_data_as_ptr( const BytesContainer raw ) {
 	ParseContext p(raw);
 	return from_data_as_ptr(p);
 }

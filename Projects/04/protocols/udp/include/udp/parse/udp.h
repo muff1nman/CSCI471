@@ -25,8 +25,8 @@ UdpMaybe from_data( const BytesContainer& bytes );
 /**
  * Do the same as #from_data but return a shared_ptr instead
  */
-InheritedProtocolMaybePtr from_data_as_ptr( ParseContext& parse_context );
-InheritedProtocolMaybePtr from_data_as_ptr( const BytesContainer& bytes );
+Udp::InheritedProtocolMaybePtr from_data_as_ptr( ParseContext& parse_context );
+Udp::InheritedProtocolMaybePtr from_data_as_ptr( const BytesContainer& bytes );
 
 }
 

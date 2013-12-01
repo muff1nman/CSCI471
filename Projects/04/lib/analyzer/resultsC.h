@@ -13,6 +13,7 @@
 #include "ethernet/domain/domain.h"
 #include "icmp/domain/domain.h"
 #include "udp/domain/domain.h"
+#include "dns/domain/domain.h"
 #include <boost/optional.hpp>
 #include "parse_hint.h"
 
@@ -30,6 +31,9 @@ class resultsC {
 		size_t udp_count;
 		size_t other_transport_count;
 
+		size_t dns_count;
+		size_t other_application_count;
+
 		boost::optional<size_t> ip_max_size;
 		boost::optional<size_t> ip_min_size;
 		ParseHint process_protocol(const Ethernetv2& ether);
@@ -37,6 +41,7 @@ class resultsC {
 		ParseHint process_protocol(const Ip& ip);
 		ParseHint process_protocol(const Echo& echo);
 		ParseHint process_protocol(const Udp& echo);
+		ParseHint process_protocol(const DNS& echo);
 
   public:
    //resultsC() : 

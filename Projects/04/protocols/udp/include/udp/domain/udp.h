@@ -13,12 +13,12 @@
 #include "networkmuncher/util/logging.h"
 #include "networkmuncher/domain/all.h"
 
-typedef TransportLayerProtocol InheritedProtocol;
-typedef TransportLayerProtocolPtr InheritedProtocolPtr;
-typedef TransportLayerProtocolMaybePtr InheritedProtocolMaybePtr;
 
-struct Udp : public InheritedProtocol, public Logging {
+struct Udp : public TransportLayerProtocol, public Logging {
 	public:
+		typedef TransportLayerProtocol InheritedProtocol;
+		typedef TransportLayerProtocolPtr InheritedProtocolPtr;
+		typedef TransportLayerProtocolMaybePtr InheritedProtocolMaybePtr;
 
 		static const size_t PORT_LENGTH = 16;
 		static const size_t LENGTH_LENGTH = 16;

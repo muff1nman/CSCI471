@@ -12,6 +12,7 @@ namespace PType {
 
 	const static int APPLICATION = 400;
 	namespace Application {
+		const static int DNS = 401;
 	}
 
 	const static int TRANSPORT =  300;

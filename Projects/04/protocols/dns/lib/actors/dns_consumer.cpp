@@ -11,7 +11,9 @@
 void DNSConsumer::run(Socket* socket) {
 	boost::optional<BytesContainer> raw_data = socket->recv();
 	if( raw_data ) {
-		result = from_data_as_ptr( *raw_data );
+		DNS::InheritedProtocolMaybePtr temp = from_data_as_ptr( *raw_data );
+		if(temp)
+			result = boost::dynamic_pointer_cast<DNS>(*temp);
 	}
 }
 

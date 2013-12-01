@@ -24,8 +24,8 @@ boost::optional<DNS> from_data( ParseContext& context );
 /**
  * Do the same as #from_data but return a shared_ptr instead
  */
-DnsMaybePtr from_data_as_ptr( const BytesContainer raw );
-DnsMaybePtr from_data_as_ptr( ParseContext& context );
+DNS::InheritedProtocolMaybePtr from_data_as_ptr( const BytesContainer raw );
+DNS::InheritedProtocolMaybePtr from_data_as_ptr( ParseContext& context );
 
 #endif /* !__dns_h__ */
 

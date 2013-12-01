@@ -77,13 +77,13 @@ namespace UDP {
 		return from_data( parse_context );
 	}
 
-	InheritedProtocolMaybePtr from_data_as_ptr( ParseContext& parse_context ) {
-		InheritedProtocolMaybePtr to_return;
+	Udp::InheritedProtocolMaybePtr from_data_as_ptr( ParseContext& parse_context ) {
+		Udp::InheritedProtocolMaybePtr to_return;
 		boost::shared_ptr<UdpBuilder> b( new UdpBuilder());
 		UdpParseContext context(parse_context,b);
 
 		if(parse_internal(context)) {
-			to_return = boost::dynamic_pointer_cast<InheritedProtocol>(context.b->build_ptr());
+			to_return = boost::dynamic_pointer_cast<Udp::InheritedProtocol>(context.b->build_ptr());
 #ifdef LOGGING
 		} else {
 			LOG(WARNING) << "Could not parse a udp packet";
@@ -94,7 +94,7 @@ namespace UDP {
 	}
 
 
-	InheritedProtocolMaybePtr from_data_as_ptr( const BytesContainer& bytes ) {
+	Udp::InheritedProtocolMaybePtr from_data_as_ptr( const BytesContainer& bytes ) {
 		ParseContext parse_context(bytes, bytes.begin(), bytes.end(), bytes.begin());
 		return from_data_as_ptr( parse_context );
 	}

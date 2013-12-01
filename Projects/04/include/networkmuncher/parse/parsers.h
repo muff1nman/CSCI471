@@ -14,6 +14,7 @@
 #include "icmp/parse/ip.h"
 #include "icmp/parse/echo.h"
 #include "udp/parse/udp.h"
+#include "dns/parse/dns.h"
 #include "parser_types.h"
 #include "networkmuncher/domain/protocol_types.h"
 
@@ -35,6 +36,11 @@ TransportParseFunction udp = &UDP::from_data_as_ptr;
 std::map<int,TransportParser> transport_parsers = boost::assign::map_list_of
 (PType::Transport::ICMP_ECHO,icmp)
 (PType::Transport::UDP, udp);
+
+ApplicationParseFunction dns = &from_data_as_ptr; // TODO nest in namespace
+std::map<int,ApplicationParser> application_parsers = boost::assign::map_list_of
+(PType::Application::DNS, dns);
+
 
 #endif /* !PARSERS_H */
 

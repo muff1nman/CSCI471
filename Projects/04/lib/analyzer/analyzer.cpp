@@ -125,6 +125,20 @@ void pk_processor(u_char *user, const struct pcap_pkthdr *pkthdr, const u_char *
 #endif
 	}
 
+	// ignore this so that it isnt necessary to have a transport layer protocol?
+	// if( !hint.get_should_parse() ) {return;}	
+
+	ApplicationLayerProtocolMaybePtr app = parse_layer<ApplicationLayerProtocolMaybePtr,ApplicationParser>(application_parsers,parse,hint);
+
+	if(app) {
+		hint = results->process(*app);
+	} else {
+		hint = results->process(ApplicationLayerProtocolPtr(new ApplicationLayerProtocol()));
+#ifdef LOGGING
+		LOG(WARNING) << "Could not parse application layer";
+#endif
+	}
+
   return;
 }
 

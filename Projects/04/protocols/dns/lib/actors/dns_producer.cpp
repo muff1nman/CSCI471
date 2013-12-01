@@ -29,10 +29,11 @@ void DnsProducer::run(Socket* socket) {
 	if(!raw_data) {
 		return;
 	}
-	DnsMaybePtr parsed_query = from_data_as_ptr( *raw_data );
-	if( parsed_query ) {
+	DNS::InheritedProtocolMaybePtr maybe_parsed_query = from_data_as_ptr( *raw_data );
+	if( maybe_parsed_query ) {
+		DnsPtr parsed_query = boost::dynamic_pointer_cast<DNS>(*maybe_parsed_query);
 #ifdef LOGGING
-		LOG(INFO) << "receieved: " << (*parsed_query)->to_string();
+		LOG(INFO) << "receieved: " << (parsed_query)->to_string();
 #endif
 
 		////////////////////////////////////////////////
@@ -49,9 +50,9 @@ void DnsProducer::run(Socket* socket) {
 			LOG(INFO) << "Created auxilary socket";
 #endif
 #ifdef DAEMON_DEBUG
-			lookup = query_once_and_then_try_recursive( ROOT_SERVER, *parsed_query, aux_socket, true );
+			lookup = query_once_and_then_try_recursive( ROOT_SERVER, parsed_query, aux_socket, true );
 #else
-			lookup = query_once_and_then_try_recursive( ROOT_SERVER, *parsed_query, aux_socket );
+			lookup = query_once_and_then_try_recursive( ROOT_SERVER, parsed_query, aux_socket );
 #endif
 		}
 
@@ -63,8 +64,8 @@ void DnsProducer::run(Socket* socket) {
 		if( lookup && (*lookup)->get_answers().size() > 0) {
 			DNSBuilder b;
 			b.is_response().
-				set_id( (*parsed_query)->get_id());
-			DNS::QuestionList question_list = (*parsed_query)->get_questions();
+				set_id( (parsed_query)->get_id());
+			DNS::QuestionList question_list = (parsed_query)->get_questions();
 			for( size_t i = 0; i < question_list.size(); ++i ) {
 				b.add_question( (question_list.at(i)) );
 			}
@@ -92,7 +93,7 @@ void DnsProducer::run(Socket* socket) {
 		} else {
 			to_send_back = DNSBuilder().
 				is_response().
-				set_id( (*parsed_query)->get_id()).
+				set_id( (parsed_query)->get_id()).
 				return_code( std::bitset<DNS::RCODE_FIELD_LENGTH>(DNS::SERVER_FAILURE) ).
 				build_ptr();
 

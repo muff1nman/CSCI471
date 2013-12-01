@@ -10,6 +10,7 @@
 
 #include "networkmuncher/util/logging.h"
 #include "networkmuncher/util/byte/byte.h"
+#include "networkmuncher/domain/all.h"
 
 #include "resource_record.h"
 #include "question.h"
@@ -27,8 +28,13 @@
 /**
  * A DNS class to represent any DNS packet.
  */
-class DNS : public Logging {
+class DNS : public ApplicationLayerProtocol, public Logging {
 	public:
+		virtual int what_type() const { return PType::Application::DNS; }
+
+		typedef ApplicationLayerProtocol InheritedProtocol;
+		typedef ApplicationLayerProtocolPtr InheritedProtocolPtr;
+		typedef ApplicationLayerProtocolMaybePtr InheritedProtocolMaybePtr;
 
 		typedef boost::shared_ptr<Question> QuestionPtr;
 		typedef boost::shared_ptr<ResourceRecord> ResourcePtr;
