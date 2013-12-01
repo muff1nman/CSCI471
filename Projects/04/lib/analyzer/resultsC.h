@@ -12,6 +12,7 @@
 #include "networkmuncher/domain/all.h"
 #include "ethernet/domain/domain.h"
 #include "icmp/domain/domain.h"
+#include "udp/domain/domain.h"
 #include <boost/optional.hpp>
 #include "parse_hint.h"
 
@@ -23,16 +24,19 @@ class resultsC {
 		size_t other_link_count;
 
 		size_t icmp_echo_count;
+		size_t ip_count;
 		size_t other_network_count;
 
+		size_t udp_count;
 		size_t other_transport_count;
-		size_t ip_count;
+
 		boost::optional<size_t> ip_max_size;
 		boost::optional<size_t> ip_min_size;
 		ParseHint process_protocol(const Ethernetv2& ether);
 		ParseHint process_protocol(const Ethernet8023& ether);
 		ParseHint process_protocol(const Ip& ip);
 		ParseHint process_protocol(const Echo& echo);
+		ParseHint process_protocol(const Udp& echo);
 
   public:
    //resultsC() : 

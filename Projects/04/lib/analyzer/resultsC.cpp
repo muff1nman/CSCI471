@@ -8,6 +8,7 @@
 
 #include "analyzer.h"
 #include "networkmuncher/domain/protocol_types.h"
+#include <string>
 
 
 // ***************************************************************************
@@ -17,9 +18,15 @@
 // *  collected to stdout.
 // ***************************************************************************
 void resultsC::displayResults() {
+	std::string separator = 
+		"================================";
   std::cout << "A total of " << totalPacketCount << " packets processed." << std::endl;
+
+	std::cout << "Link Layer Statistics" << std::endl << separator << std::endl;
 	std::cout << "Ethernet II packets: " << ethernet_v2_count << std::endl;
 	std::cout << "Ethernet 802.3 packets: " << ethernet_8023 << std::endl;
+
+	std::cout << "Network Layer Statistics" << std::endl << separator << std::endl;
 	std::cout << "Ip packets: " << ip_count << std::endl;
 	if(ip_max_size) {
 		std::cout << "Max Ip size: " << *ip_max_size << std::endl;
@@ -28,6 +35,11 @@ void resultsC::displayResults() {
 		std::cout << "Min Ip size: " << *ip_min_size << std::endl;
 	}
 	std::cout << "Icmp echo packets: " << icmp_echo_count << std::endl;
+
+	std::cout << "Network Layer Statistics" << std::endl << separator << std::endl;
+	std::cout << "Upd packets: " << udp_count << std::endl;
+
+	std::cout << "Misc" << std::endl << separator << std::endl;
 	std::cout << "Unrecognized link layer packets: " << other_link_count << std::endl;
 	std::cout << "Unrecognized network layer packets: " << other_network_count << std::endl;
 	std::cout << "Unrecognized transport layer packets: " << other_transport_count << std::endl;
@@ -48,6 +60,8 @@ ParseHint map_ip_proto_to_hint(size_t proto) {
 	switch(proto) {
 		case 1:
 			return ParseHint(true, PType::Transport::ICMP_ECHO);
+		case 17:
+			return ParseHint(true, PType::Transport::UDP);
 		default:
 			return false;
 	}
@@ -76,6 +90,11 @@ ParseHint resultsC::process_protocol(const Ethernet8023& ether) {
 ParseHint resultsC::process_protocol(const Echo& echo) {
 	this->icmp_echo_count++;
 	return false;
+}
+
+ParseHint resultsC::process_protocol(const Udp& echo) {
+	this->udp_count++;
+	return true;
 }
 
 ParseHint resultsC::process(const ProtocolPtr proto) {
@@ -107,6 +126,12 @@ ParseHint resultsC::process(const ProtocolPtr proto) {
 			LOG(INFO) << "Parsed icmp echo";
 #endif
 			return process_protocol(*boost::dynamic_pointer_cast<Echo>(proto));
+
+		case PType::Transport::UDP:
+#ifdef LOGGING
+			LOG(INFO) << "Parsed udp";
+#endif
+			return process_protocol(*boost::dynamic_pointer_cast<Udp>(proto));
 
 		///////////////////////////////////////////////////////
 		// Network Layer

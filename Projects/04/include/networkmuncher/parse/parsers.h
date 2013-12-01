@@ -13,6 +13,7 @@
 #include "ethernet/parse/ethernet.h"
 #include "icmp/parse/ip.h"
 #include "icmp/parse/echo.h"
+#include "udp/parse/udp.h"
 #include "parser_types.h"
 #include "networkmuncher/domain/protocol_types.h"
 
@@ -29,9 +30,11 @@ std::map<int,LinkParser> link_parsers = boost::assign::map_list_of
 (PType::Link::ETHERNET_8023, ethernet_8023);
 
 TransportParseFunction icmp = &ECHO::from_data_as_ptr;
+TransportParseFunction udp = &UDP::from_data_as_ptr;
 
 std::map<int,TransportParser> transport_parsers = boost::assign::map_list_of
-(PType::Transport::ICMP_ECHO,icmp);
+(PType::Transport::ICMP_ECHO,icmp)
+(PType::Transport::UDP, udp);
 
 #endif /* !PARSERS_H */
 
