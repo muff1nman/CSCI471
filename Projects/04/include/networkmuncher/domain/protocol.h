@@ -15,6 +15,8 @@ class Protocol {
 
 		virtual int what_type() const = 0;
 
+		virtual size_t size() const { return 0; }
+
 };
 
 #endif /* !PROTOCOL_H */

@@ -48,8 +48,8 @@ namespace demaria_util {
 		return to_string( data.data(), data.size(), group_space, group_newline, padding_front );
 	}
 
-	inline std::string to_string( const ParseContext parse, size_t group_space = GROUP_SPACE_DEFAULT, size_t group_newline = GROUP_NEWLINE_DEFAULT, size_t padding_front = PADDING_FRONT_DEFAULT ) {
-		return to_string( parse.raw_data.data() + std::distance( parse.start, parse.current ), std::distance( parse.current, parse.finish ), group_space, group_newline, padding_front );
+	inline std::string to_string( const ParseContext& parse, size_t group_space = GROUP_SPACE_DEFAULT, size_t group_newline = GROUP_NEWLINE_DEFAULT, size_t padding_front = PADDING_FRONT_DEFAULT ) {
+		return to_string( parse.raw_data.data() + parse.get_current_index(), std::distance( *parse.current, parse.finish ), group_space, group_newline, padding_front );
 	}
 
 }

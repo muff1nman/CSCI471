@@ -59,7 +59,7 @@ void loop_over_and_print( BytesContainer::const_iterator start, BytesContainer::
 boost::optional<std::string> parse_string_part( ParseContext& context ) {
 	boost::optional<std::string> to_return;
 	if( context_has_bytes_left( context, 1 )) {
-		size_t length = (size_t) *(context.current++);
+		size_t length = (size_t) *(context.get_current()++);
 #ifdef LOGGING
 		LOG(INFO) << "length of next string: " << length;
 #endif
@@ -67,13 +67,13 @@ boost::optional<std::string> parse_string_part( ParseContext& context ) {
 			return to_return;
 		}
 		if( context_has_bytes_left( context, length )) {
-			BytesContainer::const_iterator end_of_string = context.current;
+			BytesContainer::const_iterator end_of_string = context.get_current();
 			std::advance( end_of_string, length);
-			to_return = std::string(context.current, end_of_string);
+			to_return = std::string(context.get_current(), end_of_string);
 #ifdef LOGGING
 			LOG(INFO) << "Created string: " << *to_return;
 #endif
-			context.current = end_of_string;
+			context.get_current() = end_of_string;
 		}
 #ifdef LOGGING
 		else {
@@ -95,7 +95,7 @@ bool is_pointer( ParseContext& context ) {
 		return false;
 	}
 
-	Byte first_byte = *(context.current);
+	Byte first_byte = *(context.get_current());
 	std::bitset<BITS_PER_BYTE> pointer = std::bitset<BITS_PER_BYTE>( first_byte );
 	return pointer.test(BITS_PER_BYTE - 1) && pointer.test(BITS_PER_BYTE - 2);
 }
@@ -303,10 +303,10 @@ if( rdlength ) {
 		LOG(WARNING) << "Could not parse record";
 	}
 
-	if( duplicate_before_rdata_parse.current > context.current ) {
+	if( duplicate_before_rdata_parse.get_current() > context.get_current() ) {
 		LOG(WARNING) << "Parsing contexts do not match after parsing specific type rdata";
 		LOG(INFO) << "Duplicate at: " << current_index(duplicate_before_rdata_parse) << " and context at: " << current_index( context );
-	} else if ( duplicate_before_rdata_parse.current != context.current ) {
+	} else if ( duplicate_before_rdata_parse.get_current() != context.get_current()) {
 		LOG(INFO) << "Duplicate at: " << current_index(duplicate_before_rdata_parse) << " and context at: " << current_index( context );
 	}
 #endif
@@ -363,7 +363,7 @@ bool parse_header( DNSParseContext& context, size_t& question_count, size_t& ans
 		ns_count = *nss_count;
 		ar_count = *arr_count;
 #ifdef LOGGING
-		LOG(INFO) << context.finish - context.current << " bytes remaining after header";
+		LOG(INFO) << context.finish - context.get_current() << " bytes remaining after header";
 		LOG(INFO) << "Current build: " << context.b->to_string();
 #endif
 		return true;

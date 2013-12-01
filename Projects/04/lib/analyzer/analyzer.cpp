@@ -24,7 +24,7 @@ ProtocolPtr parse_layer(std::vector<ParserType> parsers, ParseContext& context) 
 	ProtocolPtr to_return;
 	for( size_t i = 0; i < parsers.size(); ++i ) {
 		// save context's spot
-		ParseContext::ConstIterator saved_spot = context.current;
+		size_t saved_spot = context.get_current_index();
 
 		// Attempt parse
 		ParserType current = parsers.at(i);
@@ -34,8 +34,11 @@ ProtocolPtr parse_layer(std::vector<ParserType> parsers, ParseContext& context) 
 		if( to_return ) {
 			return to_return;
 		} else {
+#ifdef LOGGING
+			LOG(WARNING) << "Reseting parse context";
+#endif
 			// reset parse context
-			context.current = saved_spot;
+			context.set_to_index(saved_spot);
 		}
 	}
 
@@ -58,20 +61,39 @@ void pk_processor(u_char *user, const struct pcap_pkthdr *pkthdr, const u_char *
 
 	ParseContext parse( bytes_from_packet );
 
+#ifdef LOGGING
+	LOG(INFO) << "\n" << demaria_util::to_string(parse);
+#endif
+
 	LinkLayerProtocolMaybePtr link = parse_layer<LinkLayerProtocolMaybePtr,LinkParser>(link_parsers,parse);
+
+#ifdef LOGGING
+	LOG(INFO) << "Offset after parsing link: " << parse.get_current_index();
+#endif
 
 	if(link) {
 		results->count(*link);
 	} else {
 #ifdef LOGGING
-		LOG(INFO) << "could not parse link layer";
+		LOG(WARNING) << "could not parse link layer";
 #endif
 		return;
 	}
 
+	NetworkLayerProtocolMaybePtr net = parse_layer<NetworkLayerProtocolMaybePtr,NetworkParser>(network_parsers,parse);
+
 #ifdef LOGGING
-	LOG(WARNING) << demaria_util::to_string(parse);
+	LOG(INFO) << "Offset after parsing network: " << parse.get_current_index();
 #endif
+
+	if(net) {
+		results->count(*net);
+	} else {
+#ifdef LOGGING
+		LOG(WARNING) << "Could not parse network layer";
+#endif
+		return;
+	}
 
   return;
 }
@@ -96,6 +118,8 @@ int main (int argc, const char * argv[])
      std::cerr << "useage: project4 <filename>" << std::endl;
      exit(EXIT_FAILURE);
   }
+
+	init_log(0,PROJECT_NAME);
 
 
   // **********************************************************************

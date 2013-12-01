@@ -21,7 +21,7 @@ namespace PType {
 
 	const static int NETWORK = 200;
 	namespace Network {
-
+		const static int IPV4 = 201;
 	}
 
 	const static int LINK = 100;

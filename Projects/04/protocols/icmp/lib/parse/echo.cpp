@@ -13,11 +13,6 @@
 
 bool from_data_internal( EchoParseContext& context ) {
 
-#ifdef LOGGING
-	BytesContainer copy(context.current, context.finish);
-	LOG(INFO) << "Parsing these bytes for context: " << demaria_util::to_string(copy);
-#endif
-
 	boost::optional<Echo::Type> type = parse_bitset<Echo::TYPE_LENGTH / BITS_PER_BYTE>(context);
 	if(type) {
 		context.b->set_type(*type);

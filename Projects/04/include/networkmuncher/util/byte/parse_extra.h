@@ -15,7 +15,7 @@
 #include "networkmuncher/util/iterator.h"
 
 inline size_t current_index( ParseContext& context ) {
-	return std::distance( context.start, context.current );
+	return context.get_current_index();
 }
 
 template <class ForwardIterator>
@@ -24,7 +24,7 @@ inline bool context_has_bytes_left( const ForwardIterator& start, const ForwardI
 }
 
 inline bool context_has_bytes_left( const ParseContext& context, size_t bytes ) {
-	return context_has_bytes_left(context.current, context.finish, bytes);
+	return context_has_bytes_left(context.get_current(), context.finish, bytes);
 }
 
 /**
@@ -83,7 +83,7 @@ inline std::bitset<bytes * BITS_PER_BYTE> parse_bitset_with_missing_as_zeros( Fo
 
 template <size_t bytes>
 inline boost::optional<std::bitset<bytes * BITS_PER_BYTE> > parse_bitset( ParseContext& context ) {
-	return parse_bitset<ParseContext::ConstIterator, bytes>(context.current, context.finish);
+	return parse_bitset<ParseContext::ConstIterator, bytes>(context.get_current(), context.finish);
 }
 
 // N is the number of bytes
@@ -99,26 +99,26 @@ inline boost::optional<T> parse_number( ParseContext& context ) {
 }
 
 inline bool is_zero_byte( ParseContext& context ) {
-	return context_has_bytes_left( context, 1 )  && *(context.current) == (Byte) 0;
+	return context_has_bytes_left( context, 1 )  && *(context.get_current()) == (Byte) 0;
 }
 
 inline bool parse_zero_byte( ParseContext& context ) {
 	if( is_zero_byte( context ) ) {
-		std::advance( context.current, 1 );
+		std::advance( context.get_current(), 1 );
 		return true;
 	}
 	return false;
 }
 
-inline boost::optional<BytesContainer> parse_data( ParseContext& context, size_t length ) {
+inline boost::optional<BytesContainer> parse_data( ParseContext& context, size_t length_in_bytes ) {
 #ifdef LOGGING
-	LOG(INFO) << "#parse_data called with length " << length;
+	LOG(INFO) << "#parse_data called with length_in_bytes " << length_in_bytes;
 #endif
 	boost::optional<BytesContainer> c;
-	if( context_has_bytes_left( context, length ) ) {
-		BytesContainer::const_iterator end_of_rdata = next(context.current,length);
-		c = BytesContainer(context.current, end_of_rdata);
-		context.current = end_of_rdata;
+	if( context_has_bytes_left( context, length_in_bytes ) ) {
+		BytesContainer::const_iterator end_of_rdata = next(context.get_current(),length_in_bytes);
+		c = BytesContainer(context.get_current(), end_of_rdata);
+		context.get_current() = end_of_rdata;
 	}
 #ifdef LOGGING
 	else {
@@ -132,7 +132,7 @@ inline boost::optional<BytesContainer> parse_data( ParseContext& context, size_t
 
 // possibly no data left, in which case this will return an empty bytescontainer
 inline BytesContainer parse_remaining_data( ParseContext& context ) {
-	size_t bytes_left = std::distance(context.current, context.finish);
+	size_t bytes_left = std::distance(context.get_current(), context.finish);
 	return *parse_data(context,bytes_left);
 }
 

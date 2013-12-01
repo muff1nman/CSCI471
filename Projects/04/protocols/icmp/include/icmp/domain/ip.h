@@ -17,7 +17,11 @@
 struct Ip : public Logging, public NetworkLayerProtocol {
 	public:
 
-		static const size_t EXPECTED_VERSION = 69;
+		virtual int what_type() const { return PType::Network::IPV4; }
+
+		static const size_t EXPECTED_VERSION = 4;
+
+		virtual size_t size() const { return header_length.to_ulong() * BITS_PER_BYTE * 4 + options.size(); }
 
 		/**
 		 * Lengths for bitsets

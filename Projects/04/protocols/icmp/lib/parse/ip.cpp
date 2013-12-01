@@ -10,30 +10,33 @@
 #include "ip_parse_context.h"
 
 bool parse_internal( IpParseContext& context ) {
-	boost::optional<Ip::Version> version = parse_bitset<Ip::VERSION_LENGTH / BITS_PER_BYTE>(context);
-	if(version) {
-		// ensure version is IPv4
-		if(version->to_ulong() == Ip::EXPECTED_VERSION ) {
-			context.b->set_version(*version);
-		} else {
-			return false;
-#ifdef LOGGING
-			LOG(ERROR) << "Ipv4 version not correctly parsed";
-#endif
-		}
-	} else {
-#ifdef LOGGING
-		LOG(ERROR) << "Could not parse version";
-#endif
-		return false;
-	}
 
-	boost::optional<Ip::HeaderLength> header_length = parse_bitset<Ip::HEADER_LENGTH_LENGTH / BITS_PER_BYTE>(context);
-	if(header_length) {
-		context.b->set_header_length(*header_length);
+#define VH_LEN (Ip::VERSION_LENGTH + Ip::HEADER_LENGTH_LENGTH)
+
+	boost::optional< std::bitset<VH_LEN> > v_and_h;
+	v_and_h = parse_bitset<VH_LEN / BITS_PER_BYTE>(context);
+
+	Ip::HeaderLength header_length;
+	Ip::Version version;
+	if(v_and_h) {
+#ifdef LOGGING
+		LOG(INFO) << "Parsing: " << v_and_h->to_string() << " " << v_and_h->to_ulong();
+#endif
+		version = dissect<VH_LEN,Ip::VERSION_LENGTH>(*v_and_h, Ip::HEADER_LENGTH_LENGTH);
+		header_length = dissect<VH_LEN,Ip::HEADER_LENGTH_LENGTH>(*v_and_h);
+		// ensure version is IPv4
+		if(version.to_ulong() == Ip::EXPECTED_VERSION ) {
+			context.b->set_version(version);
+		} else {
+#ifdef LOGGING
+			LOG(ERROR) << "Unexpected ipv4 version, found: " << version.to_ulong();
+#endif
+			return false;
+		}
+		context.b->set_header_length(header_length);
 	} else {
 #ifdef LOGGING
-		LOG(ERROR) << "Could not parse header_length";
+		LOG(ERROR) << "Could not parse version and header";
 #endif
 		return false;
 	}
@@ -68,22 +71,19 @@ bool parse_internal( IpParseContext& context ) {
 		return false;
 	}
 
-	boost::optional<Ip::Flags> flags = parse_bitset<Ip::FLAGS_LENGTH / BITS_PER_BYTE>(context);
-	if(flags) {
-		context.b->set_flags(*flags);
-	} else {
-#ifdef LOGGING
-		LOG(ERROR) << "Could not parse flags";
-#endif
-		return false;
-	}
+#define FF_LEN (Ip::FLAGS_LENGTH + Ip::FRAG_OFFSET_LENGTH)
 
-	boost::optional<Ip::FragOffset> frag_offset = parse_bitset<Ip::FRAG_OFFSET_LENGTH / BITS_PER_BYTE>(context);
-	if(frag_offset) {
-		context.b->set_fragment_offset(*frag_offset);
+	boost::optional< std::bitset<FF_LEN> > f_and_f;
+	f_and_f = parse_bitset<FF_LEN / BITS_PER_BYTE>(context);
+
+	if(f_and_f) {
+		Ip::Flags flags = dissect<FF_LEN, Ip::FLAGS_LENGTH>(*f_and_f,Ip::FRAG_OFFSET_LENGTH);
+		Ip::FragOffset frag = dissect<FF_LEN, Ip::FRAG_OFFSET_LENGTH>(*f_and_f);
+		context.b->set_flags(flags);
+		context.b->set_fragment_offset(frag);
 	} else {
 #ifdef LOGGING
-		LOG(ERROR) << "Could not parse frag offset";
+		LOG(ERROR) << "Could not parse flags or frag len";
 #endif
 		return false;
 	}
@@ -141,29 +141,36 @@ bool parse_internal( IpParseContext& context ) {
 	// anything beyond ip header length we will treat as opionts.. which should be
 	// divisible by 32 bit words
 	size_t ip_header_length =
-		VERSION_LENGTH +
-		HEADER_LENGTH_LENGTH +
-		TOS_LENGTH +
-		TOTAL_LENGTH_LENGTH +
-		ID_LENGTH +
-		FLAGS_LENGTH +
-		FRAG_OFFSET_LENGTH +
-		TTL_LENGTH +
-		PROTOCOL_LENGTH +
-		CHECKSUM_LENGTH +
-		SOURCE_ADDR_LENGTH +
-		DEST_ADDR_LENGTH +
+		Ip::VERSION_LENGTH +
+		Ip::HEADER_LENGTH_LENGTH +
+		Ip::TOS_LENGTH +
+		Ip::TOTAL_LENGTH_LENGTH +
+		Ip::ID_LENGTH +
+		Ip::FLAGS_LENGTH +
+		Ip::FRAG_OFFSET_LENGTH +
+		Ip::TTL_LENGTH +
+		Ip::PROTOCOL_LENGTH +
+		Ip::CHECKSUM_LENGTH +
+		Ip::SOURCE_ADDR_LENGTH +
+		Ip::DEST_ADDR_LENGTH +
 		0;
 
-	size_t extra = header_length - ip_header_length;
+	int extra = header_length.to_ulong() * 4 * BITS_PER_BYTE - ip_header_length;
 	if( extra != 0 ) {
 		if( extra % 32 == 0 ) {
 #ifdef LOGGING
-			LOG(INFO) << "Ip options present"
+			LOG(INFO) << "Ip options present";
 #endif
-			BytesContainer options = parse_data(context, extra);
-			// TODO
-			//context.b->set_options(options);
+			boost::optional<BytesContainer> options = parse_data(context, extra/BITS_PER_BYTE);
+			if( options ) {
+				// TODO
+				//context.b->set_options(*options);
+			} else {
+#ifdef LOGGING
+				LOG(ERROR) << "Could not parse options";
+#endif
+				return false;
+			}
 		} else {
 #ifdef LOGGING
 			LOG(WARNING) << "Optional data not divisible by 32 bits";
@@ -185,19 +192,12 @@ namespace IP {
 	 * the return value will not be instaniated.
 	 */
 	IpMaybe from_data( ParseContext& parse_context ) {
-		/*TODO*/ 
 		IpMaybe to_return;
-		ParseContext::ConstIterator end_of_ip = next(parse_context.current, 20);
-
-#ifdef LOGGING
-		BytesContainer copy(parse_context.current, end_of_ip);
-		LOG(INFO) << "Parsing these bytes for ip:\n"
-			<< demaria_util::to_string(copy);
-#endif
-
-		parse_context.current = end_of_ip;
-
-		to_return = Ip();
+		boost::shared_ptr<IpBuilder> ip_b(new IpBuilder());
+		IpParseContext context(parse_context, ip_b);
+		if(parse_internal(context)) {
+			to_return = context.b->build();
+		}
 		return to_return;
 	}
 
@@ -210,19 +210,12 @@ namespace IP {
 	 * Do the same as #from_data but return a shared_ptr instead
 	 */
 	NetworkLayerProtocolMaybePtr from_data_as_ptr( ParseContext& parse_context ) {
-		/*TODO*/ 
 		NetworkLayerProtocolMaybePtr to_return;
-		ParseContext::ConstIterator end_of_ip = next(parse_context.current, 20);
-
-#ifdef LOGGING
-		BytesContainer copy(parse_context.current, end_of_ip);
-		LOG(INFO) << "Parsing these bytes for ip:\n"
-			<< demaria_util::to_string(copy);
-#endif
-
-		parse_context.current = end_of_ip;
-
-		to_return = NetworkLayerProtocolPtr( new Ip());
+		boost::shared_ptr<IpBuilder> ip_b( new IpBuilder());
+		IpParseContext context(parse_context, ip_b);
+		if(parse_internal(context)) {
+			to_return = boost::dynamic_pointer_cast<NetworkLayerProtocol>(context.b->build_ptr());
+		}
 
 		return to_return;
 	}
