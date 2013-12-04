@@ -46,6 +46,8 @@ class UdpBuilder {
 			return UdpPtr( new Udp(dest,src,length,checksum) );
 		}
 
+		virtual ~UdpBuilder() { }
+
 	protected:
 		Udp::Port dest;
 		Udp::Port src;

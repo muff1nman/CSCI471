@@ -14,10 +14,9 @@
 #include "networkmuncher/util/logging.h"
 
 template <size_t bytes>
-
 void add_to_sum(std::bitset<bytes * BITS_PER_BYTE>& sum, const std::bitset<bytes * BITS_PER_BYTE>& to_add) {
 	unsigned long result = sum.to_ulong() + to_add.to_ulong();
-	unsigned long carry = pow(2, bytes * BITS_PER_BYTE);
+	unsigned long carry = (long) pow(2, bytes * BITS_PER_BYTE);
 	if( result >= carry ) {
 		result += (1 - carry);
 	}
