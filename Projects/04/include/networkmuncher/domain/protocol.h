@@ -17,6 +17,8 @@ class Protocol {
 
 		virtual size_t size() const { return 0; }
 
+		virtual ~Protocol() { }
+
 };
 
 #endif /* !PROTOCOL_H */

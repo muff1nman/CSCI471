@@ -55,6 +55,8 @@ class EthernetBuilder {
 			return EthernetPtr( new Ethernet(extra, dest, src) );
 		}
 
+		virtual ~EthernetBuilder() { };
+
 	protected:
 		Ethernet::Extra extra;
 		MacAddr dest;
