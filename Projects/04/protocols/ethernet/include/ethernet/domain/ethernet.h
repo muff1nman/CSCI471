@@ -12,7 +12,7 @@
 #include "networkmuncher/util/byte/byte.h"
 #include "networkmuncher/util/logging.h"
 #include "networkmuncher/domain/link_layer_protocol.h"
-#include "mac_addr.h"
+#include "networkmuncher/domain/mac_addr.h"
 
 struct Ethernet : public LinkLayerProtocol, public Logging {
 	public:

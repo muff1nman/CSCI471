@@ -11,7 +11,6 @@
 #include <bitset>
 #include "networkmuncher/util/byte/byte.h"
 #include "networkmuncher/util/logging.h"
-#include "mac_addr.h"
 
 struct Ethernetv2 : public Ethernet {
 	public:

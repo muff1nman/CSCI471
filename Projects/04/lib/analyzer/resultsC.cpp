@@ -22,11 +22,11 @@ void resultsC::displayResults() {
 		"================================";
   std::cout << "A total of " << totalPacketCount << " packets processed." << std::endl;
 
-	std::cout << "Link Layer Statistics" << std::endl << separator << std::endl;
+	std::cout << std::endl << "Link Layer Statistics" << std::endl << separator << std::endl;
 	std::cout << "Ethernet II packets: " << ethernet_v2_count << std::endl;
 	std::cout << "Ethernet 802.3 packets: " << ethernet_8023 << std::endl;
 
-	std::cout << "Network Layer Statistics" << std::endl << separator << std::endl;
+	std::cout << std::endl << "Network Layer Statistics" << std::endl << separator << std::endl;
 	std::cout << "Ip packets: " << ip_count << std::endl;
 	if(ip_max_size) {
 		std::cout << "Max Ip size: " << *ip_max_size << std::endl;
@@ -34,12 +34,13 @@ void resultsC::displayResults() {
 	if(ip_min_size) {
 		std::cout << "Min Ip size: " << *ip_min_size << std::endl;
 	}
-	std::cout << "Icmp echo packets: " << icmp_echo_count << std::endl;
+	std::cout << "Arp packets: " << arp_count << std::endl;
 
-	std::cout << "Network Layer Statistics" << std::endl << separator << std::endl;
+	std::cout << std::endl << "Transport Layer Statistics" << std::endl << separator << std::endl;
+	std::cout << "Icmp echo packets: " << icmp_echo_count << std::endl;
 	std::cout << "Upd packets: " << udp_count << std::endl;
 
-	std::cout << "Application Layer Statistics" << std::endl << separator << std::endl;
+	std::cout << std::endl << "Application Layer Statistics" << std::endl << separator << std::endl;
 	std::cout << "Dns packets: " << dns_count << std::endl;
 
 	std::cout << "Misc" << std::endl << separator << std::endl;
@@ -105,6 +106,11 @@ ParseHint resultsC::process_protocol(const DNS& echo) {
 	return false;
 }
 
+ParseHint resultsC::process_protocol(const Arp& arp) {
+	this->arp_count++;
+	return false;
+}
+
 ParseHint resultsC::process(const ProtocolPtr proto) {
 	switch(proto->what_type()) {
 
@@ -142,6 +148,7 @@ ParseHint resultsC::process(const ProtocolPtr proto) {
 #endif
 			return process_protocol(*boost::dynamic_pointer_cast<Echo>(proto));
 
+
 		case PType::Transport::UDP:
 #ifdef LOGGING
 			LOG(INFO) << "Parsed udp";
@@ -164,6 +171,12 @@ ParseHint resultsC::process(const ProtocolPtr proto) {
 			LOG(INFO) << "Ipv4 parsed";
 #endif
 			return process_protocol(*boost::dynamic_pointer_cast<Ip>(proto));
+
+		case PType::Network::ARP:
+#ifdef LOGGING
+			LOG(INFO) << "Arp parsed";
+#endif
+			return process_protocol(*boost::dynamic_pointer_cast<Arp>(proto));
 
 		///////////////////////////////////////////////////////
 		// Link Layer

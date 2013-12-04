@@ -11,7 +11,9 @@ set(LINK_LIBRARIES
 	muncher_icmp_parse
 	muncher_ethernet_parse
 	muncher_udp_parse
-	muncher_dns_parse)
+	muncher_dns_parse
+	muncher_arp_parse
+	)
 
 add_executable(analyzer ${SRCS})
 target_link_libraries(analyzer ${LINK_LIBRARIES})
