@@ -50,11 +50,11 @@ void resultsC::displayResults() {
 
 template <class C>
 void register_size( boost::optional<C>& current_max, boost::optional<C>& current_min, const C& new_val ) {
-	if(!current_max || current_max < new_val) {
+	if(!current_max || *current_max < new_val) {
 		current_max = new_val;
 	}
 
-	if(!current_min || current_min > new_val) { 
+	if(!current_min || *current_min > new_val) { 
 		current_min = new_val;
 	}
 }

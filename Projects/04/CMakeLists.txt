@@ -13,7 +13,7 @@ set( CMAKE_EXPORT_COMPILE_COMMANDS ON )
 # Configuration Stuff
 option(DEBUG "Turn debuggin on or off" ON)
 option(LOGGING "Turn loggin on or off" OFF)
-
+option(ISENGARD "Building on isengard" ON)
 option(TEST "Turn testing on or off" OFF)
 
 # DNS options
@@ -58,6 +58,14 @@ configure_file(
 # Project includes 
 include_directories( ${PROJECT_INCLUDE_DIR} 
 	${CMAKE_CURRENT_BINARY_DIR}/include )
+
+# isengard lib on isengard is not in the usual location
+if(ISENGARD)
+	#set(CMAKE_INCLUDE_PATH "/u/wy/ys/promig3/pub/pcap/include")
+	#set(CMAKE_LIBRARY_PATH "/u/wy/ys/promig3/pub/pcap/lib")
+	LINK_DIRECTORIES("/u/wy/ys/promig3/pub/pcap/lib")
+	INCLUDE_DIRECTORIES("/u/wy/ys/promig3/pub/pcap/include")
+endif()
 
 FILE(GLOB_RECURSE INC_ALL ${CMAKE_SOURCE_DIR}/include/*.h)
 
