@@ -40,7 +40,8 @@ Byte convert_to_char_little_endian( const std::bitset<n>& bits, size_t index = 0
 		Logging::do_error("Width too large");
 	}
 
-	if ( n/width <= index ) {
+	// cast to double to avoid warnings
+	if ( (double) (n/width) <= (double) (index) ) {
 		Logging::do_error("Out of Bounds");
 	}
 
@@ -69,7 +70,8 @@ Byte convert_to_char_big_endian( const std::bitset<n>& bits, size_t index = 0 ) 
 		Logging::do_error("Width too large");
 	}
 
-	if ( n/width <= index ) {
+	// cast to double to avoid warnings
+	if ( (double)(n/width) <= (double)(index) ) {
 		Logging::do_error("Out of Bounds");
 	}
 	return convert_to_char_little_endian<width>( bits, n / width - index - 1 );

@@ -19,11 +19,13 @@ namespace PType {
 	namespace Transport {
 		const static int ICMP_ECHO  = 301; // TODO move to network layer?
 		const static int UDP = 302;
+		const static int TCP = 303;
 	}
 
 	const static int NETWORK = 200;
 	namespace Network {
 		const static int IPV4 = 201;
+		const static int ARP = 202;
 	}
 
 	const static int LINK = 100;

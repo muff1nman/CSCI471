@@ -12,7 +12,6 @@
 #include "ethernetv2_builder.h"
 #include "ethernet802.3_builder.h"
 #include "ptr_types.h"
-#include "mac_addr.h"
 
 #endif /* !ETHERNET_DOMAIN_DOMAIN_H */
 

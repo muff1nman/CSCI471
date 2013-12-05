@@ -21,8 +21,11 @@
 
 template <class ProtoPtr, class ParserType>
 ProtoPtr parse_layer_with_parser( ParserType parser, ParseContext& context ) {
-	ProtoPtr to_return = parser(context);
+#ifdef LOGGING
+	LOG(INFO) << "Begin parsing at: " << context.get_current_index();
+#endif
 	size_t saved_spot = context.get_current_index();
+	ProtoPtr to_return = parser(context);
 	if( !to_return ) {
 
 #ifdef LOGGING
@@ -65,8 +68,8 @@ void pk_processor(u_char *user, const struct pcap_pkthdr *pkthdr, const u_char *
 
 	ParseHint hint(true);
 
-  resultsC* results = (resultsC*)user;
-  results->incrementPacketCount();
+	resultsC* results = (resultsC*)user;
+	results->incrementPacketCount();
 
 	BytesContainer bytes_from_packet( packet, packet + pkthdr->caplen );
 
@@ -126,7 +129,7 @@ void pk_processor(u_char *user, const struct pcap_pkthdr *pkthdr, const u_char *
 	}
 
 	// ignore this so that it isnt necessary to have a transport layer protocol?
-	// if( !hint.get_should_parse() ) {return;}	
+	if( !hint.get_should_parse() ) {return;}	
 
 	ApplicationLayerProtocolMaybePtr app = parse_layer<ApplicationLayerProtocolMaybePtr,ApplicationParser>(application_parsers,parse,hint);
 

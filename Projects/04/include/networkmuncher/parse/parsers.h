@@ -15,12 +15,16 @@
 #include "icmp/parse/echo.h"
 #include "udp/parse/udp.h"
 #include "dns/parse/dns.h"
+#include "arp/parse/arp.h"
+#include "tcp/parse/tcp.h"
 #include "parser_types.h"
 #include "networkmuncher/domain/protocol_types.h"
 
 NetworkParseFunction ip_parser = &IP::from_data_as_ptr;
+NetworkParseFunction arp = &ARP::from_data_as_ptr;
 
 std::map<int, NetworkParser> network_parsers = boost::assign::map_list_of
+(PType::Network::ARP, arp)
 (PType::Network::IPV4, ip_parser);
 
 LinkParseFunction ethernet_v2 = &ETHERNETV2::from_data_as_ptr;
@@ -32,9 +36,11 @@ std::map<int,LinkParser> link_parsers = boost::assign::map_list_of
 
 TransportParseFunction icmp = &ECHO::from_data_as_ptr;
 TransportParseFunction udp = &UDP::from_data_as_ptr;
+TransportParseFunction tcp = &TCP::from_data_as_ptr;
 
 std::map<int,TransportParser> transport_parsers = boost::assign::map_list_of
 (PType::Transport::ICMP_ECHO,icmp)
+(PType::Transport::TCP,tcp)
 (PType::Transport::UDP, udp);
 
 ApplicationParseFunction dns = &from_data_as_ptr; // TODO nest in namespace
