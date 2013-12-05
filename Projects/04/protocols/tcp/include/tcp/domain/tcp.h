@@ -22,7 +22,7 @@ struct Tcp : public TransportLayerProtocol, public Logging {
 
 		static const size_t PORT_LENGTH = 2*BITS_PER_BYTE;
 		static const size_t SYNACK_NUM_LENGTH = 4*BITS_PER_BYTE;
-		static const size_t DATA_OFFSET_LENGTH = 3;
+		static const size_t DATA_OFFSET_LENGTH = 4;
 		static const size_t RESERVED_LENGTH = 3;
 		static const size_t FLAGS_LENGTH = 9;
 		static const size_t WINDOW_SIZE_LENGTH = 2*BITS_PER_BYTE;
@@ -34,7 +34,7 @@ struct Tcp : public TransportLayerProtocol, public Logging {
 		typedef std::bitset<DATA_OFFSET_LENGTH> DataOffset;
 		typedef std::bitset<RESERVED_LENGTH> Reserved;
 		typedef std::bitset<FLAGS_LENGTH> Flags;
-		typedef std::bitset<WINDOW_SIZE_LENGTH> WindowSize
+		typedef std::bitset<WINDOW_SIZE_LENGTH> WindowSize;
 		typedef std::bitset<CHECKSUM_LENGTH> Checksum;
 		typedef std::bitset<URGENT_LENGTH> Urgent;
 		typedef BytesContainer Options;

@@ -15,72 +15,88 @@
 class TcpBuilder {
 
 	public:
-		TcpBuilder& set_hardware_type(const Tcp::HardwareType& type) {
-			this->hardware_type = type;
+		TcpBuilder& set_source_port(const Tcp::Port& port) {
+			this->source_port = port;
 			return do_common();
 		}
 
-		TcpBuilder& set_protocol_type(const Tcp::ProtocolType& type) {
-			this->protocol_type = type;
-			return do_common();
-		}
-		
-		TcpBuilder& set_hardware_size(const Tcp::HardwareSize& size) {
-			this->hardware_size = size;
-			return do_common();
-		}
-		
-		TcpBuilder& set_protocol_size(const Tcp::ProtocolSize& size) {
-			this->protocol_size = size;
-			return do_common();
-		}
-		
-		TcpBuilder& set_sender_hardware_address(const Tcp::HardwareAddress addr) {
-			this->sender_hardware_address = addr;
+		TcpBuilder& set_dest_port(const Tcp::Port& port) {
+			this->dest_port = port;
 			return do_common();
 		}
 
-		TcpBuilder& set_sender_protocol_address(const Tcp::ProtocolAddress addr) {
-			this->sender_protocol_address = addr;
+		TcpBuilder& set_seq_num(const Tcp::SynAck& synack) {
+			this->seq_num = synack;
 			return do_common();
 		}
-		
-		TcpBuilder& set_target_hardware_address(const Tcp::HardwareAddress addr) {
-			this->target_hardware_address = addr;
+
+		TcpBuilder& set_ack_num(const Tcp::SynAck& synack) {
+			this->ack_num = synack;
 			return do_common();
 		}
-		
-		TcpBuilder& set_target_protocol_address(const Tcp::ProtocolAddress addr) {
-			this->target_protocol_address = addr;
+
+		TcpBuilder& set_data_offset(const Tcp::DataOffset& offset) {
+			this->data_offset = offset;
+			return do_common();
+		}
+
+		TcpBuilder& set_reserved(const Tcp::Reserved& reserved) {
+			this->reserved = reserved;
+			return do_common();
+		}
+
+		TcpBuilder& set_flags(const Tcp::Flags& flags) {
+			this->flags = flags;
+			return do_common();
+		}
+
+		TcpBuilder& set_window_size(const Tcp::WindowSize& window) {
+			this->window_size = window;
+			return do_common();
+		}
+
+		TcpBuilder& set_checksum(const Tcp::Checksum& checksum) {
+			this->checksum = checksum;
+			return do_common();
+		}
+
+		TcpBuilder& set_urgent(const Tcp::Urgent& urgent) {
+			this->urgent = urgent;
+			return do_common();
+		}
+
+		TcpBuilder& set_options(const Tcp::Options& options) {
+			this->options = options;
 			return do_common();
 		}
 
 		virtual Tcp build() {
 			set_default_fields();
-			return Tcp(hardware_type, protocol_type, hardware_size,
-				protocol_size, sender_hardware_address,
-				sender_protocol_address,target_hardware_address, 
-				target_protocol_address);
+			return Tcp(source_port, dest_port, seq_num, ack_num, data_offset,
+					reserved, flags, window_size, checksum, urgent, options);
  }
 
 		virtual TcpPtr build_ptr() {
 			set_default_fields();
-			return TcpPtr( new Tcp(hardware_type, protocol_type,
-				hardware_size, protocol_size, sender_hardware_address, sender_protocol_address,
-				target_hardware_address, target_protocol_address));
+			return TcpPtr( new Tcp(source_port, dest_port, seq_num, ack_num,
+						data_offset, reserved, flags, window_size, checksum, urgent,
+						options));
 		}
 
 		virtual ~TcpBuilder() { }
 
 	protected:
-		Tcp::HardwareType hardware_type;
-		Tcp::ProtocolType protocol_type;
-		Tcp::HardwareSize hardware_size;
-		Tcp::ProtocolSize protocol_size;
-		Tcp::HardwareAddress sender_hardware_address;
-		Tcp::ProtocolAddress sender_protocol_address;
-		Tcp::HardwareAddress target_hardware_address;
-		Tcp::ProtocolAddress target_protocol_address;
+		Tcp::Port source_port;
+		Tcp::Port dest_port;
+		Tcp::SynAck seq_num;
+		Tcp::SynAck ack_num;
+		Tcp::DataOffset data_offset;
+		Tcp::Reserved reserved;
+		Tcp::Flags flags;
+		Tcp::WindowSize window_size;
+		Tcp::Checksum checksum;
+		Tcp::Urgent urgent;
+		Tcp::Options options;
 
 		TcpBuilder& do_common() {
 			return *this;

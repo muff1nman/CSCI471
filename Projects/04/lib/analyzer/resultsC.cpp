@@ -39,6 +39,7 @@ void resultsC::displayResults() {
 	std::cout << std::endl << "Transport Layer Statistics" << std::endl << separator << std::endl;
 	std::cout << "Icmp echo packets: " << icmp_echo_count << std::endl;
 	std::cout << "Upd packets: " << udp_count << std::endl;
+	std::cout << "Tcp packets: " << tcp_count << std::endl;
 
 	std::cout << std::endl << "Application Layer Statistics" << std::endl << separator << std::endl;
 	std::cout << "Dns packets: " << dns_count << std::endl;
@@ -66,7 +67,15 @@ ParseHint map_ip_proto_to_hint(size_t proto) {
 			return ParseHint(true, PType::Transport::ICMP_ECHO);
 		case 17:
 			return ParseHint(true, PType::Transport::UDP);
+		case 6:
+#ifdef LOGGING
+			LOG(INFO) << "TCP found on ip";
+#endif
+			return ParseHint(true, PType::Transport::TCP);
 		default:
+#ifdef LOGGING
+				LOG(WARNING) << "Unknown protocol discovered riding an ipv4 horse";
+#endif
 			return false;
 	}
 }
