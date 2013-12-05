@@ -8,15 +8,13 @@
 #ifndef __file_ops_h__
 #define __file_ops_h__
 
-#include "networkmuncher/util/byte/byte.h"
-#ifdef LOGGING
-#include <glog/logging.h>
-#endif
+#include "byte.h"
+#include "networkmuncher/util/logging.h"
 
 #include <fstream>
 
 // See http://codereview.stackexchange.com/questions/22901/reading-all-bytes-from-a-file
-static BytesContainer bytes_from_file(char const* filename) {
+inline static BytesContainer bytes_from_file(char const* filename) {
 	// open file at end
 	std::ifstream input_stream( filename, std::ios::binary|std::ios::ate );
 	if( !input_stream ) {

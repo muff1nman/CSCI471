@@ -50,7 +50,7 @@ class Ipv4AddrConvert : public Convert {
 			Ipv4::Addr ip_bytes;
 			for( size_t i = 0; i < Ipv4::ADDR_LENGTH_IN_BYTES; ++i ) {
 				byte = Byte(ip_nums[i]);
-				copy_into(ip_bytes, byte, BITS_PER_BYTE * reverse_index(i, Ipv4::ADDR_LENGTH_IN_BYTES));
+				copy_into(ip_bytes, byte, BITS_PER_BYTE * reverse_index(i, +Ipv4::ADDR_LENGTH_IN_BYTES));
 			}
 
 			return ip_bytes;

@@ -10,7 +10,7 @@
 
 #include "ipv4/config.h"
 #include "ipv4/domain/domain.h"
-#include "file_ops.h"
+#include "networkmuncher/util/byte/file_ops.h"
 #include "file_names.h"
 #include <boost/assign/list_of.hpp>
 

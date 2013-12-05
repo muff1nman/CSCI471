@@ -3,7 +3,7 @@ set(SRCS
 )
 
 FILE(GLOB_RECURSE INC_ALL ${CMAKE_SOURCE_DIR}/include/*.h)
-set(LINK_LIBRARIES_ICMP muncher_logging muncher_icmp_parse muncher_ipv4_parse)
+set(LINK_LIBRARIES_ICMP muncher_logging muncher_icmp_parse)
 add_library(muncher_icmp ${SRCS} ${INC_ALL})
 target_link_libraries(muncher_icmp ${LINK_LIBRARIES_ICMP})
 

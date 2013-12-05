@@ -6,7 +6,6 @@
  */
 
 #include "test_helper.h"
-#include "file_ops.h"
 #include "file_names.h"
 #include "dns_common.h"
 
