@@ -25,8 +25,8 @@ TcpMaybe from_data( const BytesContainer& bytes );
 /**
  * Do the same as #from_data but return a shared_ptr instead
  */
-LinkLayerProtocolMaybePtr from_data_as_ptr( ParseContext& parse_context );
-LinkLayerProtocolMaybePtr from_data_as_ptr( const BytesContainer& bytes );
+Tcp::InheritedProtocolMaybePtr from_data_as_ptr( ParseContext& parse_context );
+Tcp::InheritedProtocolMaybePtr from_data_as_ptr( const BytesContainer& bytes );
 
 }
 

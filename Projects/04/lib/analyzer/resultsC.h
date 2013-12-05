@@ -15,6 +15,7 @@
 #include "udp/domain/domain.h"
 #include "dns/domain/domain.h"
 #include "arp/domain/domain.h"
+#include "tcp/domain/domain.h"
 #include <boost/optional.hpp>
 #include "parse_hint.h"
 
@@ -30,6 +31,7 @@ class resultsC {
 		size_t other_network_count;
 
 		size_t udp_count;
+		size_t tcp_count;
 		size_t icmp_echo_count;
 		size_t other_transport_count;
 
@@ -45,6 +47,7 @@ class resultsC {
 		ParseHint process_protocol(const Udp& echo);
 		ParseHint process_protocol(const DNS& echo);
 		ParseHint process_protocol(const Arp& arp);
+		ParseHint process_protocol(const Tcp& tcp);
 
   public:
 		resultsC() : 
@@ -56,6 +59,7 @@ class resultsC {
 			arp_count(0),
 			other_network_count(0),
 			udp_count(0),
+			tcp_count(0),
 			icmp_echo_count(0),
 			other_transport_count(0),
 			dns_count(0),

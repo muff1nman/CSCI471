@@ -101,6 +101,11 @@ ParseHint resultsC::process_protocol(const Udp& echo) {
 	return true;
 }
 
+ParseHint resultsC::process_protocol(const Tcp& tcp) {
+	this->tcp_count++;
+	return true;
+}
+
 ParseHint resultsC::process_protocol(const DNS& echo) {
 	this->dns_count++;
 	return false;
@@ -154,6 +159,12 @@ ParseHint resultsC::process(const ProtocolPtr proto) {
 			LOG(INFO) << "Parsed udp";
 #endif
 			return process_protocol(*boost::dynamic_pointer_cast<Udp>(proto));
+
+		case PType::Transport::TCP:
+#ifdef LOGGING
+			LOG(INFO) << "Parsed tcp";
+#endif
+			return process_protocol(*boost::dynamic_pointer_cast<Tcp>(proto));
 
 		///////////////////////////////////////////////////////
 		// Network Layer

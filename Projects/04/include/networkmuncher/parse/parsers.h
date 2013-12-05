@@ -16,6 +16,7 @@
 #include "udp/parse/udp.h"
 #include "dns/parse/dns.h"
 #include "arp/parse/arp.h"
+#include "tcp/parse/tcp.h"
 #include "parser_types.h"
 #include "networkmuncher/domain/protocol_types.h"
 
@@ -35,9 +36,11 @@ std::map<int,LinkParser> link_parsers = boost::assign::map_list_of
 
 TransportParseFunction icmp = &ECHO::from_data_as_ptr;
 TransportParseFunction udp = &UDP::from_data_as_ptr;
+TransportParseFunction tcp = &TCP::from_data_as_ptr;
 
 std::map<int,TransportParser> transport_parsers = boost::assign::map_list_of
 (PType::Transport::ICMP_ECHO,icmp)
+(PType::Transport::TCP,tcp)
 (PType::Transport::UDP, udp);
 
 ApplicationParseFunction dns = &from_data_as_ptr; // TODO nest in namespace
