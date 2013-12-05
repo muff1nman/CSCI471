@@ -53,6 +53,8 @@ configure_file(
 	${PROJECT_INCLUDE_DIR}/dns/config.h.cmake
 	${CMAKE_CURRENT_BINARY_DIR}/include/dns/config.h )
 
+include_directories( ${PROTOCOL_INCLUDE_DIR}/ipv4/include )
+
 # Project includes 
 include_directories( ${PROJECT_INCLUDE_DIR} 
 	${CMAKE_CURRENT_BINARY_DIR}/include )

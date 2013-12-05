@@ -9,7 +9,6 @@
 #define ICMP_DOMAIN_DOMAIN_H
 
 #include "echo_builder.h"
-#include "ip_builder.h"
 #include "raw.h"
 #include "ptr_types.h"
 
@@ -19,10 +18,6 @@
 typedef   boost::optional<Echo>      EchoMaybe;
 typedef   boost::shared_ptr<Echo>    EchoPtr;
 typedef   boost::optional<EchoPtr>   EchoMaybePtr;
-
-typedef   boost::optional<Ip>        IpMaybe;
-typedef   boost::shared_ptr<Ip>      IpPtr;
-typedef   boost::optional<IpPtr>     IpMaybePtr;
 
 typedef   boost::optional<Raw>       RawMaybe;
 typedef   boost::shared_ptr<Raw>     RawPtr;

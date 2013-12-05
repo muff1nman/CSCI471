@@ -1,20 +1,20 @@
 /*
- * ip.h
+ * ipv4.h
  * Copyright (C) 2013 Andrew DeMaria (muff1nman) <ademaria@mines.edu>
  *
  * All Rights Reserved.
  */
 
-#ifndef IP_H
-#define IP_H
+#ifndef IPV4_H
+#define IPV4_H
 
 #include <bitset>
 #include "networkmuncher/util/byte/byte.h"
+#include "networkmuncher/util/byte/convert.h"
 #include "networkmuncher/util/logging.h"
-#include "networkmuncher/parse/ip_addr.h"
 #include "networkmuncher/domain/network_layer_protocol.h"
 
-struct Ip : public Logging, public NetworkLayerProtocol {
+struct Ipv4 : public Logging, public NetworkLayerProtocol {
 	public:
 
 		virtual int what_type() const { return PType::Network::IPV4; }
@@ -36,8 +36,9 @@ struct Ip : public Logging, public NetworkLayerProtocol {
 		static const size_t TTL_LENGTH                   =  8;
 		static const size_t PROTOCOL_LENGTH              =  8;
 		static const size_t CHECKSUM_LENGTH              =  16;
-		static const size_t SOURCE_ADDR_LENGTH           =  32;
-		static const size_t DEST_ADDR_LENGTH             =  32;
+		static const size_t ADDR_LENGTH                  =  32;
+
+		static const size_t ADDR_LENGTH_IN_BYTES = ADDR_LENGTH / BITS_PER_BYTE;
 
 		/**
 		 * Offsets for flags
@@ -58,12 +59,11 @@ struct Ip : public Logging, public NetworkLayerProtocol {
 		typedef   std::bitset<TTL_LENGTH>             TTL;
 		typedef   std::bitset<PROTOCOL_LENGTH>        Protocol;
 		typedef   std::bitset<CHECKSUM_LENGTH>        Checksum;
-		typedef   std::bitset<SOURCE_ADDR_LENGTH>     SourceAddr;
-		typedef   std::bitset<DEST_ADDR_LENGTH>       DestAddr;
+		typedef   std::bitset<ADDR_LENGTH>            Addr;
 		typedef   BytesContainer                      Options;
 
 		/**
-		 * Ip instance variables
+		 * Ipv4 instance variables
 		 */
 		Version        version;
 		HeaderLength   header_length;
@@ -75,11 +75,11 @@ struct Ip : public Logging, public NetworkLayerProtocol {
 		TTL            ttl;
 		Protocol       protocol;
 		Checksum       checksum;
-		SourceAddr     source_addr;
-		DestAddr       dest_addr;
+		Addr           source_addr;
+		Addr           dest_addr;
 		Options        options;
 
-		friend class IpBuilder;
+		friend class Ipv4Builder;
 
 		std::string stringify_object() const {
 			std::stringstream object;
@@ -93,14 +93,14 @@ struct Ip : public Logging, public NetworkLayerProtocol {
 			object << "ttl: " << ttl.to_ulong() << list_sep;
 			object << "protocol: " << protocol.to_ulong() << list_sep;
 			object << "checksum: " << checksum.to_string() << list_sep;
-			object << "source addr: " << ip_from_data(source_addr) << list_sep;
-			object << "dest addr: " << ip_from_data(dest_addr) << list_sep;
+			object << "source addr: " << addr_from_data(source_addr) << list_sep;
+			object << "dest addr: " << addr_from_data(dest_addr) << list_sep;
 			object << "options: " << "NOT SHOWN" << sep;
 
 			return object.str();
 		}
 
-		bool operator==( const Ip& other ) const {
+		bool operator==( const Ipv4& other ) const {
 			return
 				version       == other.version       &&
 				header_length == other.header_length &&
@@ -118,12 +118,36 @@ struct Ip : public Logging, public NetworkLayerProtocol {
 				true;
 		}
 
+		static inline std::string addr_from_data( const BytesContainer& data ) {
+			std::stringstream joined;
+
+			for( size_t i = 0; i < ADDR_LENGTH_IN_BYTES; ++i ) {
+				if( ! (i  < data.size()) ) {
+					throw "Unexpected end of data while parsing ip";
+				}
+
+				joined << (size_t) data.at(i);
+
+				if( i != ADDR_LENGTH_IN_BYTES - 1 ) {
+					joined << ".";
+				}
+
+			}
+
+			return joined.str();
+
+		}
+
+		static inline std::string addr_from_data( const std::bitset<ADDR_LENGTH>& data ) {
+			return addr_from_data( convert_big_endian<ADDR_LENGTH_IN_BYTES>(data));
+		}
+
     // TODO make protected
     //	protected:
-		Ip() {}
+		Ipv4() {}
 
 
 };
 
-#endif /* !IP_H */
+#endif /* !IPV4_H */
 

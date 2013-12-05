@@ -8,11 +8,11 @@
 #ifndef IP_ADDR_CONVERT_H
 #define IP_ADDR_CONVERT_H
 
-#include "convert.h"
-
-#include "networkmuncher/domain/ip_addr.h"
+#include "networkmuncher/data/convert.h"
 
 #include "networkmuncher/util/logging.h"
+
+#include "ipv4/domain/ipv4.h"
 
 #include "networkmuncher/util/byte/byte.h"
 #include "networkmuncher/util/byte/copy.h"
@@ -20,47 +20,47 @@
 #include "networkmuncher/util/index.h"
 #include "networkmuncher/util/split.h"
 
+#include <string>
+
 /**
  * Handy class that will convert your ips to a binary representation.
  *
  * If something goes wrong, return an empty container.
  */
-class IpAddrConvert : public Convert {
+class Ipv4AddrConvert : public Convert {
 	public:
-		IpAddrConvert(IpAddr ip) : ip(ip) { }
-
-		typedef std::bitset<IP_ADDR::BYTE_LENGTH * BITS_PER_BYTE> IpAddrBytes;
+		Ipv4AddrConvert(const std::string& ip) : ip(ip) { }
 
 		virtual BytesContainer to_data() const {
-			IpAddrBytes ip_bytes = to_bitset();
-			return convert_big_endian<IP_ADDR::BYTE_LENGTH>(ip_bytes);
+			Ipv4::Addr ip_bytes = to_bitset();
+			return convert_big_endian<Ipv4::ADDR_LENGTH_IN_BYTES>(ip_bytes);
 		}
 
-		IpAddrBytes to_bitset() const {
+		Ipv4::Addr to_bitset() const {
 			std::vector<unsigned short> ip_nums = split_numerics<unsigned short>( ip, std::string(".") );
-			if( ip_nums.size() != IP_ADDR::BYTE_LENGTH ) {
+			if( ip_nums.size() != Ipv4::ADDR_LENGTH_IN_BYTES) {
 #ifdef LOGGING
 				LOG(ERROR) << "Could not convert ip address ["<< ip <<"]";
 #endif
-				return IpAddrBytes();
+				return Ipv4::Addr();
 			}
 
 			typedef std::bitset<BITS_PER_BYTE> Byte;
 			Byte byte;
-			IpAddrBytes ip_bytes;
-			for( size_t i = 0; i < IP_ADDR::BYTE_LENGTH; ++i ) {
+			Ipv4::Addr ip_bytes;
+			for( size_t i = 0; i < Ipv4::ADDR_LENGTH_IN_BYTES; ++i ) {
 				byte = Byte(ip_nums[i]);
-				copy_into(ip_bytes, byte, BITS_PER_BYTE * reverse_index(i, IP_ADDR::BYTE_LENGTH));
+				copy_into(ip_bytes, byte, BITS_PER_BYTE * reverse_index(i, Ipv4::ADDR_LENGTH_IN_BYTES));
 			}
 
 			return ip_bytes;
 
 		}
 
-		virtual ~IpAddrConvert() { }
+		virtual ~Ipv4AddrConvert() { }
 
 	private:
-		IpAddr ip;
+		std::string ip;
 
 };
 

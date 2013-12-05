@@ -10,8 +10,6 @@
 #include "dns/domain/cname_resource_record.h"
 #include "dns/dns.h"
 
-#include "networkmuncher/parse/ip_addr.h"
-
 #include <iostream>
 
 void DNSResponseConsumer::run(Socket* socket) {

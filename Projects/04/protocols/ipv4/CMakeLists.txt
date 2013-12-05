@@ -1,5 +1,5 @@
 cmake_minimum_required( VERSION 2.6 )
-project( NetworkMuncher_ICMP )
+project( NetworkMuncher_Ipv4 )
 
 if(${CMAKE_SOURCE_DIR} STREQUAL ${CMAKE_BINARY_DIR})
   message(FATAL_ERROR "In-source builds not allowed. Please make a new directory (called a build directory) and run CMake from there. You may need to remove CMakeCache.txt. ")
@@ -42,10 +42,8 @@ endif()
 
 #ensure this is after we find the boost version
 configure_file( 
-	${PROJECT_INCLUDE_DIR}/icmp/config.h.cmake
-	${CMAKE_CURRENT_BINARY_DIR}/include/icmp/config.h )
-
-include_directories( ${PROTOCOL_INCLUDE_DIR}/ipv4/include )
+	${PROJECT_INCLUDE_DIR}/ipv4/config.h.cmake
+	${CMAKE_CURRENT_BINARY_DIR}/include/ipv4/config.h )
 
 # Project includes 
 include_directories( ${PROJECT_INCLUDE_DIR} 

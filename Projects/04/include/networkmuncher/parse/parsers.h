@@ -11,7 +11,7 @@
 #include <map>
 
 #include "ethernet/parse/ethernet.h"
-#include "icmp/parse/ip.h"
+#include "ipv4/parse/ipv4.h"
 #include "icmp/parse/echo.h"
 #include "udp/parse/udp.h"
 #include "dns/parse/dns.h"
@@ -20,12 +20,12 @@
 #include "parser_types.h"
 #include "networkmuncher/domain/protocol_types.h"
 
-NetworkParseFunction ip_parser = &IP::from_data_as_ptr;
+NetworkParseFunction ipv4_parser = &IPV4::from_data_as_ptr;
 NetworkParseFunction arp = &ARP::from_data_as_ptr;
 
 std::map<int, NetworkParser> network_parsers = boost::assign::map_list_of
 (PType::Network::ARP, arp)
-(PType::Network::IPV4, ip_parser);
+(PType::Network::IPV4, ipv4_parser);
 
 LinkParseFunction ethernet_v2 = &ETHERNETV2::from_data_as_ptr;
 LinkParseFunction ethernet_8023 = &ETHERNET8023::from_data_as_ptr;

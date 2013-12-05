@@ -1,6 +1,5 @@
 set(SRCS
 	echo.cpp
-	ip.cpp
 )
 
 add_library(muncher_icmp_parse ${SRCS})

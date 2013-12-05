@@ -1,35 +1,37 @@
 /*
- * ip_builder.h
+ * ipv4_builder.h
  * Copyright (C) 2013 Andrew DeMaria (muff1nman) <ademaria@mines.edu>
  *
  * All Rights Reserved.
  */
 
-#ifndef IP_BUILDER_H
-#define IP_BUILDER_H
+#ifndef IPV4_BUILDER_H
+#define IPV4_BUILDER_H
 
-#include "ip.h"
+#include "ipv4.h"
 #include "ptr_types.h"
 
 #include "networkmuncher/util/byte/byte.h"
 #include "networkmuncher/util/index.h"
 
-#include "networkmuncher/data/ip_addr_convert.h"
+#include "ipv4/data/ipv4_convert.h"
+#include "ipv4/data/ipv4_addr_convert.h"
 
 #include <stdlib.h>
 #include <time.h>
+#include <string>
 
 /**
  * Pretty self explanatory class here.  However, one thing to clarify.  Some
  * default options will be set for you here if you do not set the value
  * yourself.  However, some values will also be set by the kernel after we
- * convert an Ip to a packet and hand it over to the socket library. See raw(7)
+ * convert an Ipv4 to a packet and hand it over to the socket library. See raw(7)
  * for more info on that end.  The following table was copied from raw(7):
  *
  * ┌───────────────────────────────────────────────────┐
- * │IP Header fields modified on sending by IP_HDRINCL │
+ * │IPV4 Header fields modified on sending by IPV4_HDRINCL │
  * ├──────────────────────┬────────────────────────────┤
- * │IP Checksum           │Always filled in.           │
+ * │IPV4 Checksum           │Always filled in.           │
  * ├──────────────────────┼────────────────────────────┤
  * │Source Address        │Filled in when zero.        │
  * ├──────────────────────┼────────────────────────────┤
@@ -47,105 +49,105 @@
  * warned you here.
  *
  */
-class IpBuilder {
+class Ipv4Builder {
 
 	public:
 		static const unsigned int IPV4 = 4;
 		static const unsigned int HEADER_LENGTH_WITHOUT_OPTIONS = 5;
 
-		IpBuilder& set_version(Ip::Version version) {
+		Ipv4Builder& set_version(Ipv4::Version version) {
 			variable_holder.version = version;
 			version_set = true;
 			return do_common();
 		}
 
-		IpBuilder& set_header_length(Ip::HeaderLength header_length) {
+		Ipv4Builder& set_header_length(Ipv4::HeaderLength header_length) {
 			variable_holder.header_length = header_length;
 			header_length_set = true;
 			return do_common();
 		}
 
-		IpBuilder& set_type_of_service(Ip::Tos tos) {
+		Ipv4Builder& set_type_of_service(Ipv4::Tos tos) {
 			variable_holder.tos = tos;
 			return do_common();
 		}
 
-		IpBuilder& set_total_length(Ip::TotalLength total_length) {
+		Ipv4Builder& set_total_length(Ipv4::TotalLength total_length) {
 			variable_holder.total_length = total_length;
 			return do_common();
 		}
 
-		IpBuilder& set_id(Ip::Id id) {
+		Ipv4Builder& set_id(Ipv4::Id id) {
 			variable_holder.id = id;
 			return do_common();
 		}
 
-		IpBuilder& set_flags(Ip::Flags flags) {
+		Ipv4Builder& set_flags(Ipv4::Flags flags) {
 			variable_holder.flags = flags;
 			return do_common();
 		}
 
-		IpBuilder& set_dont_fragment(bool value = true) {
+		Ipv4Builder& set_dont_fragment(bool value = true) {
 			set_with_reverse_index( 
 					variable_holder.flags,
-					+Ip::DONT_FRAGMENT_POS_FROM_LEFT, 
+					+Ipv4::DONT_FRAGMENT_POS_FROM_LEFT, 
 					value );
 			return do_common();
 		}
 
-		IpBuilder& set_more_fragments(bool value = true ) {
+		Ipv4Builder& set_more_fragments(bool value = true ) {
 			set_with_reverse_index(
 				variable_holder.flags,
-				+Ip::MORE_FRAGMENTS_POS_FROM_LEFT,
+				+Ipv4::MORE_FRAGMENTS_POS_FROM_LEFT,
 				value);
 			return do_common();
 		}
 
-		IpBuilder& set_fragment_offset(Ip::FragOffset fo) {
+		Ipv4Builder& set_fragment_offset(Ipv4::FragOffset fo) {
 			variable_holder.frag_offset = fo;
 			return do_common();
 		}
 
-		IpBuilder& set_ttl(Ip::TTL ttl) {
+		Ipv4Builder& set_ttl(Ipv4::TTL ttl) {
 			variable_holder.ttl = ttl;
 			ttl_set = true;
 			return do_common();
 		}
 
-		IpBuilder& set_protocol(Ip::Protocol protocol) {
+		Ipv4Builder& set_protocol(Ipv4::Protocol protocol) {
 			variable_holder.protocol = protocol;
 			protocol_set = true;
 			return do_common();
 		}
 
-		IpBuilder& set_checksum(Ip::Checksum checksum) {
+		Ipv4Builder& set_checksum(Ipv4::Checksum checksum) {
 			variable_holder.checksum = checksum;
 			return do_common();
 		}
 
-		IpBuilder& set_source_addr(Ip::SourceAddr addr) {
+		Ipv4Builder& set_source_addr(const Ipv4::Addr& addr) {
 			variable_holder.source_addr = addr;
 			return do_common();
 		}
 
-		IpBuilder& set_source_addr(const IpAddr& ip_addr) {
-			return set_source_addr(IpAddrConvert(ip_addr).to_bitset());
+		Ipv4Builder& set_source_addr(const std::string& ipv4_addr) {
+			return set_source_addr(Ipv4AddrConvert(ipv4_addr).to_bitset());
 		}
 
-		IpBuilder& set_dest_addr(Ip::DestAddr addr) {
+		Ipv4Builder& set_dest_addr(const Ipv4::Addr& addr) {
 			variable_holder.dest_addr = addr;
 			dest_addr_set = true;
 			return do_common();
 		}
 
-		IpBuilder& set_dest_addr(const IpAddr& ip_addr) {
-			return set_dest_addr(IpAddrConvert(ip_addr).to_bitset());
+		Ipv4Builder& set_dest_addr(const std::string& ipv4_addr) {
+			return set_dest_addr(Ipv4AddrConvert(ipv4_addr).to_bitset());
 		}
 
 
 
 		// No options for you!
-		// IpBuilder& set_options() ---
+		// Ipv4Builder& set_options() ---
 
 		bool is_valid() {
 			return 
@@ -155,20 +157,20 @@ class IpBuilder {
 				true; // why? cause I wanted the three lines above nice and symmetric :)
 		}
 
-		Ip build() {
+		Ipv4 build() {
 			set_default_fields();
-			return Ip(variable_holder);
+			return Ipv4(variable_holder);
 		}
 
-		IpPtr build_ptr() {
+		Ipv4Ptr build_ptr() {
 			set_default_fields();
-			return IpPtr( new Ip(variable_holder) );
+			return Ipv4Ptr( new Ipv4(variable_holder) );
 		}
 
 	private:
-		Ip variable_holder;
+		Ipv4 variable_holder;
 
-		IpBuilder& do_common() {
+		Ipv4Builder& do_common() {
 			return *this;
 		}
 
@@ -198,5 +200,5 @@ class IpBuilder {
 
 };
 
-#endif /* !IP_BUILDER_H */
+#endif /* !IPV4_BUILDER_H */
 

@@ -27,12 +27,12 @@ void resultsC::displayResults() {
 	std::cout << "Ethernet 802.3 packets: " << ethernet_8023 << std::endl;
 
 	std::cout << std::endl << "Network Layer Statistics" << std::endl << separator << std::endl;
-	std::cout << "Ip packets: " << ip_count << std::endl;
-	if(ip_max_size) {
-		std::cout << "Max Ip size: " << *ip_max_size << std::endl;
+	std::cout << "Ipv4 packets: " << ipv4_count << std::endl;
+	if(ipv4_max_size) {
+		std::cout << "Max Ipv4 size: " << *ipv4_max_size << std::endl;
 	}
-	if(ip_min_size) {
-		std::cout << "Min Ip size: " << *ip_min_size << std::endl;
+	if(ipv4_min_size) {
+		std::cout << "Min Ipv4 size: " << *ipv4_min_size << std::endl;
 	}
 	std::cout << "Arp packets: " << arp_count << std::endl;
 
@@ -74,15 +74,15 @@ ParseHint map_ip_proto_to_hint(size_t proto) {
 			return ParseHint(true, PType::Transport::TCP);
 		default:
 #ifdef LOGGING
-				LOG(WARNING) << "Unknown protocol discovered riding an ipv4 horse";
+				LOG(WARNING) << "Unknown protocol discovered riding an ip horse";
 #endif
 			return false;
 	}
 }
 
-ParseHint resultsC::process_protocol(const Ip& ip) {
-	ip_count++;
-	register_size(ip_max_size, ip_min_size, ip.size());
+ParseHint resultsC::process_protocol(const Ipv4& ip) {
+	ipv4_count++;
+	register_size(ipv4_max_size, ipv4_min_size, ip.size());
 	ParseHint hint = map_ip_proto_to_hint(ip.protocol.to_ulong());
 	if(hint.get_should_parse() == false ) {
 		other_transport_count++;
@@ -190,7 +190,7 @@ ParseHint resultsC::process(const ProtocolPtr proto) {
 #ifdef LOGGING
 			LOG(INFO) << "Ipv4 parsed";
 #endif
-			return process_protocol(*boost::dynamic_pointer_cast<Ip>(proto));
+			return process_protocol(*boost::dynamic_pointer_cast<Ipv4>(proto));
 
 		case PType::Network::ARP:
 #ifdef LOGGING

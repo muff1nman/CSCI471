@@ -12,8 +12,12 @@
 
 typedef std::string IpAddr;
 
-namespace IP_ADDR {
+namespace IPV4_ADDR {
 	const size_t BYTE_LENGTH = 4;
+}
+
+namespace IPV6_ADDR {
+	const size_t BYTE_LENGTH = 16;
 }
 
 #endif /* !DOMAIN_IP_ADDR_H */

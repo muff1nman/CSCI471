@@ -9,7 +9,6 @@
 #include "networkmuncher/util/logging.h"
 #include "networkmuncher/actors/data_producer.h"
 #include "networkmuncher/socket/socket.h"
-#include "networkmuncher/parse/ip_addr.h"
 #include "networkmuncher/util/collection.h"
 
 #include "dns/config.h"
@@ -20,6 +19,8 @@
 #include "dns/actors/dns_producer.h"
 #include "dns/domain/resource_record_all.h"
 #include "dns/domain/dns_builder.h"
+
+#include "ipv4/domain/ipv4.h"
 #ifdef CACHING
 #include "dns/cache.h"
 #endif
@@ -53,7 +54,7 @@ boost::optional<std::string> ip_filter_function( DNS::ResourcePtr resource ) {
 #ifdef LOGGING
 	LOG(INFO) << "Interpreting as ips";
 #endif
-	return ip_from_data( resource->get_data() );
+	return Ipv4::addr_from_data( resource->get_data() );
 }
 
 std::vector<std::string> filter_ips( DnsPtr query ) {
@@ -155,7 +156,7 @@ std::string find_ip_with_name_in_additional( DnsPtr query, const std::string& na
 			LOG(INFO) << "Comparign name with: " << (*i)->get_label_name().to_string();
 #endif
 			if( (*i)->get_type() == Type::A && (*i)->get_label_name() == name ) {
-				return ip_from_data( (*i)->get_data() );
+				return Ipv4::addr_from_data( (*i)->get_data() );
 			}
 		}
 	}
