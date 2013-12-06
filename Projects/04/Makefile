@@ -26,6 +26,7 @@ clean:
 	rm -f dug
 	rm -f pong
 	rm -f analyzer
+	rm -f gmon.out
 
 # vim:ft=make
 #
