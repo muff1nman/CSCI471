@@ -25,7 +25,8 @@ namespace PType {
 	const static int NETWORK = 200;
 	namespace Network {
 		const static int IPV4 = 201;
-		const static int ARP = 202;
+		const static int IPV6 = 202;
+		const static int ARP = 203;
 	}
 
 	const static int LINK = 100;

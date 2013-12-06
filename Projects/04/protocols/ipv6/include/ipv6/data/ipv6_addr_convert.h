@@ -5,14 +5,14 @@
  * All Rights Reserved.
  */
 
-#ifndef IPV4_ADDR_CONVERT_H
-#define IPV4_ADDR_CONVERT_H
+#ifndef IPv6_ADDR_CONVERT_H
+#define IPv6_ADDR_CONVERT_H
 
 #include "networkmuncher/data/convert.h"
 
 #include "networkmuncher/util/logging.h"
 
-#include "ipv4/domain/ipv4.h"
+#include "ipv6/domain/ipv6.h"
 
 #include "networkmuncher/util/byte/byte.h"
 #include "networkmuncher/util/byte/copy.h"
@@ -27,42 +27,42 @@
  *
  * If something goes wrong, return an empty container.
  */
-class Ipv4AddrConvert : public Convert {
+class Ipv6AddrConvert : public Convert {
 	public:
-		Ipv4AddrConvert(const std::string& ip) : ip(ip) { }
+		Ipv6AddrConvert(const std::string& ip) : ip(ip) { }
 
 		virtual BytesContainer to_data() const {
-			Ipv4::Addr ip_bytes = to_bitset();
-			return convert_big_endian<Ipv4::ADDR_LENGTH_IN_BYTES>(ip_bytes);
+			Ipv6::Addr ip_bytes = to_bitset();
+			return convert_big_endian<Ipv6::ADDR_LENGTH_IN_BYTES>(ip_bytes);
 		}
 
-		Ipv4::Addr to_bitset() const {
+		Ipv6::Addr to_bitset() const {
 			std::vector<unsigned short> ip_nums = split_numerics<unsigned short>( ip, std::string(".") );
-			if( ip_nums.size() != Ipv4::ADDR_LENGTH_IN_BYTES) {
+			if( ip_nums.size() != Ipv6::ADDR_LENGTH_IN_BYTES) {
 #ifdef LOGGING
 				LOG(ERROR) << "Could not convert ip address ["<< ip <<"]";
 #endif
-				return Ipv4::Addr();
+				return Ipv6::Addr();
 			}
 
 			typedef std::bitset<BITS_PER_BYTE> Byte;
 			Byte byte;
-			Ipv4::Addr ip_bytes;
-			for( size_t i = 0; i < Ipv4::ADDR_LENGTH_IN_BYTES; ++i ) {
+			Ipv6::Addr ip_bytes;
+			for( size_t i = 0; i < Ipv6::ADDR_LENGTH_IN_BYTES; ++i ) {
 				byte = Byte(ip_nums[i]);
-				copy_into(ip_bytes, byte, BITS_PER_BYTE * reverse_index(i, +Ipv4::ADDR_LENGTH_IN_BYTES));
+				copy_into(ip_bytes, byte, BITS_PER_BYTE * reverse_index(i, +Ipv6::ADDR_LENGTH_IN_BYTES));
 			}
 
 			return ip_bytes;
 
 		}
 
-		virtual ~Ipv4AddrConvert() { }
+		virtual ~Ipv6AddrConvert() { }
 
 	private:
 		std::string ip;
 
 };
 
-#endif /* !IPV4_ADDR_CONVERT_H */
+#endif /* !IPv6_ADDR_CONVERT_H */
 

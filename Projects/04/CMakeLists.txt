@@ -81,6 +81,7 @@ include_directories(
 	${PROTOCOL_INCLUDE_DIR}/arp/include
 	${PROTOCOL_INCLUDE_DIR}/tcp/include
 	${PROTOCOL_INCLUDE_DIR}/ipv4/include
+	${PROTOCOL_INCLUDE_DIR}/ipv6/include
 	)
 
 # Go do work CMake!

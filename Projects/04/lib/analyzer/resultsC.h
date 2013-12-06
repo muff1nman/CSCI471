@@ -17,6 +17,7 @@
 #include "arp/domain/domain.h"
 #include "tcp/domain/domain.h"
 #include "ipv4/domain/domain.h"
+#include "ipv6/domain/domain.h"
 #include <boost/optional.hpp>
 #include "parse_hint.h"
 
@@ -28,6 +29,7 @@ class resultsC {
 		size_t other_link_count;
 
 		size_t ipv4_count;
+		size_t ipv6_count;
 		size_t arp_count;
 		size_t other_network_count;
 
@@ -45,6 +47,7 @@ class resultsC {
 		ParseHint process_protocol(const Ethernetv2& ether);
 		ParseHint process_protocol(const Ethernet8023& ether);
 		ParseHint process_protocol(const Ipv4& ip);
+		ParseHint process_protocol(const Ipv6& ip);
 		ParseHint process_protocol(const Echo& echo);
 		ParseHint process_protocol(const Udp& echo);
 		ParseHint process_protocol(const DNS& echo);
@@ -58,6 +61,7 @@ class resultsC {
 			ethernet_8023(0),
 			other_link_count(0),
 			ipv4_count(0),
+			ipv6_count(0),
 			arp_count(0),
 			other_network_count(0),
 			udp_count(0),

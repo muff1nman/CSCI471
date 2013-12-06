@@ -15,6 +15,7 @@ set(LINK_LIBRARIES
 	muncher_arp_parse
 	muncher_tcp_parse
 	muncher_ipv4_parse
+	muncher_ipv6_parse
 	)
 
 add_executable(analyzer ${SRCS})

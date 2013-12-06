@@ -34,6 +34,7 @@ void resultsC::displayResults() {
 	if(ipv4_min_size) {
 		std::cout << "Min Ipv4 size: " << *ipv4_min_size << std::endl;
 	}
+	std::cout << "Ipv6 packets: " << ipv6_count << std::endl;
 	std::cout << "Arp packets: " << arp_count << std::endl;
 
 	std::cout << std::endl << "Transport Layer Statistics" << std::endl << separator << std::endl;
@@ -88,6 +89,12 @@ ParseHint resultsC::process_protocol(const Ipv4& ip) {
 		other_transport_count++;
 	}
 	return hint;
+}
+
+ParseHint resultsC::process_protocol(const Ipv6& ip) {
+	ipv6_count++;
+	//register_size(ipv4_max_size, ipv4_min_size, ip.size());
+	return true;
 }
 
 ParseHint resultsC::process_protocol(const Ethernetv2& ether) {
@@ -191,6 +198,12 @@ ParseHint resultsC::process(const ProtocolPtr proto) {
 			LOG(INFO) << "Ipv4 parsed";
 #endif
 			return process_protocol(*boost::dynamic_pointer_cast<Ipv4>(proto));
+
+		case PType::Network::IPV6:
+#ifdef LOGGING
+			LOG(INFO) << "Ipv6 parsed";
+#endif
+			return process_protocol(*boost::dynamic_pointer_cast<Ipv6>(proto));
 
 		case PType::Network::ARP:
 #ifdef LOGGING
