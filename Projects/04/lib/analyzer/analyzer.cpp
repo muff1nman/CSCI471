@@ -66,7 +66,9 @@ ProtoPtr parse_layer(std::map<int, ParserType> parsers, ParseContext& context, P
 // ****************************************************************************
 void pk_processor(u_char *user, const struct pcap_pkthdr *pkthdr, const u_char *packet) {
 
+
 	ParseHint hint(true);
+	size_t before_processing_size;
 
 	resultsC* results = (resultsC*)user;
 	results->incrementPacketCount();
@@ -74,6 +76,8 @@ void pk_processor(u_char *user, const struct pcap_pkthdr *pkthdr, const u_char *
 	BytesContainer bytes_from_packet( packet, packet + pkthdr->caplen );
 
 	ParseContext parse( bytes_from_packet );
+
+ 	before_processing_size = parse.get_remaining();
 
 #ifdef LOGGING
 	LOG(INFO) << "\n" << demaria_util::to_string(parse);
@@ -86,15 +90,17 @@ void pk_processor(u_char *user, const struct pcap_pkthdr *pkthdr, const u_char *
 #endif
 
 	if(link) {
-		hint = results->process(*link);
+		hint = results->process(*link, before_processing_size);
 	} else {
-		hint = results->process(LinkLayerProtocolPtr(new LinkLayerProtocol()));
+		hint = results->process(LinkLayerProtocolPtr(new LinkLayerProtocol()),0);
 #ifdef LOGGING
 		LOG(WARNING) << "could not parse link layer";
 #endif
 	}
 
 	if( !hint.get_should_parse() ) {return;}
+
+ 	before_processing_size = parse.get_remaining();
 
 	NetworkLayerProtocolMaybePtr net = parse_layer<NetworkLayerProtocolMaybePtr,NetworkParser>(network_parsers,parse,hint);
 
@@ -103,15 +109,17 @@ void pk_processor(u_char *user, const struct pcap_pkthdr *pkthdr, const u_char *
 #endif
 
 	if(net) {
-		hint = results->process(*net);
+		hint = results->process(*net, before_processing_size);
 	} else {
-		hint = results->process(NetworkLayerProtocolPtr(new NetworkLayerProtocol()));
+		hint = results->process(NetworkLayerProtocolPtr(new NetworkLayerProtocol()),0);
 #ifdef LOGGING
 		LOG(WARNING) << "Could not parse network layer";
 #endif
 	}
 
 	if( !hint.get_should_parse() ) {return;}
+
+ 	before_processing_size = parse.get_remaining();
 
 	TransportLayerProtocolMaybePtr trans = parse_layer<TransportLayerProtocolMaybePtr,TransportParser>(transport_parsers,parse, hint);
 
@@ -120,9 +128,9 @@ void pk_processor(u_char *user, const struct pcap_pkthdr *pkthdr, const u_char *
 #endif
 
 	if(trans) {
-		hint = results->process(*trans);
+		hint = results->process(*trans,before_processing_size);
 	} else {
-		hint = results->process(TransportLayerProtocolPtr(new TransportLayerProtocol()));
+		hint = results->process(TransportLayerProtocolPtr(new TransportLayerProtocol()),0);
 #ifdef LOGGING
 		LOG(WARNING) << "Could not parse transport layer";
 #endif
@@ -130,13 +138,14 @@ void pk_processor(u_char *user, const struct pcap_pkthdr *pkthdr, const u_char *
 
 	// ignore this so that it isnt necessary to have a transport layer protocol?
 	if( !hint.get_should_parse() ) {return;}	
+ 	before_processing_size = parse.get_remaining();
 
 	ApplicationLayerProtocolMaybePtr app = parse_layer<ApplicationLayerProtocolMaybePtr,ApplicationParser>(application_parsers,parse,hint);
 
 	if(app) {
-		hint = results->process(*app);
+		hint = results->process(*app,before_processing_size);
 	} else {
-		hint = results->process(ApplicationLayerProtocolPtr(new ApplicationLayerProtocol()));
+		hint = results->process(ApplicationLayerProtocolPtr(new ApplicationLayerProtocol()),0);
 #ifdef LOGGING
 		LOG(WARNING) << "Could not parse application layer";
 #endif

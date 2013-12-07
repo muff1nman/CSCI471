@@ -23,6 +23,16 @@ void add_to_sum(std::bitset<bytes * BITS_PER_BYTE>& sum, const std::bitset<bytes
 	sum = std::bitset<bytes * BITS_PER_BYTE>(result);
 }
 
+template <size_t bits>
+bool less_than(const std::bitset<bits>& first, const std::bitset<bits>& second) {
+	for(size_t i = 0; i < bits; ++i ) {
+		if(first[i] != second[i] ) {
+			return first[i] < second[i];
+		}
+	}
+	return false;
+}
+
 template <size_t bytes>
 std::bitset<bytes * BITS_PER_BYTE> ones_complement_sum( const BytesContainer& list_of_bytes ) {
 	typedef std::bitset<bytes*BITS_PER_BYTE> RowOfBytes;

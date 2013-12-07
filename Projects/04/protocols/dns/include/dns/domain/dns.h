@@ -256,16 +256,24 @@ class DNS : public ApplicationLayerProtocol, public Logging {
 			return ar_count.to_ulong();
 		}
 
-		size_t response_code() {
+		size_t response_code() const {
 			return rcode.to_ulong();
 		}
 		
-		bool is_authoritative() {
+		bool is_authoritative() const {
 			return aa;
+		}
+
+		bool is_recursion_desired() const {
+			return rd;
 		}
 
 		size_t get_id() const {
 			return this->id.to_ulong();
+		}
+
+		bool is_response() const {
+			return response;
 		}
 
 	private:

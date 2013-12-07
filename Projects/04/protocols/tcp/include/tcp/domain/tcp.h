@@ -51,6 +51,25 @@ struct Tcp : public TransportLayerProtocol, public Logging {
 		Urgent urgent;
 		Options options;
 
+		// Flag helpers
+		static const size_t FIN_FLAG_OFFSET = 0;
+		static const size_t SYN_FLAG_OFFSET = 1;
+		static const size_t RST_FLAG_OFFSET = 2;
+		static const size_t PSH_FLAG_OFFSET = 3;
+		static const size_t ACK_FLAG_OFFSET = 4;
+		static const size_t URG_FLAG_OFFSET = 5;
+		static const size_t ECE_FLAG_OFFSET = 6;
+		static const size_t CWR_FLAG_OFFSET = 7;
+		static const size_t NS_FLAG_OFFSET  = 8;
+
+		bool is_syn() const {
+			return flags[SYN_FLAG_OFFSET];
+		}
+
+		bool is_ack() const {
+			return flags[ACK_FLAG_OFFSET];
+		}
+
 		friend class TcpBuilder;
 
 		virtual int what_type() const { return PType::Transport::TCP; }
