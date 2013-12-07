@@ -9,7 +9,7 @@
 #define ICMP_PARSE_RAW_H
 
 #include "echo.h"
-#include "ip.h"
+#include "ipv4/parse/ipv4.h"
 
 #include "networkmuncher/util/byte/print.h"
 
@@ -23,10 +23,10 @@ namespace RAW {
 #ifdef LOGGING
 		LOG(INFO) << "Bytes off wire:\n" <<  demaria_util::to_string( parse_context.raw_data );
 #endif
-		NetworkLayerProtocolMaybePtr ip = IP::from_data_as_ptr( parse_context );
+		NetworkLayerProtocolMaybePtr ip = IPV4::from_data_as_ptr( parse_context );
 		TransportLayerProtocolMaybePtr echo = ECHO::from_data_as_ptr( parse_context );
 		if( ip && echo ) {
-			raw = Raw(boost::dynamic_pointer_cast<Ip>(*ip), boost::dynamic_pointer_cast<Echo>(*echo));
+			raw = Raw(boost::dynamic_pointer_cast<Ipv4>(*ip), boost::dynamic_pointer_cast<Echo>(*echo));
 		}
 		return raw;
 	}
@@ -44,13 +44,13 @@ namespace RAW {
 #ifdef LOGGING
 		LOG(INFO) << "Bytes off wire:\n" <<  demaria_util::to_string( parse_context.raw_data );
 #endif
-		NetworkLayerProtocolMaybePtr ip = IP::from_data_as_ptr( parse_context );
+		NetworkLayerProtocolMaybePtr ip = IPV4::from_data_as_ptr( parse_context );
 		TransportLayerProtocolMaybePtr echo = ECHO::from_data_as_ptr( parse_context );
 		if( ip && echo ) {
 #ifdef LOGGING
 			LOG(INFO) << "Valid ip and echo";
 #endif
-			raw = RawPtr( new Raw(boost::dynamic_pointer_cast<Ip>(*ip), boost::dynamic_pointer_cast<Echo>(*echo)));
+			raw = RawPtr( new Raw(boost::dynamic_pointer_cast<Ipv4>(*ip), boost::dynamic_pointer_cast<Echo>(*echo)));
 
 		}
 #ifdef LOGGING

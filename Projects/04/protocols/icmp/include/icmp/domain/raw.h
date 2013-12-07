@@ -10,12 +10,12 @@
 
 #include "ptr_types.h"
 #include "networkmuncher/util/logging.h"
-#include "ip.h"
+#include "ipv4/domain/domain.h"
 
 struct Raw : public Logging {
-	Raw(IpPtr ip, EchoPtr echo) : ip(ip), echo(echo) { }
+	Raw(Ipv4Ptr ip, EchoPtr echo) : ip(ip), echo(echo) { }
 
-	IpPtr ip;
+	Ipv4Ptr ip;
 	EchoPtr echo;
 
 	std::string stringify_object() const {

@@ -9,6 +9,7 @@
 #define __test_helper_h__
 
 #include "dns/config.h"
+#include "networkmuncher/util/byte/file_ops.h"
 #ifdef LOGGING
 #include <glog/logging.h>
 #endif

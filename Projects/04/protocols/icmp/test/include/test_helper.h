@@ -10,8 +10,8 @@
 
 #include "icmp/config.h"
 #include "icmp/domain/domain.h"
-#include "file_ops.h"
 #include "file_names.h"
+#include "networkmuncher/util/byte/file_ops.h"
 #include <boost/assign/list_of.hpp>
 
 #ifdef LOGGING

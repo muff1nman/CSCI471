@@ -12,11 +12,9 @@
 
 class Raw;
 class Echo;
-class Ip;
 
 typedef boost::shared_ptr<Raw> RawPtr;
 typedef boost::shared_ptr<Echo> EchoPtr;
-typedef boost::shared_ptr<Ip> IpPtr;
 
 #endif /* !ICMP_PTR_TYPES_H */
 

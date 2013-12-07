@@ -30,8 +30,8 @@ struct Arp : public NetworkLayerProtocol, public Logging {
 		typedef std::bitset<PROTOCOL_TYPE_LENGTH> ProtocolType;
 		typedef std::bitset<HARDWARE_SIZE_LENGTH> HardwareSize;
 		typedef std::bitset<PROTOCOL_SIZE_LENGTH> ProtocolSize;
-		typedef MacAddr HardwareAddress;
-		typedef std::bitset<IP_ADDR::BYTE_LENGTH * BITS_PER_BYTE> ProtocolAddress;
+		typedef BytesContainer HardwareAddress;
+		typedef BytesContainer ProtocolAddress;
 
 		HardwareType hardware_type;
 		ProtocolType protocol_type;

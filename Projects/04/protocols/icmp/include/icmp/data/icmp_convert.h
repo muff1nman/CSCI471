@@ -11,7 +11,7 @@
 #include "networkmuncher/data/convert.h"
 
 #include "icmp/domain/domain.h"
-#include "ip_convert.h"
+#include "ipv4/data/ipv4_convert.h"
 #include "echo_convert.h"
 #include "networkmuncher/util/join.h"
 #include "networkmuncher/util/logging.h"
@@ -20,7 +20,7 @@ class ICMPConvert : public Convert {
 	public:
 		ICMPConvert(RawPtr raw) : icmp(raw) { }
 		virtual BytesContainer to_data() const {
-			return join(IpConvert(icmp->ip).to_data(), EchoConvert(icmp->echo).to_data());
+			return join(Ipv4Convert(icmp->ip).to_data(), EchoConvert(icmp->echo).to_data());
 		}
 
 	private:

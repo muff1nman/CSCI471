@@ -9,7 +9,6 @@
 #include "icmp_helper.h"
 
 #include "icmp/parse/echo.h"
-#include "icmp/parse/ip.h"
 #include "icmp/parse/raw.h"
 
 TEST(ParseBytesFile, Helper) {
@@ -34,12 +33,6 @@ TEST(ParseEcho, GoogleEchoRequest) {
 	EchoPtr expected = google_echo_request_echo_part();
 	ASSERT_TRUE(echomaybe);
 	EXPECT_EQ(*expected, *echomaybe);
-}
-
-TEST(ParseIp, GoogleIpRequest) {
-	IpMaybe ip = IP::from_data(bytes_from_file(GOOGLE_ECHO_REQUEST_IP_ONLY));
-	ASSERT_TRUE(ip);
-	EXPECT_EQ(*(google_echo_request()->ip), *ip);
 }
 
 TEST(ParseRaw, FullGoogleEchoRequest) {
