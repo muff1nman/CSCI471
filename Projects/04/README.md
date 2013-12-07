@@ -28,7 +28,9 @@ Other options include
 - TEST
 	- If you want to run the included tests, you will need to turn this option
 	  on.  Note that you do not need to install anything as all the required
-	  test libraries are bundled in with the source (gtest is being used)
+	  test libraries are bundled in with the source (gtest is being used) *NOTE*
+	  submitted project does not include gtest libs so you will need google
+	  gtest installed to enable this option.
 
 To change which are enabled (but really the defaults should be fine):
 
@@ -44,32 +46,15 @@ Running
 -------
 ```
 cd build # if you aren't there already
-./lib/networkmuncher --help
+./lib/analyzer/analyzer [pcap file]
 ```
 
 Extra Credit
 ----------
-Caching should be working fine. The best way to test it is to run in daemon mode
-and check that no queries are sent the second time.
-
-Querying for other types (SOA, NS, etc) are supported internally and at one
-point worked, but this feature fell by the way side as I started trying to hurry
-to get things done and you can no longer use the --type switch. So unless having
-some code counts for partial credit, theres not much there.
+I have implemented parts 2 and 3 (dns)
 
 
 Bugs
 ------
-You can't put a nameserver into the server ip query field, it needs to be an ip
-address. Although the docs seem to imply this is fine, I thought it was
-annoying.
-
-There is an issue when trying to query for the root domain. I didn't have enough
-time to look into this however.
-
-You cant use the debug option with the daemon option.  I had planned to fix
-this, but involved passing a silly bool down way too many levels of abstraction
-so I decided it wasn't worth the time. If you want this feature use the
-DAEMON_DEBUG option when compiling (see Building)
 
 
