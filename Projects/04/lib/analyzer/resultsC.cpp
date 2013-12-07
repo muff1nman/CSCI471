@@ -39,9 +39,11 @@ void resultsC::displayResults() {
 	std::cout << std::endl << "Network Layer Statistics" << std::endl << separator << std::endl;
 	std::cout << "Ipv4 packets: " << ipv4_count << std::endl;
 	display_size_stats("Ipv4",ipv4_sizes);
-	display_size_stats("Ipv4",ipv4_sizes);
+	std::cout << "Number of fragmented packets: " << number_of_fragmented << std::endl;
+	std::cout << "Unique ipv4 addresses: " << ipv4_addresses.size() << std::endl;
 	std::cout << "Ipv6 packets: " << ipv6_count << std::endl;
 	display_size_stats("Ipv6",ipv6_sizes);
+	std::cout << "Unique ipv6 addresses: " << ipv6_addresses.size() << std::endl;
 	std::cout << "Arp packets: " << arp_count << std::endl;
 	display_size_stats("Arp",arp_sizes);
 
@@ -50,8 +52,12 @@ void resultsC::displayResults() {
 	display_size_stats("Icmp",icmp_sizes);
 	std::cout << "Upd packets: " << udp_count << std::endl;
 	display_size_stats("Udp",udp_sizes);
+	std::cout << "Unique udp ports: " << udp_ports.size() << std::endl;
 	std::cout << "Tcp packets: " << tcp_count << std::endl;
 	display_size_stats("Tcp",tcp_sizes);
+	std::cout << "Unique tcp ports: " << tcp_ports.size() << std::endl;
+	std::cout << "Number of tcp packets with syn: " << number_of_syns << std::endl;
+	std::cout << "Number of tcp packets with ack: " << number_of_acks << std::endl;
 
 	std::cout << std::endl << "Application Layer Statistics" << std::endl << separator << std::endl;
 	std::cout << "Dns packets: " << dns_count << std::endl;
@@ -95,6 +101,11 @@ ParseHint map_ip_proto_to_hint(size_t proto) {
 ParseHint resultsC::process_protocol(const Ipv4& ip, size_t size) {
 	ipv4_count++;
 	ipv4_sizes.push_back(size);
+	ipv4_addresses.insert(ip.source_addr);
+	ipv4_addresses.insert(ip.dest_addr);
+	if(ip.is_fragmented()) {
+		number_of_fragmented++;
+	}
 	ParseHint hint = map_ip_proto_to_hint(ip.protocol.to_ulong());
 	if(hint.get_should_parse() == false ) {
 		other_transport_count++;
@@ -105,6 +116,8 @@ ParseHint resultsC::process_protocol(const Ipv4& ip, size_t size) {
 ParseHint resultsC::process_protocol(const Ipv6& ip,size_t size) {
 	ipv6_count++;
 	ipv6_sizes.push_back(size);
+	ipv6_addresses.insert(ip.source_addr);
+	ipv6_addresses.insert(ip.dest_addr);
 	return true;
 }
 
@@ -124,19 +137,29 @@ ParseHint resultsC::process_protocol(const Echo& echo,size_t size) {
 	return false;
 }
 
-ParseHint resultsC::process_protocol(const Udp& echo, size_t size) {
+ParseHint resultsC::process_protocol(const Udp& udp, size_t size) {
 	udp_sizes.push_back(size);
+	udp_ports.insert(udp.dest);
+	udp_ports.insert(udp.src);
 	this->udp_count++;
 	return true;
 }
 
-ParseHint resultsC::process_protocol(const Tcp& tcp,size_t size) {
+ParseHint resultsC::process_protocol(const Tcp& tcp, size_t size) {
 	tcp_sizes.push_back(size);
+	tcp_ports.insert(tcp.source_port);
+	tcp_ports.insert(tcp.dest_port);
+	if(tcp.is_syn()) {
+		number_of_syns++;
+	}
+	if(tcp.is_ack()) {
+		number_of_acks++;
+	}
 	this->tcp_count++;
 	return true;
 }
 
-ParseHint resultsC::process_protocol(const DNS& echo,size_t size) {
+ParseHint resultsC::process_protocol(const DNS& dns, size_t size) {
 	this->dns_count++;
 	return false;
 }

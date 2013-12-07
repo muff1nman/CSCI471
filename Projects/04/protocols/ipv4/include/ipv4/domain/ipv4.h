@@ -45,6 +45,7 @@ struct Ipv4 : public Logging, public NetworkLayerProtocol {
 		 */
 		static const size_t DONT_FRAGMENT_POS_FROM_LEFT  =  1;
 		static const size_t MORE_FRAGMENTS_POS_FROM_LEFT =  2;
+		static const size_t MORE_FRAGMENTS_POS_FROM_RIGHT = 0;
 
 		/**
 		 * Types
@@ -98,6 +99,10 @@ struct Ipv4 : public Logging, public NetworkLayerProtocol {
 			object << "options: " << "NOT SHOWN" << sep;
 
 			return object.str();
+		}
+
+		bool is_fragmented() const {
+			return flags[MORE_FRAGMENTS_POS_FROM_RIGHT];
 		}
 
 		bool operator==( const Ipv4& other ) const {

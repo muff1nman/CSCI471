@@ -18,8 +18,11 @@
 #include "tcp/domain/domain.h"
 #include "ipv4/domain/domain.h"
 #include "ipv6/domain/domain.h"
-#include <boost/optional.hpp>
+
 #include "parse_hint.h"
+#include "networkmuncher/util/byte/operations.h"
+#include <boost/optional.hpp>
+#include <set>
 
 class resultsC {
   protected:
@@ -49,6 +52,17 @@ class resultsC {
 		std::vector<size_t> tcp_sizes;
 		std::vector<size_t> icmp_sizes;
 
+		std::set<MacAddr> mac_addresses;
+		std::set<Ipv4::Addr, bool(*)(const Ipv4::Addr&, const Ipv4::Addr&)> ipv4_addresses;
+		std::set<Ipv6::Addr, bool(*)(const Ipv6::Addr&, const Ipv6::Addr&)> ipv6_addresses;
+		std::set<Udp::Port, bool(*)(const Udp::Port&, const Udp::Port&)> udp_ports;
+		std::set<Tcp::Port, bool(*)(const Tcp::Port&, const Tcp::Port&)> tcp_ports;
+
+		size_t number_of_syns;
+		size_t number_of_acks;
+
+		size_t number_of_fragmented;
+
 		ParseHint process_protocol(const Ethernetv2& ether,size_t size);
 		ParseHint process_protocol(const Ethernet8023& ether,size_t size);
 		ParseHint process_protocol(const Ipv4& ip,size_t size);
@@ -58,6 +72,10 @@ class resultsC {
 		ParseHint process_protocol(const DNS& echo,size_t size);
 		ParseHint process_protocol(const Arp& arp,size_t size);
 		ParseHint process_protocol(const Tcp& tcp,size_t size);
+
+		//bool ipv4_less_than(const Ipv4::Addr& f, const Ipv4::Addr& s) {
+			//return less_than<Ipv4::ADDR_LENGTH>(f,s);
+		//}
 
   public:
 		resultsC() : 
@@ -74,7 +92,15 @@ class resultsC {
 			icmp_echo_count(0),
 			other_transport_count(0),
 			dns_count(0),
-			other_application_count(0) {}
+			other_application_count(0),
+			ipv4_addresses(less_than),
+			ipv6_addresses(less_than),
+			udp_ports(less_than),
+			tcp_ports(less_than),
+			number_of_syns(0),
+			number_of_acks(0),
+			number_of_fragmented(0)
+ 	{}
 
    void incrementPacketCount() { totalPacketCount++; };
    void displayResults();
