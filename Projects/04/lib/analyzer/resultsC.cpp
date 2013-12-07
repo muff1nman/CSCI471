@@ -125,7 +125,11 @@ ParseHint resultsC::process_protocol(const Ipv6& ip,size_t size) {
 	ipv6_sizes.push_back(size);
 	ipv6_addresses.insert(ip.source_addr);
 	ipv6_addresses.insert(ip.dest_addr);
-	return true;
+	ParseHint hint = map_ip_proto_to_hint(ip.next_header.to_ulong());
+	if(hint.get_should_parse() == false ) {
+		other_transport_count++;
+	}
+	return hint;
 }
 
 ParseHint resultsC::process_protocol(const Ethernetv2& ether,size_t size) {
