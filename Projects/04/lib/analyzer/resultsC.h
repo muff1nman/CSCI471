@@ -63,6 +63,14 @@ class resultsC {
 
 		size_t number_of_fragmented;
 
+		size_t number_of_authoritative;
+		size_t number_of_questions;
+		size_t number_of_queries;
+		size_t number_of_responses;
+		size_t number_of_recursive_queries;
+		size_t number_of_resource_records;
+		std::set<std::string> labels;
+
 		ParseHint process_protocol(const Ethernetv2& ether,size_t size);
 		ParseHint process_protocol(const Ethernet8023& ether,size_t size);
 		ParseHint process_protocol(const Ipv4& ip,size_t size);
@@ -99,7 +107,13 @@ class resultsC {
 			tcp_ports(less_than),
 			number_of_syns(0),
 			number_of_acks(0),
-			number_of_fragmented(0)
+			number_of_fragmented(0),
+			number_of_authoritative(0),
+			number_of_questions(0),
+			number_of_queries(0),
+			number_of_responses(0),
+			number_of_recursive_queries(0),
+			number_of_resource_records(0)
  	{}
 
    void incrementPacketCount() { totalPacketCount++; };

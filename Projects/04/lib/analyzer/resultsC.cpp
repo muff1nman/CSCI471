@@ -61,6 +61,13 @@ void resultsC::displayResults() {
 
 	std::cout << std::endl << "Application Layer Statistics" << std::endl << separator << std::endl;
 	std::cout << "Dns packets: " << dns_count << std::endl;
+	std::cout << "Number of queries: " << number_of_queries << std::endl;
+	std::cout << "Number of questions found in queries: " << number_of_questions << std::endl;
+	std::cout << "Number of resursion desired queries: " << number_of_recursive_queries << std::endl;
+	std::cout << "Number of responses: " << number_of_responses << std::endl;
+	std::cout << "Number of authoritative responses: " << number_of_authoritative << std::endl;
+	std::cout << "Number of resource records found in responses: " << number_of_resource_records << std::endl;
+	std::cout << "Unique labels: " << labels.size() << std::endl;
 
 	std::cout << std::endl << "Misc" << std::endl << separator << std::endl;
 	std::cout << "Unrecognized link layer packets: " << other_link_count << std::endl;
@@ -160,6 +167,33 @@ ParseHint resultsC::process_protocol(const Tcp& tcp, size_t size) {
 }
 
 ParseHint resultsC::process_protocol(const DNS& dns, size_t size) {
+
+	DNS::ResourceList resources = dns.get_resource_records();
+	DNS::ResourceList::const_iterator i = resources.begin();
+	for(;i != resources.end(); ++i ) {
+		labels.insert((*i)->get_label_name().to_string());
+	}
+	DNS::QuestionList questions = dns.get_questions();
+	DNS::QuestionList::const_iterator j = questions.begin();
+	for(;j != questions.end(); ++j ) {
+		labels.insert((*j)->get_name().to_string());
+	}
+
+	if(dns.is_response()) {
+		++number_of_responses;
+		number_of_resource_records += dns.get_resource_record_count();
+		if(dns.is_authoritative()) {
+			number_of_authoritative++;
+		}
+	} else {
+		if(dns.is_recursion_desired()) {
+			number_of_recursive_queries++;
+		}
+		++number_of_queries;
+		number_of_questions += dns.get_question_count();
+
+	}
+
 	this->dns_count++;
 	return false;
 }
