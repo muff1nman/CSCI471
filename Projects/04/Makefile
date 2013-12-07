@@ -28,6 +28,12 @@ clean:
 	rm -f analyzer
 	rm -f gmon.out
 
+deep-clean: clean
+	rm -rf captures
+	rm -rf instructions_and_resources
+	rm -rf pcap_libs
+	rm -rf test-lib
+
 # vim:ft=make
 #
 
