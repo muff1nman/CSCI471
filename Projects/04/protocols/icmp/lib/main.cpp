@@ -11,6 +11,7 @@
 
 #include "networkmuncher/config.h"
 #include "networkmuncher/util/logging.h"
+#include "networkmuncher/util/math.h"
 
 #include "icmp/icmp.h"
 
@@ -60,11 +61,6 @@ bool is_ip(const string& str) {
 		return true;
 	}
 	return false;
-}
-
-double average(const std::vector<double>& nums) {
-	double sum = std::accumulate(nums.begin(), nums.end(), 0.0);
-	return sum / (double) nums.size();
 }
 
 int main(int argc, char** argv) {

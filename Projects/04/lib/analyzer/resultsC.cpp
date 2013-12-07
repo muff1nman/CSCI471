@@ -8,7 +8,17 @@
 
 #include "analyzer.h"
 #include "networkmuncher/domain/protocol_types.h"
+#include "networkmuncher/util/math.h"
 #include <string>
+#include <algorithm>
+
+void display_size_stats(const char* name, std::vector<size_t> sizes) {
+	if(sizes.size() > 0 ) {
+		std::cout << "Max " << name << " size: " << *std::max_element(sizes.begin(), sizes.end()) << std::endl;
+		std::cout << "Min " << name << " size: " << *std::min_element(sizes.begin(), sizes.end()) << std::endl;
+		std::cout << "Average " << name << " size: " << average(sizes) << std::endl;
+	} 
+}
 
 
 // ***************************************************************************
@@ -28,24 +38,25 @@ void resultsC::displayResults() {
 
 	std::cout << std::endl << "Network Layer Statistics" << std::endl << separator << std::endl;
 	std::cout << "Ipv4 packets: " << ipv4_count << std::endl;
-	if(ipv4_max_size) {
-		std::cout << "Max Ipv4 size: " << *ipv4_max_size << std::endl;
-	}
-	if(ipv4_min_size) {
-		std::cout << "Min Ipv4 size: " << *ipv4_min_size << std::endl;
-	}
+	display_size_stats("Ipv4",ipv4_sizes);
+	display_size_stats("Ipv4",ipv4_sizes);
 	std::cout << "Ipv6 packets: " << ipv6_count << std::endl;
+	display_size_stats("Ipv6",ipv6_sizes);
 	std::cout << "Arp packets: " << arp_count << std::endl;
+	display_size_stats("Arp",arp_sizes);
 
 	std::cout << std::endl << "Transport Layer Statistics" << std::endl << separator << std::endl;
 	std::cout << "Icmp echo packets: " << icmp_echo_count << std::endl;
+	display_size_stats("Icmp",icmp_sizes);
 	std::cout << "Upd packets: " << udp_count << std::endl;
+	display_size_stats("Udp",udp_sizes);
 	std::cout << "Tcp packets: " << tcp_count << std::endl;
+	display_size_stats("Tcp",tcp_sizes);
 
 	std::cout << std::endl << "Application Layer Statistics" << std::endl << separator << std::endl;
 	std::cout << "Dns packets: " << dns_count << std::endl;
 
-	std::cout << "Misc" << std::endl << separator << std::endl;
+	std::cout << std::endl << "Misc" << std::endl << separator << std::endl;
 	std::cout << "Unrecognized link layer packets: " << other_link_count << std::endl;
 	std::cout << "Unrecognized network layer packets: " << other_network_count << std::endl;
 	std::cout << "Unrecognized transport layer packets: " << other_transport_count << std::endl;
@@ -81,9 +92,9 @@ ParseHint map_ip_proto_to_hint(size_t proto) {
 	}
 }
 
-ParseHint resultsC::process_protocol(const Ipv4& ip) {
+ParseHint resultsC::process_protocol(const Ipv4& ip, size_t size) {
 	ipv4_count++;
-	register_size(ipv4_max_size, ipv4_min_size, ip.size());
+	ipv4_sizes.push_back(size);
 	ParseHint hint = map_ip_proto_to_hint(ip.protocol.to_ulong());
 	if(hint.get_should_parse() == false ) {
 		other_transport_count++;
@@ -91,48 +102,52 @@ ParseHint resultsC::process_protocol(const Ipv4& ip) {
 	return hint;
 }
 
-ParseHint resultsC::process_protocol(const Ipv6& ip) {
+ParseHint resultsC::process_protocol(const Ipv6& ip,size_t size) {
 	ipv6_count++;
-	//register_size(ipv4_max_size, ipv4_min_size, ip.size());
+	ipv6_sizes.push_back(size);
 	return true;
 }
 
-ParseHint resultsC::process_protocol(const Ethernetv2& ether) {
+ParseHint resultsC::process_protocol(const Ethernetv2& ether,size_t size) {
 	this->ethernet_v2_count++;
 	return true;
 }
 
-ParseHint resultsC::process_protocol(const Ethernet8023& ether) {
+ParseHint resultsC::process_protocol(const Ethernet8023& ether,size_t size) {
 	this->ethernet_8023++;
 	return true;
 }
 
-ParseHint resultsC::process_protocol(const Echo& echo) {
+ParseHint resultsC::process_protocol(const Echo& echo,size_t size) {
+	icmp_sizes.push_back(size);
 	this->icmp_echo_count++;
 	return false;
 }
 
-ParseHint resultsC::process_protocol(const Udp& echo) {
+ParseHint resultsC::process_protocol(const Udp& echo, size_t size) {
+	udp_sizes.push_back(size);
 	this->udp_count++;
 	return true;
 }
 
-ParseHint resultsC::process_protocol(const Tcp& tcp) {
+ParseHint resultsC::process_protocol(const Tcp& tcp,size_t size) {
+	tcp_sizes.push_back(size);
 	this->tcp_count++;
 	return true;
 }
 
-ParseHint resultsC::process_protocol(const DNS& echo) {
+ParseHint resultsC::process_protocol(const DNS& echo,size_t size) {
 	this->dns_count++;
 	return false;
 }
 
-ParseHint resultsC::process_protocol(const Arp& arp) {
+ParseHint resultsC::process_protocol(const Arp& arp,size_t size) {
+	arp_sizes.push_back(size);
 	this->arp_count++;
 	return false;
 }
 
-ParseHint resultsC::process(const ProtocolPtr proto) {
+ParseHint resultsC::process(const ProtocolPtr proto, size_t size) {
 	switch(proto->what_type()) {
 
 		///////////////////////////////////////////////////////
@@ -150,7 +165,7 @@ ParseHint resultsC::process(const ProtocolPtr proto) {
 #ifdef LOGGING
 			LOG(INFO) << "Parsed dns";
 #endif
-			return process_protocol(*boost::dynamic_pointer_cast<DNS>(proto));
+			return process_protocol(*boost::dynamic_pointer_cast<DNS>(proto), size);
 
 		///////////////////////////////////////////////////////
 		// Transport Layer
@@ -167,20 +182,20 @@ ParseHint resultsC::process(const ProtocolPtr proto) {
 #ifdef LOGGING
 			LOG(INFO) << "Parsed icmp echo";
 #endif
-			return process_protocol(*boost::dynamic_pointer_cast<Echo>(proto));
+			return process_protocol(*boost::dynamic_pointer_cast<Echo>(proto),size);
 
 
 		case PType::Transport::UDP:
 #ifdef LOGGING
 			LOG(INFO) << "Parsed udp";
 #endif
-			return process_protocol(*boost::dynamic_pointer_cast<Udp>(proto));
+			return process_protocol(*boost::dynamic_pointer_cast<Udp>(proto),size);
 
 		case PType::Transport::TCP:
 #ifdef LOGGING
 			LOG(INFO) << "Parsed tcp";
 #endif
-			return process_protocol(*boost::dynamic_pointer_cast<Tcp>(proto));
+			return process_protocol(*boost::dynamic_pointer_cast<Tcp>(proto),size);
 
 		///////////////////////////////////////////////////////
 		// Network Layer
@@ -197,19 +212,19 @@ ParseHint resultsC::process(const ProtocolPtr proto) {
 #ifdef LOGGING
 			LOG(INFO) << "Ipv4 parsed";
 #endif
-			return process_protocol(*boost::dynamic_pointer_cast<Ipv4>(proto));
+			return process_protocol(*boost::dynamic_pointer_cast<Ipv4>(proto),size);
 
 		case PType::Network::IPV6:
 #ifdef LOGGING
 			LOG(INFO) << "Ipv6 parsed";
 #endif
-			return process_protocol(*boost::dynamic_pointer_cast<Ipv6>(proto));
+			return process_protocol(*boost::dynamic_pointer_cast<Ipv6>(proto),size);
 
 		case PType::Network::ARP:
 #ifdef LOGGING
 			LOG(INFO) << "Arp parsed";
 #endif
-			return process_protocol(*boost::dynamic_pointer_cast<Arp>(proto));
+			return process_protocol(*boost::dynamic_pointer_cast<Arp>(proto),size);
 
 		///////////////////////////////////////////////////////
 		// Link Layer
@@ -233,13 +248,13 @@ ParseHint resultsC::process(const ProtocolPtr proto) {
 #ifdef LOGGING
 			LOG(INFO) << "Ethernet 802.3 protocol parsed";
 #endif
-			return process_protocol(*boost::dynamic_pointer_cast<Ethernet8023>(proto));
+			return process_protocol(*boost::dynamic_pointer_cast<Ethernet8023>(proto),size);
 
 		case PType::Link::ETHERNET_V2:
 #ifdef LOGGING
 			LOG(INFO) << "Ethernet II protocol parsed";
 #endif
-			return process_protocol(*boost::dynamic_pointer_cast<Ethernetv2>(proto));
+			return process_protocol(*boost::dynamic_pointer_cast<Ethernetv2>(proto),size);
 
 		///////////////////////////////////////////////////////
 		// Unknown Layer

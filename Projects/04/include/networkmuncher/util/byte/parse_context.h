@@ -44,6 +44,10 @@ class ParseContext {
 			return std::distance( start, *current);
 		}
 
+		size_t get_remaining() const {
+			return std::distance( *current, finish );
+		}
+
 		ConstIterator& get_current() const {
 			return *current;
 		}
